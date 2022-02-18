@@ -5,7 +5,9 @@
 
 import unittest
 
-from pycmtensor import pycmtensor
+import pandas as pd
+
+import pycmtensor as cmt
 
 
 class TestPycmtensor(unittest.TestCase):
@@ -13,9 +15,12 @@ class TestPycmtensor(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
+        pass
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
+        pass
 
-    def test_000_something(self):
-        """Test something."""
+    def test_simple(self):
+        swissmetro = pd.read_csv("../data/swissmetro.dat", sep="\t")
+        db = cmt.Database("swissmetro", swissmetro, choiceVar="CHOICE")

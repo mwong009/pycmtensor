@@ -4,11 +4,10 @@ import aesara
 import aesara.tensor as aet
 import numpy as np
 import pandas as pd
-
-from scipy import linalg, stats
 from numpy import nan_to_num as nan2num
+from scipy import linalg, stats
 
-from pycmtensor.functions import hessians, bhhh, neg_loglikelihood
+from pycmtensor.functions import bhhh, hessians, neg_loglikelihood
 
 
 def variance_covariance(h):

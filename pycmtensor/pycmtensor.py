@@ -2,13 +2,14 @@
 
 import aesara
 import aesara.tensor as aet
-from aesara.tensor.var import TensorVariable
-import biogeme.expressions as bioexp
 import biogeme.database as biodb
+import biogeme.expressions as bioexp
 import dill as pickle
 import numpy as np
 import tqdm
-from pycmtensor.functions import full_loglikelihood, errors
+from aesara.tensor.var import TensorVariable
+
+from pycmtensor.functions import errors, full_loglikelihood
 from pycmtensor.utils import learn_rate_tempering
 
 floatX = aesara.config.floatX
