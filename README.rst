@@ -19,11 +19,12 @@ PyCMTensor
      :alt: Updates
 
 
+Python Choice Modelling Tensor package
 
-Python Tensor based package for Deep Neural Net assisted Discrete Choice Modelling.
+A Python Tensor based package for Deep neural net assisted Discrete Choice Modelling.
 
 
-* Free software: MIT license
+* Licence: MIT license
 * Documentation: https://pycmtensor.readthedocs.io.
 
 
