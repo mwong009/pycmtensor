@@ -89,7 +89,7 @@ class PyCMTensorModel:
         self.params = []  # keep track of params
         self.beta_params = []
 
-    def store_params(self, locals):
+    def append_params(self, locals):
         for _, local in locals.items():
             if isinstance(local, (Beta, Weights)):
                 # update model params into list
