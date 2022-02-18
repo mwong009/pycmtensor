@@ -86,16 +86,24 @@ class Expressions:
 
 class PyCMTensorModel:
     def __init__(self):
+        self.name = "PyCMTensorModel"
         self.params = []  # keep track of params
         self.beta_params = []
 
-    def append_params(self, locals):
-        for _, local in locals.items():
-            if isinstance(local, (Beta, Weights)):
+    def append_to_params(self, params):
+        assert isinstance(params, (dict, list)), f"params must be of type dict or list"
+        if isinstance(params, list):
+            d = {}
+            for param in params:
+                d[str(param)] = param
+            params = d
+
+        for _, param in params.items():
+            if isinstance(param, (Beta, Weights)):
                 # update model params into list
-                self.params.append(local)
-                if isinstance(local, (Beta)):
-                    self.beta_params.append(local)
+                self.params.append(param)
+                if isinstance(param, (Beta)):
+                    self.beta_params.append(param)
 
     def get_weights(self):
         return [p for p in self.params if ((p().ndim > 0) and (p.status != 1))]
@@ -117,6 +125,9 @@ class PyCMTensorModel:
 
     def get_beta_values(self):
         return [p() for p in self.beta_params]
+
+    def __repr__(self):
+        return f"{self.name}"
 
 
 class Weights(Expressions):
