@@ -13,10 +13,10 @@ with open("HISTORY.rst") as history_file:
 requirements = [
     "aesara>=2.4.0",
     "biogeme",
-    "numpy>=1.21.0",
-    "scipy>=1.7.0",
-    "pandas>=1.3.0",
     "dill>=0.3.4",
+    "numpy>=1.21.5",
+    "pandas>=1.3.5",
+    "scipy>=1.7.3",
     "tqdm>=4.62.3",
 ]
 
