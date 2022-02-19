@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycmtensor"
-version = "0.1.0"
+version = "0.2.0"
 description = "Python Tensor based package for Deep neural net assisted Discrete Choice Modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
@@ -15,14 +15,14 @@ keywords = ["pycmtensor"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: MIT",
     "Natural Language :: English",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.8,<3.10"
 aesara = "^2.4.0"
 biogeme = "^3.2.8"
 numpy = "^1.21.5"
@@ -33,6 +33,11 @@ tqdm = "^4.62.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
+pre-commit = "^2.17.0"
+tox = "^3.24.0"
+bump2version = "^1.0.1"
+isort = "^5.10.1"
+black = "^22.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
