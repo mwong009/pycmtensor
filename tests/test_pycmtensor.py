@@ -88,4 +88,3 @@ class TestPycmtensor(unittest.TestCase):
         for iter, patience, f in [[50, 500, 1], [30, 100, 0.2], [70, 100, 0.1]]:
             lr = learn_rate_tempering(iter, patience, lr_init=0.01)
             assert lr == 0.01 * f
-

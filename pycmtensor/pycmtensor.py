@@ -410,4 +410,3 @@ def train(Model, db, optimizer, batch_size=256, max_epoch=2000, lr_init=0.01, se
     pbar0.close()
     pbar.close()
     return best_model
-
