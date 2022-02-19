@@ -12,7 +12,7 @@ from pycmtensor.statistics import *
 
 class Results:
     def __init__(self, model, db, show_weights=False):
-        """ Generate the output results to stdout
+        """Generate the output results to stdout
 
         Args:
             model (Class): The model class object or pickle file

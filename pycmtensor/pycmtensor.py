@@ -76,12 +76,12 @@ class Expressions:
 
     def __pow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar ** other
+            return self.sharedVar**other
         return super().__pow__(other)
 
     def __rpow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return other ** self.sharedVar
+            return other**self.sharedVar
         return super().__pow__(other)
 
 
@@ -237,7 +237,7 @@ class Database(biodb.Database):
         return self.get_x() + self.get_y()
 
     def input_data(self, index=None, batch_size=None, shift=None):
-        """ Outputs a list of pandas table data corresponding to the 
+        """Outputs a list of pandas table data corresponding to the
             Symbolic variables
 
         Args:
@@ -295,15 +295,21 @@ def build_functions(model, optimizer=None):
     )
 
     model.output_probabilities = aesara.function(
-        inputs=model.inputs, outputs=model.p_y_given_x, on_unused_input="ignore",
+        inputs=model.inputs,
+        outputs=model.p_y_given_x,
+        on_unused_input="ignore",
     )
 
     model.output_estimated_betas = aesara.function(
-        inputs=[], outputs=model.get_beta_values(), on_unused_input="ignore",
+        inputs=[],
+        outputs=model.get_beta_values(),
+        on_unused_input="ignore",
     )
 
     model.output_estimated_weights = aesara.function(
-        inputs=[], outputs=model.get_weight_values(), on_unused_input="ignore",
+        inputs=[],
+        outputs=model.get_weight_values(),
+        on_unused_input="ignore",
     )
 
     model.output_errors = aesara.function(

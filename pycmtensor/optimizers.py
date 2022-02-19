@@ -29,11 +29,11 @@ class Adam:
         v_prev = self._v
 
         t_new = t + 1.0
-        a_t = aet.sqrt(one - self.b2 ** t_new) / (one - self.b1 ** t_new)
+        a_t = aet.sqrt(one - self.b2**t_new) / (one - self.b1**t_new)
 
         for m, v, param, grad in zip(m_prev, v_prev, params, grads):
             m_t = self.b1 * m + (one - self.b1) * grad
-            v_t = self.b2 * v + (one - self.b2) * grad ** 2
+            v_t = self.b2 * v + (one - self.b2) * grad**2
             g_t = a_t * m_t / (aet.sqrt(v_t) + self.epsilon)
             p_t = param - lr * g_t
             updates.append((m, m_t))
@@ -67,7 +67,7 @@ class Adamax:
         v_prev = self._v
 
         t_new = t + 1.0
-        a_t = lr / (one - self.b1 ** t)
+        a_t = lr / (one - self.b1**t)
 
         for m, v, param, grad in zip(m_prev, v_prev, params, grads):
             m_t = self.b1 * m + (one - self.b1) * grad
@@ -102,11 +102,11 @@ class Adadelta:
         delta = self._delta
         for a, d, param, grad in zip(accumulator, delta, params, grads):
             # update accumulator
-            a_t = self.rho * a + (one - self.rho) * grad ** 2
+            a_t = self.rho * a + (one - self.rho) * grad**2
             # compute parameter update, using previous delta
             g_t = grad * aet.sqrt(d + self.epsilon) / aet.sqrt(a_t + self.epsilon)
             p_t = param - lr * g_t
-            d_t = self.rho * d + (one - self.rho) * g_t ** 2
+            d_t = self.rho * d + (one - self.rho) * g_t**2
             updates.append((param, p_t))
             updates.append((a, a_t))
             updates.append((d, d_t))
@@ -131,7 +131,7 @@ class RMSProp:
         updates = []
         accumulators = self._a
         for a, param, grad in zip(accumulators, params, grads):
-            a_t = self.rho * a + (one - self.rho) * grad ** 2
+            a_t = self.rho * a + (one - self.rho) * grad**2
             g_t = grad / (aet.sqrt(a_t) + self.epsilon)
             p_t = param - lr * g_t
 

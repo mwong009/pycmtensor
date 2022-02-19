@@ -2,7 +2,7 @@
 
 
 def learn_rate_tempering(iter, patience, lr_init):
-    """ Tempering learning rate as a function of iteration step
+    """Tempering learning rate as a function of iteration step
 
     Args:
         iter (int): Iteration step.
