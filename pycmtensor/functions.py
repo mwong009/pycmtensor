@@ -18,29 +18,35 @@ def logit(utility, avail):
         assert len(utility) == len(
             avail
         ), f"{utility} must have the same length as {avail}"
-        U = aet.concatenate(utility, axis=1)
+        U = aet.stacklists(utility).flatten(2)
     else:
         U = utility
 
-    AV = aet.concatenate(avail, axis=1)
+    AV = aet.stacklists(avail)
 
-    prob = aet.nnet.softmax(U, axis=1) * AV
-    return prob / aet.sum(prob, axis=1, keepdims=1)
+    assert U.ndim == AV.ndim
+
+    prob = aet.nnet.softmax(U, axis=0) * AV
+    return prob / aet.sum(prob, axis=0, keepdims=1)
 
 
 def neg_loglikelihood(prob, y):
-    nll = -aet.mean(aet.log(prob)[aet.arange(y.shape[0]), y])
+    nll = -aet.mean(aet.log(prob)[y, aet.arange(y.shape[0])])
     return nll
 
 
 def full_loglikelihood(prob, y):
-    ll = aet.sum(aet.log(prob)[aet.arange(y.shape[0]), y])
+    ll = -neg_loglikelihood(prob, y) * y.shape[0]
+    # ll = aet.sum(aet.log(prob)[y, aet.arange(y.shape[0])])
     return ll
 
 
 def errors(prob, y):
     # symbolic description of how to compute prediction as a class
-    pred = aet.argmax(prob, axis=1)
+    if prob.ndim > 2:
+        prob = aet.reshape(prob, [prob.shape[0], y.shape[0], -1])
+        prob = aet.mean(prob, axis=-1)
+    pred = aet.argmax(prob, axis=0)
 
     if y.ndim != pred.ndim:
         raise TypeError(
