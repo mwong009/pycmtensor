@@ -3,16 +3,16 @@
 """Tests for `pycmtensor` package."""
 import unittest
 
-import pandas as pd
-import numpy as np
-import dill as pickle
-import pycmtensor as cmt
-
-from pycmtensor.pycmtensor import PyCMTensorModel, Beta, Weights, build_functions
-from pycmtensor.functions import logit, neg_loglikelihood
-from pycmtensor.results import Results
-from pycmtensor.optimizers import Adam
 import aesara.tensor as aet
+import dill as pickle
+import numpy as np
+import pandas as pd
+
+import pycmtensor as cmt
+from pycmtensor.functions import logit, neg_loglikelihood
+from pycmtensor.optimizers import Adam
+from pycmtensor.pycmtensor import Beta, PyCMTensorModel, Weights, build_functions
+from pycmtensor.results import Results
 
 
 class MNLModel(PyCMTensorModel):
