@@ -76,20 +76,21 @@ class Expressions:
 
     def __pow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar**other
+            return self.sharedVar ** other
         return super().__pow__(other)
 
     def __rpow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return other**self.sharedVar
+            return other ** self.sharedVar
         return super().__pow__(other)
 
 
 class PyCMTensorModel:
-    def __init__(self):
+    def __init__(self, db):
         self.name = "PyCMTensorModel"
         self.params = []  # keep track of params
         self.beta_params = []
+        self.inputs = db.tensors()
 
     def append_to_params(self, params):
         assert isinstance(params, (dict, list)), f"params must be of type dict or list"
@@ -160,11 +161,13 @@ class Weights(Expressions):
         return self.sharedVar
 
     def __str__(self):
-        return f"{self.sharedVar.get_value()}"
+        return f"{self.name}"
 
     def __repr__(self):
-        value = self.sharedVar.get_value()
-        return f"WeightsShared('{self.name}', {value})"
+        return f"{self.name}(shape{self.sharedVar.shape.eval()}, TensorSharedVariable)"
+
+    def get_value(self):
+        return self.sharedVar.get_value()
 
 
 class Beta(Expressions, bioexp.Beta):
@@ -177,64 +180,76 @@ class Beta(Expressions, bioexp.Beta):
         return self.sharedVar
 
     def __str__(self):
-        return f"{self.sharedVar.get_value()}"
+        return f"{self.name}"
 
     def __repr__(self):
-        value = self.sharedVar.get_value()
-        return f"BetaShared('{self.name}', {value})"
+        return f"{self.name}({self.sharedVar.get_value()}, TensorSharedVariable)"
 
 
 class Database(biodb.Database):
     def __init__(self, name, pandasDatabase, choiceVar="CHOICE"):
         super().__init__(name, pandasDatabase)
 
-        for v in self.variables:
-            if v in self.data.columns:
-                if self.variables[v].name == choiceVar:
-                    self.variables[v].y = aet.ivector(self.variables[v].name)
-                else:
-                    self.variables[v].x = aet.matrix(self.variables[v].name)
+        for _, variable in self.variables.items():
+            if variable.name == choiceVar:
+                variable.y = aet.ivector(variable.name)
+            else:
+                variable.x = aet.matrix(variable.name)
 
-    def get_x(self):
-        list_of_x = []
-        for var in self.variables:
-            if hasattr(self.variables[var], "x"):
-                list_of_x.append(self.variables[var].x)
-        return list_of_x
+    def __getitem__(self, item):
+        """ Returns the aesara.tensor.var.TensorVariable object.
+            Use Database["columnName"] to reference the TensorVariable
+        """
+        if hasattr(self.variables[item], "x"):
+            return self.variables[item].x
+        elif hasattr(self.variables[item], "y"):
+            return self.variables[item].y
+        else:
+            raise NotImplementedError(f"Variable {item} not found")
+
+    def columns(self):
+        return self.data.columns
+
+    def get_x_tensors(self):
+        x_tensors = []
+        for _, variable in self.variables.items():
+            if hasattr(variable, "x"):
+                x_tensors.append(variable.x)
+        return x_tensors
 
     def get_x_data(self, index=None, batch_size=None, shift=None):
         x_data = []
-        list_of_x = self.get_x()
-        for x in list_of_x:
+        x_tensors = self.get_x_tensors()
+        for x_tensor in x_tensors:
             if index == None:
-                x_data.append(self.data[[x.name]])
+                x_data.append(self.data[[x_tensor.name]])
             else:
                 start = index * batch_size + shift
                 end = (index + 1) * batch_size + shift
-                x_data.append(self.data[[x.name]][start:end])
+                x_data.append(self.data[[x_tensor.name]][start:end])
         return x_data
 
-    def get_y(self):
-        list_of_y = []
-        for var in self.variables:
-            if hasattr(self.variables[var], "y"):
-                list_of_y.append(self.variables[var].y)
-        return list_of_y
+    def get_y_tensors(self):
+        y_tensors = []
+        for _, variable in self.variables.items():
+            if hasattr(variable, "y"):
+                y_tensors.append(variable.y)
+        return y_tensors
 
     def get_y_data(self, index=None, batch_size=None, shift=None):
         y_data = []
-        list_of_y = self.get_y()
-        for y in list_of_y:
+        y_tensors = self.get_y_tensors()
+        for y_tensor in y_tensors:
             if index == None:
-                y_data.append(self.data[y.name])
+                y_data.append(self.data[y_tensor.name])
             else:
                 start = index * batch_size + shift
                 end = (index + 1) * batch_size + shift
-                y_data.append(self.data[y.name][start:end])
+                y_data.append(self.data[y_tensor.name][start:end])
         return y_data
 
-    def inputs(self):
-        return self.get_x() + self.get_y()
+    def tensors(self):
+        return self.get_x_tensors() + self.get_y_tensors()
 
     def input_data(self, index=None, batch_size=None, shift=None):
         """Outputs a list of pandas table data corresponding to the
@@ -258,7 +273,7 @@ class Database(biodb.Database):
             min_val = np.min(self.data[d])
             scale = 1.0
             if variables is None:
-                varlist = self.get_x()
+                varlist = self.get_x_tensors()
             else:
                 varlist = variables
             if d in varlist:
@@ -295,21 +310,15 @@ def build_functions(model, optimizer=None):
     )
 
     model.output_probabilities = aesara.function(
-        inputs=model.inputs,
-        outputs=model.p_y_given_x,
-        on_unused_input="ignore",
+        inputs=model.inputs, outputs=model.p_y_given_x, on_unused_input="ignore",
     )
 
     model.output_estimated_betas = aesara.function(
-        inputs=[],
-        outputs=model.get_beta_values(),
-        on_unused_input="ignore",
+        inputs=[], outputs=model.get_beta_values(), on_unused_input="ignore",
     )
 
     model.output_estimated_weights = aesara.function(
-        inputs=[],
-        outputs=model.get_weight_values(),
-        on_unused_input="ignore",
+        inputs=[], outputs=model.get_weight_values(), on_unused_input="ignore",
     )
 
     model.output_errors = aesara.function(
@@ -321,8 +330,18 @@ def build_functions(model, optimizer=None):
     return model
 
 
-def train(Model, db, optimizer, batch_size=256, max_epoch=2000, lr_init=0.01, seed=0):
-    assert isinstance(Model, type)
+def train(
+    Model,
+    database,
+    optimizer,
+    batch_size=256,
+    max_epoch=2000,
+    lr_init=0.01,
+    seed=999,
+    debug=False,
+):
+    assert issubclass(Model, PyCMTensorModel)
+    db = database
     rng = np.random.default_rng(seed)
 
     print("Building model...")
@@ -346,23 +365,25 @@ def train(Model, db, optimizer, batch_size=256, max_epoch=2000, lr_init=0.01, se
     print("Training model...")
 
     model.null_ll = model.loglikelihood(*db.input_data())
-    model.null_score = 1 - model.output_errors(*db.input_data())
+    model.best_ll_score = 1 - model.output_errors(*db.input_data())
     model.best_ll = model.null_ll
-    pbar0 = tqdm.tqdm(
-        bar_format=(
-            "Loglikelihood:  {postfix[0][ll]:.6f}  Score: {postfix[1][sc]:.3f}"
-        ),
-        postfix=[dict(ll=model.null_ll), dict(sc=model.null_score)],
-        position=0,
-        leave=True,
-    )
-    pbar = tqdm.tqdm(
-        total=total_iter,
-        desc="Epoch {0:4d}/{1}".format(0, total_iter),
-        unit_scale=True,
-        position=1,
-        leave=True,
-    )
+
+    if debug is False:
+        pbar0 = tqdm.tqdm(
+            bar_format=(
+                "Loglikelihood:  {postfix[0][ll]:.6f}  Score: {postfix[1][sc]:.3f}"
+            ),
+            postfix=[{"ll": model.null_ll}, {"sc": model.best_ll_score}],
+            position=0,
+            leave=True,
+        )
+        pbar = tqdm.tqdm(
+            total=total_iter,
+            desc="Epoch {0:4d}/{1}".format(0, total_iter),
+            unit_scale=True,
+            position=1,
+            leave=True,
+        )
 
     while (epoch < max_epoch) and (not done_looping):
         epoch = epoch + 1
@@ -385,17 +406,19 @@ def train(Model, db, optimizer, batch_size=256, max_epoch=2000, lr_init=0.01, se
                     model.best_epoch = epoch
                     model.best_ll_score = 1 - model.output_errors(*db.input_data())
 
-                    pbar0.postfix[0]["ll"] = model.best_ll
-                    pbar0.postfix[1]["sc"] = model.best_ll_score
-                    pbar0.update()
+                    if debug is False:
+                        pbar0.postfix[0]["ll"] = model.best_ll
+                        pbar0.postfix[1]["sc"] = model.best_ll_score
+                        pbar0.update()
 
                     if ll > (model.best_ll * validation_threshold):
                         patience = max(patience, iter * patience_increase)
                         best_model = model
 
-            pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
-            pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
-            pbar.update()
+            if debug is False:
+                pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
+                pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
+                pbar.update()
 
             if patience <= iter:
                 done_looping = True
@@ -413,6 +436,8 @@ def train(Model, db, optimizer, batch_size=256, max_epoch=2000, lr_init=0.01, se
             " with maximum loglikelihood reached @ epoch {1}."
         ).format(model.best_ll_score * 100.0, model.best_epoch)
     )
-    pbar0.close()
-    pbar.close()
+    if debug is False:
+        pbar0.close()
+        pbar.close()
+
     return best_model
