@@ -200,7 +200,7 @@ class Database(biodb.Database):
             if variable.name == choiceVar:
                 variable.y = aet.ivector(variable.name)
             else:
-                variable.x = aet.matrix(variable.name)
+                variable.x = aet.vector(variable.name)
 
     def __getitem__(self, item):
         """ Returns the aesara.tensor.var.TensorVariable object.
@@ -228,11 +228,11 @@ class Database(biodb.Database):
         x_tensors = self.get_x_tensors()
         for x_tensor in x_tensors:
             if index == None:
-                x_data.append(self.data[[x_tensor.name]])
+                x_data.append(self.data[x_tensor.name])
             else:
                 start = index * batch_size + shift
                 end = (index + 1) * batch_size + shift
-                x_data.append(self.data[[x_tensor.name]][start:end])
+                x_data.append(self.data[x_tensor.name][start:end])
         return x_data
 
     def get_y_tensors(self):
