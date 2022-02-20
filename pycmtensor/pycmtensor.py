@@ -41,12 +41,18 @@ class Expressions:
 
     def __mul__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar * other
+            if self.sharedVar.ndim > 1:
+                return aet.dot(other, self.sharedVar.T)
+            else:
+                return self.sharedVar * other
         return super().__mul__(other)
 
     def __rmul__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return other * self.sharedVar
+            if self.sharedVar.ndim > 1:
+                return aet.dot(other, self.sharedVar.T)
+            else:
+                return other * self.sharedVar
         return super().__rmul__(other)
 
     def __div__(self, other):
@@ -108,10 +114,10 @@ class PyCMTensorModel:
                     self.beta_params.append(param)
 
     def get_weights(self):
-        return [p for p in self.params if ((p().ndim > 0) and (p.status != 1))]
+        return [p for p in self.params if ((p().ndim > 1) and (p.status != 1))]
 
     def get_weight_values(self):
-        return [p() for p in self.params if (p().ndim > 0)]
+        return [p() for p in self.params if (p().ndim > 1)]
 
     def get_weight_size(self):
         if len(self.get_weights()) > 0:
