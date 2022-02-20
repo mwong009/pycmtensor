@@ -54,18 +54,21 @@ def errors(prob, y):
 
 def hessians(prob, y, params):
     params = [p() for p in params if (p.status != 1)]
+    for p in params:
+        assert p.ndim == 0, f"{p.name}, ndim={p.ndim}"
     grads = aet.grad(full_loglikelihood(prob, y), params, disconnected_inputs="ignore")
     _h = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
         _h = aet.set_subtensor(
-            x=_h[i, :],
-            y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
+            x=_h[i, :], y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
         )
     return _h
 
 
 def bhhh(prob, y, params):
     params = [p() for p in params if (p.status != 1)]
+    for p in params:
+        assert p.ndim == 0, f"{p.name}, ndim={p.ndim}"
     grads = aet.grad(full_loglikelihood(prob, y), params, disconnected_inputs="ignore")
     _bh = aet.outer(aet.as_tensor_variable(grads), aet.as_tensor_variable(grads).T)
     return _bh
