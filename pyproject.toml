@@ -39,6 +39,8 @@ isort = "^5.10.1"
 
 #Linters
 pydocstyle = "^6.1.1"
+doc8 = "^0.10.1"
+rstcheck = "^3.3.1"
 
 # Testing
 pytest = "^7.0.1"
@@ -46,6 +48,8 @@ tox = "^3.24.0"
 
 # Documentation
 Sphinx = "^4.4.0"
+myst-parser = "^0.17.0"
+sphinx-rtd-theme = "^1.0.0"
 
 # Tooling
 bump2version = "^1.0.1"
