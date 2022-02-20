@@ -50,6 +50,7 @@ Sphinx = "^4.4.0"
 # Tooling
 bump2version = "^1.0.1"
 pre-commit = "^2.17.0"
+commitizen = "^2.21.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -63,6 +64,15 @@ skip_glob = ".pytest_cache/*"
 target-version = ['py38']
 quiet = true
 line-length = 88
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.2.1"
+tag_format = "v$version"
+version_files = [
+    "pyproject.toml:version",
+    "pycmtensor/__init__.py"
+]
 
 [tool.pytest]
 addopts = """
