@@ -18,7 +18,7 @@ import aesara.tensor as aet
 class MNLModel(PyCMTensorModel):
     def __init__(self, db):
         super().__init__()
-        self.inputs = db.inputs()  # keep track of inputs
+        self.inputs = db.tensors()  # keep track of inputs
         for var in self.inputs:
             globals().update({var.name: var})
 
