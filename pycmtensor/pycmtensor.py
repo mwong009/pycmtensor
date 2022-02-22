@@ -188,6 +188,10 @@ def build_functions(model, optimizer=None):
         inputs=model.inputs, outputs=model.p_y_given_x, on_unused_input="ignore",
     )
 
+    model.output_choices = aesara.function(
+        inputs=model.inputs, outputs=model.pred, on_unused_input="ignore",
+    )
+
     model.output_estimated_betas = aesara.function(
         inputs=[], outputs=model.get_beta_values(), on_unused_input="ignore",
     )

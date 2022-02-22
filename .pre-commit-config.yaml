@@ -1,15 +1,15 @@
 repos:
-- repo: https://github.com/commitizen-tools/commitizen
-  rev: v2.21.2
-  hooks:
-  - id: commitizen
-    stages: [commit-msg]
--   repo: https://github.com/psf/black
-    rev: 22.1.0
-    hooks:
-    -   id: black
--   repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-    -   id: isort
-        name: isort (python)
+    - repo: https://github.com/commitizen-tools/commitizen
+      rev: v2.21.2
+      hooks:
+          - id: commitizen
+            stages: [commit-msg]
+    - repo: https://github.com/psf/black
+      rev: 22.1.0
+      hooks:
+          - id: black
+    - repo: https://github.com/PyCQA/isort
+      rev: 5.10.1
+      hooks:
+          - id: isort
+            name: isort (python)
