@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Feat
+
+- **pycmtensor.py**: add model.output_choices to generate choices
+
 ### Refactor
 
 - moved Beta Weights to expressions.py
