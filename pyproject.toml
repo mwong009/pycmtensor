@@ -65,9 +65,9 @@ profile = "black"
 skip_glob = ".pytest_cache/*"
 
 [tool.black]
-target-version = ['py38']
-quiet = true
 line-length = 88
+target-version = ["py38"]
+quiet = false
 
 [tool.commitizen]
 name = "cz_conventional_commits"
