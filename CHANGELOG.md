@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Refactor
+
+- moved Beta Weights to expressions.py
+
 ### Fix
 
 - **swissmetro_test.ipynb**: update swissmetro example
