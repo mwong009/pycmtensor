@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycmtensor"
-version = "0.2.1"
+version = "0.3.0"
 description = "Python Tensor based package for Deep neural net assisted Discrete Choice Modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
@@ -71,7 +71,7 @@ quiet = false
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2.1"
+version = "0.3.0"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
