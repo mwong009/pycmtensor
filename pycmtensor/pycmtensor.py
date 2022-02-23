@@ -71,6 +71,16 @@ class Database(biodb.Database):
             else:
                 variable.x = aet.vector(variable.name)
 
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+    def __getattr__(self, name):
+        if name in self.variables:
+            return self.variables[name]
+
     def __getitem__(self, item):
         """Returns the aesara.tensor.var.TensorVariable object.
         Use Database["columnName"] to reference the TensorVariable
