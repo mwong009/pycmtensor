@@ -17,5 +17,5 @@ dependencies:
 # conda env create -f environment.yml
 # conda activate pycmtensor-dev
 # pip install . , or
-# pip install git+git:https://github.com/mwong009/pycmtensor.git
+# pip install git+https://github.com/mwong009/pycmtensor.git
 # conda remove --name pycmtensor-dev --all
