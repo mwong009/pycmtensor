@@ -74,12 +74,12 @@ class Expressions:
 
     def __pow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar ** other
+            return self.sharedVar**other
         return super().__pow__(other)
 
     def __rpow__(self, other):
         if isinstance(other, (TensorVariable, Beta)):
-            return other ** self.sharedVar
+            return other**self.sharedVar
         return super().__pow__(other)
 
 

@@ -7,7 +7,7 @@ repos:
       - id: commitizen
         stages: [commit-msg]
   - repo: https://github.com/psf/black
-    rev: stable
+    rev: 22.1.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort

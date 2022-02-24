@@ -66,7 +66,8 @@ def hessians(prob, y, params):
     _h = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
         _h = aet.set_subtensor(
-            x=_h[i, :], y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
+            x=_h[i, :],
+            y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
         )
     return _h
 
