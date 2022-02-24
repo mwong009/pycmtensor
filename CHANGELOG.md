@@ -1,4 +1,8 @@
-## v0.3.1 (2022-02-24)
+## Unreleased
+
+### Fix
+
+- **tqdm**: add arg in train() to enable notebook progressbar
 
 ### Refactor
 
