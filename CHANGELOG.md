@@ -1,3 +1,13 @@
+## v0.3.1 (2022-02-24)
+
+### Refactor
+
+- **optimizers**: refactor base Optimizer class
+
+### Feat
+
+- **optimizers**: add AdaGram algorithm
+
 ## v0.3.0 (2022-02-23)
 
 ### Feat
