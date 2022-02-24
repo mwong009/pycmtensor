@@ -5,11 +5,10 @@ import aesara.tensor as aet
 import biogeme.database as biodb
 import dill as pickle
 import numpy as np
-import tqdm
 
 from pycmtensor.expressions import Beta, Weights
 from pycmtensor.functions import errors, full_loglikelihood
-from pycmtensor.utils import learn_rate_tempering
+from pycmtensor.utils import learn_rate_tempering, tqdm_nb_check
 
 floatX = aesara.config.floatX
 
@@ -195,19 +194,27 @@ def build_functions(model, optimizer=None):
     )
 
     model.output_probabilities = aesara.function(
-        inputs=model.inputs, outputs=model.p_y_given_x, on_unused_input="ignore",
+        inputs=model.inputs,
+        outputs=model.p_y_given_x,
+        on_unused_input="ignore",
     )
 
     model.output_choices = aesara.function(
-        inputs=model.inputs, outputs=model.pred, on_unused_input="ignore",
+        inputs=model.inputs,
+        outputs=model.pred,
+        on_unused_input="ignore",
     )
 
     model.output_estimated_betas = aesara.function(
-        inputs=[], outputs=model.get_beta_values(), on_unused_input="ignore",
+        inputs=[],
+        outputs=model.get_beta_values(),
+        on_unused_input="ignore",
     )
 
     model.output_estimated_weights = aesara.function(
-        inputs=[], outputs=model.get_weight_values(), on_unused_input="ignore",
+        inputs=[],
+        outputs=model.get_weight_values(),
+        on_unused_input="ignore",
     )
 
     model.output_errors = aesara.function(
@@ -228,7 +235,9 @@ def train(
     lr_init=0.01,
     seed=999,
     debug=False,
+    notebook=False,
 ):
+    tqdm = tqdm_nb_check(notebook)
     assert issubclass(Model, PyCMTensorModel)
     db = database
     rng = np.random.default_rng(seed)
@@ -258,7 +267,7 @@ def train(
     model.best_ll = model.null_ll
 
     if debug is False:
-        pbar0 = tqdm.tqdm(
+        pbar0 = tqdm(
             bar_format=(
                 "Loglikelihood:  {postfix[0][ll]:.6f}  Score: {postfix[1][sc]:.3f}"
             ),
@@ -266,7 +275,7 @@ def train(
             position=0,
             leave=True,
         )
-        pbar = tqdm.tqdm(
+        pbar = tqdm(
             total=total_iter,
             desc="Epoch {0:4d}/{1}".format(0, total_iter),
             unit_scale=True,
