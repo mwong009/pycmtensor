@@ -169,10 +169,29 @@ class MomentumSGD:
         return updates
 
 
-class SGD:
-    def __init__(self, params=None):
+class AdaGrad(Optimizer):
+    def __init__(self, name="SGD", params=None):
+        super().__init__(params, name)
+
+    def update(self, cost, params, lr=0.01):
         params = [p() for p in params if p.status != 1]
-        pass
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+        accumulator = self._accu
+        for param, grad, a in zip(params, grads, accumulator):
+            a_t = a + grad**2
+            g_t = lr / aet.sqrt(a_t + self.epsilon) * grad
+            p_t = param - g_t
+            updates.append((a, a_t))
+            updates.append((param, p_t))
+
+        return updates
+
+
+class SGD(Optimizer):
+    def __init__(self, name="SGD", params=None):
+        super().__init__(params, name)
 
     def update(self, cost, params, lr=0.001):
         params = [p() for p in params if p.status != 1]
