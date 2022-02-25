@@ -11,7 +11,7 @@ from pycmtensor.statistics import *
 
 
 class Results:
-    def __init__(self, model, db, show_weights=False):
+    def __init__(self, model, database, show_weights=False):
         """Generate the output results to stdout
 
         Args:
@@ -25,7 +25,7 @@ class Results:
         else:
             self.name = model.name
 
-        sample_size = len(db.data)
+        sample_size = len(database.data)
         n_params = len(model.get_betas())
         n_weights = model.get_weight_size()
         k = n_params + n_weights
@@ -33,15 +33,15 @@ class Results:
         null_loglike = model.null_ll
         max_loglike = model.best_ll
 
-        self.beta_results = get_beta_statistics(model, db)
+        self.beta_results = get_beta_statistics(model, database)
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
         self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
         self.ll_ratio_test = -2.0 * (null_loglike - max_loglike)
 
         self.akaike = 2.0 * (k - max_loglike)
         self.bayesian = -2.0 * max_loglike + k * np.log(sample_size)
-        self.g_norm = gradient_norm(model, db)
-        self.correlationMatrix = correlation_matrix(model, db)
+        self.g_norm = gradient_norm(model, database)
+        self.correlationMatrix = correlation_matrix(model, database)
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
