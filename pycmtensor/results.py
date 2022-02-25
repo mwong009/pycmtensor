@@ -89,6 +89,35 @@ class Results:
         return self.print_results + self.beta_results.to_string()
 
 
+class Predict:
+    def __init__(self, model, database):
+        """Class to output estimated model predictions
+
+        Usage:
+            Call Predict(model, database).probs() or .choices() for probabilities or
+            discrete choices (argmax) respectively
+
+        Args:
+            model (PyCMTensor): the estimated model class object
+            database (pycmtensor.Database): the given database object
+        """
+        self.model = model
+        self.database = database
+        self.columns = None
+        if hasattr(database, "choices"):
+            self.columns = database.choices
+
+    def probs(self):
+        db = self.database
+        data_obj = self.model.output_probabilities(*db.input_data()).T
+        return pd.DataFrame(data_obj, columns=self.columns)
+
+    def choices(self):
+        db = self.database
+        data_obj = self.model.output_choices(*db.input_data()).T
+        return pd.DataFrame(data_obj, columns=[db.choiceVar])
+
+
 def get_beta_statistics(model, db):
     H = aesara.function(
         inputs=model.inputs,

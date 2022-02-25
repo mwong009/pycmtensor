@@ -63,6 +63,7 @@ class PyCMTensorModel:
 class Database(biodb.Database):
     def __init__(self, name, pandasDatabase, choiceVar="CHOICE"):
         super().__init__(name, pandasDatabase)
+        self.choiceVar = choiceVar
 
         for _, variable in self.variables.items():
             if variable.name == choiceVar:
