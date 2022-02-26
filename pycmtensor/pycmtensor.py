@@ -275,7 +275,7 @@ def build_functions(model, db, optimizer=None):
 
 
 def train(
-    Model,
+    model,
     database,
     optimizer,
     batch_size=256,
@@ -286,10 +286,10 @@ def train(
     notebook=False,
 ):
     tqdm = tqdm_nb_check(notebook)
-    assert issubclass(Model, PyCMTensorModel)
+    assert isinstance(model, PyCMTensorModel), f"{model} is an invalid model."
     db = database
     rng = np.random.default_rng(seed)
-    model = build_functions(Model(db), db, optimizer)
+    model = build_functions(model, db, optimizer)
 
     n_samples = len(db.data)
     n_batches = n_samples // batch_size
@@ -347,7 +347,7 @@ def train(
                 if ll > model.best_ll:
                     model.best_ll = ll
                     model.best_epoch = epoch
-                    model.best_ll_score = 1 - model.output_errors(*db.input_data())
+                    model.best_ll_score = 1 - model.output_errors()
 
                     if debug is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
