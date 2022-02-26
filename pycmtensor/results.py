@@ -111,30 +111,32 @@ class Predict:
 
     def probs(self):
         db = self.database
-        data_obj = self.model.output_probabilities(*db.input_data()).T
+        data_obj = self.model.output_probabilities().T
         return pd.DataFrame(data_obj, columns=self.columns)
 
     def choices(self):
         db = self.database
-        data_obj = self.model.output_choices(*db.input_data()).T
+        data_obj = self.model.output_choices().T
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
 def get_beta_statistics(model, db):
     H = aesara.function(
-        inputs=model.inputs,
+        inputs=[],
         outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
         on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
     )
 
     BHHH = aesara.function(
-        inputs=model.inputs,
+        inputs=[],
         outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
         on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
     )
 
-    h = H(*db.input_data())
-    bh = BHHH(*db.input_data())
+    h = H()
+    bh = BHHH()
 
     pandas_stats = pd.DataFrame(
         columns=[
