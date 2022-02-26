@@ -72,15 +72,16 @@ class PyCMTensorModel:
 
 
 class Database(biodb.Database):
-    def __init__(self, name, pandasDatabase, choiceVar="CHOICE"):
+    def __init__(self, name, pandasDatabase, choiceVar):
         super().__init__(name, pandasDatabase)
-        self.choiceVar = choiceVar
+        assert choiceVar in self.data.columns
         for name, variable in self.variables.items():
             if name in self.data.columns:
                 if name == choiceVar:
                     variable.y = aet.ivector(name)
                 else:
                     variable.x = aet.vector(name)
+        self.choiceVar = self[choiceVar]
 
     def __getstate__(self):
         return self.__dict__
