@@ -21,6 +21,11 @@ class PyCMTensorModel:
         self.inputs = db.tensors()
 
     def append_to_params(self, params):
+        """[Depreciated] Use add_params() instead."""
+        print(f"Depreciated method append_to_params(). Use add_params() instead.")
+        return self.add_params(params)
+
+    def add_params(self, params):
         assert isinstance(params, (dict, list)), f"params must be of type dict or list"
         if isinstance(params, list):
             d = {}
