@@ -46,6 +46,7 @@ class Results:
         self.n_params = n_params
         self.n_weights = n_weights
         self.sample_size = sample_size
+        self.excluded_data = database.excludedData
         self.best_epoch = model.best_epoch
         self.best_ll_score = model.best_ll_score
         self.null_loglike = null_loglike
@@ -60,6 +61,7 @@ class Results:
                 else ""
             )
             + f"Sample size: {self.sample_size}\n"
+            + f"Excluded data: {self.excluded_data}\n"
             + f"Init loglikelihood: {self.null_loglike:.3f}\n"
             + f"Final loglikelihood: {self.max_loglike:.3f}\n"
             + f"Likelihood ratio test: {self.ll_ratio_test:.3f}\n"
