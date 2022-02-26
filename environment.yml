@@ -13,6 +13,7 @@ dependencies:
     - ipykernel>=6.4.1
     - libblas>=3.9.0
     - libpython>=2.1
+    - pydot>=1.4.1
 # conda install nb_conda_kernels
 # conda env create -f environment.yml
 # conda activate pycmtensor-dev
