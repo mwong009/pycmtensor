@@ -35,6 +35,12 @@ class PyCMTensorModel:
                 if isinstance(param, (Beta)):
                     self.beta_params.append(param)
 
+    def add_regularizers(self, l_reg):
+        if hasattr(self, "cost"):
+            self.cost += l_reg
+        else:
+            print("Error in reading cost function")
+
     def get_weights(self):
         return [p for p in self.params if ((p().ndim > 1) and (p.status != 1))]
 
