@@ -111,7 +111,7 @@ class Database(biodb.Database):
                 shared_data = aesara.shared(
                     np.asarray(self.data[name], dtype=floatX), borrow=True
                 )
-                if name == self.choiceVar:
+                if hasattr(variable, "y"):
                     self.sharedData[name] = aet.cast(shared_data, "int32")
                 else:
                     self.sharedData[name] = shared_data
