@@ -11,7 +11,7 @@ from pycmtensor.statistics import *
 
 
 class Results:
-    def __init__(self, model, db, show_weights=False):
+    def __init__(self, model, database, show_weights=False):
         """Generate the output results to stdout
 
         Args:
@@ -25,7 +25,7 @@ class Results:
         else:
             self.name = model.name
 
-        sample_size = len(db.data)
+        sample_size = len(database.data)
         n_params = len(model.get_betas())
         n_weights = model.get_weight_size()
         k = n_params + n_weights
@@ -33,19 +33,20 @@ class Results:
         null_loglike = model.null_ll
         max_loglike = model.best_ll
 
-        self.beta_results = get_beta_statistics(model, db)
+        self.beta_results = get_beta_statistics(model, database)
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
         self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
         self.ll_ratio_test = -2.0 * (null_loglike - max_loglike)
 
         self.akaike = 2.0 * (k - max_loglike)
         self.bayesian = -2.0 * max_loglike + k * np.log(sample_size)
-        self.g_norm = gradient_norm(model, db)
-        self.correlationMatrix = correlation_matrix(model, db)
+        self.g_norm = gradient_norm(model, database)
+        self.correlationMatrix = correlation_matrix(model, database)
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
         self.sample_size = sample_size
+        self.excluded_data = database.excludedData
         self.best_epoch = model.best_epoch
         self.best_ll_score = model.best_ll_score
         self.null_loglike = null_loglike
@@ -60,6 +61,7 @@ class Results:
                 else ""
             )
             + f"Sample size: {self.sample_size}\n"
+            + f"Excluded data: {self.excluded_data}\n"
             + f"Init loglikelihood: {self.null_loglike:.3f}\n"
             + f"Final loglikelihood: {self.max_loglike:.3f}\n"
             + f"Likelihood ratio test: {self.ll_ratio_test:.3f}\n"
@@ -89,21 +91,52 @@ class Results:
         return self.print_results + self.beta_results.to_string()
 
 
+class Predict:
+    def __init__(self, model, database):
+        """Class to output estimated model predictions
+
+        Usage:
+            Call Predict(model, database).probs() or .choices() for probabilities or
+            discrete choices (argmax) respectively
+
+        Args:
+            model (PyCMTensor): the estimated model class object
+            database (pycmtensor.Database): the given database object
+        """
+        self.model = model
+        self.database = database
+        self.columns = None
+        if hasattr(database, "choices"):
+            self.columns = database.choices
+
+    def probs(self):
+        db = self.database
+        data_obj = self.model.output_probabilities().T
+        return pd.DataFrame(data_obj, columns=self.columns)
+
+    def choices(self):
+        db = self.database
+        data_obj = self.model.output_choices().T
+        return pd.DataFrame(data_obj, columns=[db.choiceVar])
+
+
 def get_beta_statistics(model, db):
     H = aesara.function(
-        inputs=model.inputs,
+        inputs=[],
         outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
         on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
     )
 
     BHHH = aesara.function(
-        inputs=model.inputs,
+        inputs=[],
         outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
         on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
     )
 
-    h = H(*db.input_data())
-    bh = BHHH(*db.input_data())
+    h = H()
+    bh = BHHH()
 
     pandas_stats = pd.DataFrame(
         columns=[

@@ -1,6 +1,16 @@
 # utils.py
 
 
+def tqdm_nb_check(notebook):
+    assert isinstance(notebook, bool)
+    if notebook:
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+
+    return tqdm
+
+
 def learn_rate_tempering(iter, patience, lr_init):
     """Tempering learning rate as a function of iteration step
 
