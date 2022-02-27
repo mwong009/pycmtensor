@@ -37,6 +37,7 @@ def build_functions(model, db, optimizer=None):
         outputs=full_loglikelihood(model.p_y_given_x, model.y),
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        name="loglikelihood",
     )
 
     model.output_probabilities = aesara.function(
@@ -44,6 +45,7 @@ def build_functions(model, db, optimizer=None):
         outputs=model.p_y_given_x,
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        name="p_y_given_x",
     )
 
     model.output_choices = aesara.function(
@@ -51,6 +53,7 @@ def build_functions(model, db, optimizer=None):
         outputs=model.pred,
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        name="predict",
     )
 
     model.output_estimated_betas = aesara.function(
@@ -70,6 +73,7 @@ def build_functions(model, db, optimizer=None):
         outputs=errors(model.p_y_given_x, model.y),
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        name="errors",
     )
 
     return model
