@@ -1,3 +1,19 @@
+## v0.4.1 (2022-02-27)
+
+### Fix
+
+- **Database**: add name to shared_data
+- **train**: model instance now load initiated model class (not input Class as argument)
+- **Database**: set choiceVar to mandatory argument
+- **PyCMTensor**: rename append_to_params to add_params for consistency
+- **PyCMTensor**: new method to add regularizers to cost function
+- **Expressions**: invokes different operator for Beta Beta maths
+
+### Refactor
+
+- **PyCMTensor**: refactoring models from pycmtensor.py
+- **Database**: refactor(Database): refactoring database.py from pycmtensor.py
+
 ## v0.4.0 (2022-02-26)
 
 ### Perf
