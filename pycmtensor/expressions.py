@@ -12,75 +12,97 @@ class Expressions:
         pass
 
     def __add__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar + other
-        return super().__add__(other)
+        if isinstance(other, TensorVariable):
+            return self() + other
+        elif isinstance(other, Beta):
+            return self() + other()
+        else:
+            return super().__add__(other)
 
     def __radd__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar + other
-        return super().__radd__(other)
+        if isinstance(other, TensorVariable):
+            return other + self()
+        elif isinstance(other, Beta):
+            return other() + self()
+        else:
+            return super().__radd__(other)
 
     def __sub__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar - other
-        return super().__sub__(other)
+        if isinstance(other, TensorVariable):
+            return self() - other
+        elif isinstance(other, Beta):
+            return self() - other()
+        else:
+            return super().__sub__(other)
 
     def __rsub__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return other - self.sharedVar
-        return super().__rsub__(other)
+        if isinstance(other, TensorVariable):
+            return other - self()
+        elif isinstance(other, Beta):
+            return other() - self()
+        else:
+            return super().__rsub__(other)
 
     def __mul__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            if self.sharedVar.ndim > 1:
-                return aet.dot(other, self.sharedVar.T)
+        if isinstance(other, TensorVariable):
+            if self().ndim > 1:
+                return aet.dot(other, self().T)
             else:
-                return self.sharedVar * other
-        return super().__mul__(other)
+                return self() * other
+        elif isinstance(other, Beta):
+            return self() * other()
+        else:
+            return super().__mul__(other)
 
     def __rmul__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
+        if isinstance(other, TensorVariable):
             if self.sharedVar.ndim > 1:
-                return aet.dot(other, self.sharedVar.T)
+                return aet.dot(other, self().T)
             else:
-                return other * self.sharedVar
-        return super().__rmul__(other)
+                return self() * other
+        elif isinstance(other, Beta):
+            return self() * other()
+        else:
+            return super().__rmul__(other)
 
     def __div__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar / other
-        return super().__div__(other)
+        if isinstance(other, TensorVariable):
+            return self() / other
+        elif isinstance(other, Beta):
+            return self() / other()
+        else:
+            return super().__div__(other)
 
     def __rdiv__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return other / self.sharedVar
-        return super().__rdiv__(other)
-
-    def __truediv__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar / other
-        return super().__truediv__(other)
-
-    def __rtruediv__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return other / self.sharedVar
-        return super().__rtruediv__(other)
+        if isinstance(other, TensorVariable):
+            return other / self()
+        elif isinstance(other, Beta):
+            return other() / self()
+        else:
+            return super().__rdiv__(other)
 
     def __neg__(self):
-        if isinstance(self, (TensorVariable, Beta)):
+        if isinstance(self, TensorVariable):
             return -self
-        return super().__neg__()
+        elif isinstance(self, Beta):
+            return -self()
+        return super().__neg__(self)
 
     def __pow__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return self.sharedVar**other
-        return super().__pow__(other)
+        if isinstance(other, TensorVariable):
+            return self() ** other
+        elif isinstance(other, Beta):
+            return self() ** other()
+        else:
+            return super().__pow__(other)
 
     def __rpow__(self, other):
-        if isinstance(other, (TensorVariable, Beta)):
-            return other**self.sharedVar
-        return super().__pow__(other)
+        if isinstance(other, TensorVariable):
+            return other ** self()
+        elif isinstance(other, Beta):
+            return other() ** self()
+        else:
+            return super().__rpow__(other)
 
 
 class Beta(Expressions, bioexp.Beta):
