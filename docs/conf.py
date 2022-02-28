@@ -47,7 +47,15 @@ release = pycmtensor.__version__
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "myst_parser"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "myst_parser",
+    "autoapi.extension",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.inheritance_diagram",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -71,6 +79,22 @@ source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
+
+suppress_warnings = ["autoapi"]
+
+# -- Options for autoapi -----------------------------------------------------
+
+autoapi_add_toctree_entry = True
+autoapi_type = "python"
+autoapi_dirs = ["../pycmtensor"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "private-members",
+    "show-inheritance",
+    "show-module-summary" "special-members",
+    "imported-members",
+]
 
 # -- Options for HTML output -------------------------------------------------
 

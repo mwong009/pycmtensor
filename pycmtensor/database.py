@@ -32,7 +32,7 @@ class Database(biodb.Database):
 
     def __getitem__(self, item):
         """Returns the aesara.tensor.var.TensorVariable object.
-        Use Database["columnName"] to reference the TensorVariable
+        Use `Database["columnName"]` to reference the TensorVariable
         """
         if hasattr(self.variables[item], "x"):
             return self.variables[item].x
@@ -96,7 +96,7 @@ class Database(biodb.Database):
 
     def input_data(self, index=None, batch_size=None, shift=None):
         """Outputs a list of pandas table data corresponding to the
-            Symbolic variables
+        Symbolic variables
 
         Args:
             index (int, optional): Starting index slice.
