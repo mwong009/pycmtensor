@@ -47,7 +47,15 @@ release = pycmtensor.__version__
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "myst_parser"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "autoapi.extension",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.inheritance_diagram",
+    "m2r2",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -66,18 +74,34 @@ todo_include_todos = False
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
 source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
+
+suppress_warnings = ["autoapi"]
+
+# -- Options for autoapi -----------------------------------------------------
+
+autoapi_add_toctree_entry = True
+autoapi_type = "python"
+autoapi_dirs = ["../pycmtensor"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "private-members",
+    "show-inheritance",
+    "show-module-summary",
+    "special-members",
+    "imported-members",
+]
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -147,4 +171,4 @@ texinfo_documents = [
 ]
 
 
-myst_commonmark_only = True
+# myst_commonmark_only = True

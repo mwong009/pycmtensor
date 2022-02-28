@@ -1,16 +1,15 @@
-Welcome to PyCMTensor's documentation!
-======================================
+.. include:: ../README.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-   readme
    installation
    usage
    contributing
    authors
    changelog
+   autoapi/index
 
 Indices and tables
 ==================
