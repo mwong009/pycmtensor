@@ -1,3 +1,14 @@
+## v0.5.0b0 (2022-03-01)
+
+### Fix
+
+- **result**: print more verbose results and options
+
+### Feat
+
+- **models**: add method prob() to MNLogit to output prob slices
+- **time_format**: enable logging of build and estimation time
+
 ## v0.4.1 (2022-02-27)
 
 ### Fix
