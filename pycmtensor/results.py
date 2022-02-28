@@ -42,6 +42,11 @@ class Results:
         null_loglike = model.null_ll
         max_loglike = model.best_ll
 
+        self.build_time = time_format(model.build_time)
+        self.train_time = time_format(model.train_time)
+        self.epochs_per_sec = model.epochs_per_sec
+        self.seed = model.seed
+
         self.beta_results = get_beta_statistics(model, database)
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
         self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
@@ -62,17 +67,18 @@ class Results:
         self.max_loglike = max_loglike
 
         self.print_results = (
-            f"Results for model {self.name}\n"
+            f"Results for model: {self.name}\n"
+            + f"Build time: {self.build_time}\n"
+            + f"Estimation time: {self.train_time}\n"
+            + f"Estimation rate: {self.epochs_per_sec} epochs/s\n"
+            + f"Seed value: {self.seed}\n"
             + f"Number of Beta parameters: {self.n_params}\n"
-            + (
-                f"Total size of Neural Net weights: {self.n_weights}\n"
-                if n_weights > 0
-                else ""
-            )
+            + (f"Tensor size: {self.n_weights}\n" if n_weights > 0 else "")
             + f"Sample size: {self.sample_size}\n"
             + f"Excluded data: {self.excluded_data}\n"
             + f"Init loglikelihood: {self.null_loglike:.3f}\n"
             + f"Final loglikelihood: {self.max_loglike:.3f}\n"
+            + f"Final loglikelihood reached at: epoch {self.best_epoch}\n"
             + f"Likelihood ratio test: {self.ll_ratio_test:.3f}\n"
             + f"Accuracy: {(100 * self.best_ll_score):.3f}%\n"
             + f"Rho square: {self.rho_square:.3f}\n"
@@ -83,6 +89,8 @@ class Results:
         )
 
         print(self.print_results)
+
+        print("Statistical Analysis:")
         print(self.beta_results.to_string(), "\n")
 
         if model.get_weight_size() != 0:

@@ -1,5 +1,7 @@
 # pymctensor.py
 
+import timeit
+
 import aesara
 import aesara.tensor as aet
 import dill as pickle
@@ -12,6 +14,7 @@ from pycmtensor.utils import learn_rate_tempering, tqdm_nb_check
 
 def build_functions(model, db, optimizer=None):
     print("Building model...")
+    start_time = timeit.default_timer()
     lr = aet.scalar("learning_rate")
     index = aet.lscalar("index")
     batch_size = aet.lscalar("batch_size")
@@ -75,7 +78,8 @@ def build_functions(model, db, optimizer=None):
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
         name="errors",
     )
-
+    end_time = timeit.default_timer()
+    model.build_time = round(end_time - start_time, 3)
     return model
 
 
@@ -93,7 +97,8 @@ def train(
     tqdm = tqdm_nb_check(notebook)
     assert isinstance(model, PyCMTensorModel), f"{model} is an invalid model."
     db = database
-    rng = np.random.default_rng(seed)
+    model.seed = seed
+    rng = np.random.default_rng(model.seed)
     model = build_functions(model, db, optimizer)
 
     n_samples = len(db.data)
@@ -107,6 +112,7 @@ def train(
     total_iter = max_epoch * n_batches
     epoch = 0
 
+    start_time = timeit.default_timer()
     print("dataset: {} ({})".format(db.name, n_samples))
     print("batch size: {}".format(batch_size))
     print("batches per epoch: {}".format(n_batches))
@@ -173,6 +179,11 @@ def train(
                 early_stopping = True
                 break
 
+    end_time = timeit.default_timer()
+    model.train_time = end_time - start_time
+    model.epochs_per_sec = round(epoch / model.train_time, 3)
+    model.max_iterations = iter
+
     with open(model.name + ".pkl", "wb") as f:
         pickle.dump(model, f)  # save model to pickle
 
@@ -180,8 +191,8 @@ def train(
         print("Maximum patience reached. Early stopping...")
     print(
         (
-            "Optimization complete with accuracy of {0:6.3f}%\n"
-            " with maximum loglikelihood reached @ epoch {1}."
+            "Optimization complete with accuracy of {0:6.3f}%"
+            " with maximum loglikelihood reached @ epoch {1}.\n"
         ).format(model.best_ll_score * 100.0, model.best_epoch)
     )
     if debug is False:
