@@ -82,6 +82,18 @@ class MNLogit(PyCMTensorModel):
         # probability is maximal
         self.pred = aet.argmax(self.p_y_given_x, axis=0)
 
+    def prob(self, choice: int = None):
+        """Returns the probabilities $P(y_i|x)$ of the slice $i$
+
+        Args:
+            choice (int): The index of p_y_given_x. If None, returns the full vector
+            of probabilities.
+        """
+        if choice == None:
+            return self.p_y_given_x
+        else:
+            return self.p_y_given_x[choice]
+
     def __str__(self):
         return f"{self.name}"
 
