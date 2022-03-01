@@ -4,7 +4,7 @@ version = "0.5.0b0"
 description = "Python Tensor based package for Deep neural net assisted Discrete Choice Modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
-readme = "README.rst"
+readme = "README.md"
 
 homepage = ""
 repository = "https://github.com/mwong009/pycmtensor"
