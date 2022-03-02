@@ -1,13 +1,19 @@
-## v0.5.0b0 (2022-03-01)
-
-### Fix
-
-- **result**: print more verbose results and options
+## v0.5.0 (2022-03-02)
 
 ### Feat
 
+- **config**: add PyCMTensorConfig class to store config settings
+- **expressions**: add magic methods lt le gt le ne eq
+- **config.py**: enable pre-writing of .aesararc config file on module load
 - **models**: add method prob() to MNLogit to output prob slices
 - **time_format**: enable logging of build and estimation time
+
+### Fix
+
+- **statistics**: add small value to stderror calculation to address sqrt(0)
+- **dependencies**: move ipywidgets and pydot to dependencies
+- renamed .rst to .md fix FileNotFoundError
+- **result**: print more verbose results and options
 
 ## v0.4.1 (2022-02-27)
 
@@ -60,5 +66,3 @@
 ### Fix
 
 - **swissmetro_test.ipynb**: update swissmetro example
-
-## v0.2.1 (2022-02-20)
