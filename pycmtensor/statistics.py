@@ -37,7 +37,7 @@ def stderror(h, params):
         if varCovar[i, i] < 0:
             stdErr.append(np.finfo(float).max)
         else:
-            stdErr.append(np.sqrt(varCovar[i, i]))
+            stdErr.append(np.sqrt(varCovar[i, i] + 1e-8))  # for numerical stability
 
     return stdErr
 
@@ -51,7 +51,7 @@ def rob_stderror(h, bhhh, params):
         if robVarCovar[i, i] < 0:
             robstderr.append(np.finfo(float).max)
         else:
-            robstderr.append(np.sqrt(robVarCovar[i, i]))
+            robstderr.append(np.sqrt(robVarCovar[i, i] + 1e-8))
 
     return robstderr
 
