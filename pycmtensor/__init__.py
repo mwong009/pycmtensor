@@ -3,7 +3,7 @@
 __author__ = """Melvin Wong"""
 __version__ = "0.5.0"
 
-from pycmtensor.config import PyCMTensorConfig
+from pycmtensor.configparser import PyCMTensorConfig
 
 config = PyCMTensorConfig()
 config.generate_config_file()
