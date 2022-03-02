@@ -104,6 +104,54 @@ class Expressions:
         else:
             return super().__rpow__(other)
 
+    def __lt__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() < other
+        elif isinstance(other, Beta):
+            return self() < other()
+        else:
+            return super().__lt__(other)
+
+    def __le__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() <= other
+        elif isinstance(other, Beta):
+            return self() <= other()
+        else:
+            return super().__le__(other)
+
+    def __gt__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() > other
+        elif isinstance(other, Beta):
+            return self() > other()
+        else:
+            return super().__gt__(other)
+
+    def __ge__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() >= other
+        elif isinstance(other, Beta):
+            return self() >= other()
+        else:
+            return super().__ge__(other)
+
+    def __eq__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() == other
+        elif isinstance(other, Beta):
+            return self() == other()
+        else:
+            return super().__eq__(other)
+
+    def __ne__(self, other):
+        if isinstance(other, TensorVariable):
+            return self() != other
+        elif isinstance(other, Beta):
+            return self() != other()
+        else:
+            return super().__ne__(other)
+
 
 class Beta(Expressions, bioexp.Beta):
     def __init__(self, name, value, lb, ub, status):
