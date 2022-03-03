@@ -54,7 +54,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.graphviz",
     "sphinx.ext.inheritance_diagram",
-    "m2r2",
+    # "m2r2",
+    "myst_nb",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -74,7 +75,11 @@ todo_include_todos = False
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = [".rst", ".md"]
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".md": "myst-nb",
+}
 
 # The master toctree document.
 master_doc = "index"
@@ -107,7 +112,19 @@ html_theme = "sphinx_book_theme"
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "repository_url": "https://github.com/mwong009/pycmtensor",
+    "use_repository_button": True,
+    "repository_branch": "Master",
+    "use_issues_button": True,
+    "path_to_docs": "docs/",
+    "home_page_in_toc": True,
+    "use_edit_page_button": True,
+    "show_toc_level": 2,
+}
+
+# html_logo = "path/to/myimage.png"
+# html_title = "My site title"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

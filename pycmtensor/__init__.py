@@ -11,3 +11,7 @@ config.set_num_threads()
 
 from pycmtensor.database import *
 from pycmtensor.pycmtensor import *
+
+
+def hello():
+    print(f"PyCMTensor version {__version__}")

@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fix
+
+- **configparser**: renamed from config to prevent doc conflicts
+
 ## v0.5.0 (2022-03-02)
 
 ### Feat
