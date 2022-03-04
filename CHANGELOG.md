@@ -1,3 +1,9 @@
+## v0.5.2 (2022-03-04)
+
+### Perf
+
+- **statistics**: precompute H and BHHH to results
+
 ## v0.5.1 (2022-03-04)
 
 ### Fix
