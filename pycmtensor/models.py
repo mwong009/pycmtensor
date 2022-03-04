@@ -38,7 +38,7 @@ class PyCMTensorModel:
             self.remove_unused_params(self.cost)
 
     def remove_unused_params(self, expression):
-        """Removes unused parameters not in `expression`
+        """Removes unused parameters not present in `expression`
 
         Args:
             expression (TensorVariable): The tensor expression to be checked
@@ -49,16 +49,20 @@ class PyCMTensorModel:
         symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
         params = []
         beta_params = []
+        unused_params = []
         for param in self.params:
             if param.status == 0:
                 if param.name in symbols:
                     params.append(param)
                 else:
-                    print(
-                        f"{__name__}.py: PyCMTensorWarning: "
-                        f"{param} is unused, removing from computational graph. "
-                        f"To explicity keep in model, set status=1."
-                    )
+                    unused_params.append(param.name)
+        if len(unused_params) > 0:
+            print(
+                f"PyCMTensorWarning: "
+                + f"Removing unused Betas from computational graph:"
+                + "".join(f" {p}" for p in unused_params)
+                + f". To explicity keep params in model, set param status=1."
+            )
 
         for param in self.beta_params:
             if param.status == 0:
