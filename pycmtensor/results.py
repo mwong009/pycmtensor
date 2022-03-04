@@ -90,7 +90,8 @@ class Results:
         )
 
         print(self.print_results)
-        self.precompute_hessians_and_bhhh()
+        if not (hasattr(self, "H") and hasattr(self, "BHHH")):
+            self.precompute_hessians_and_bhhh()
 
     def precompute_hessians_and_bhhh(self):
         db = self.database
