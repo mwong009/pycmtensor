@@ -34,6 +34,40 @@ class PyCMTensorModel:
                 if isinstance(param, (Beta)):
                     self.beta_params.append(param)
 
+        if hasattr(self, "cost"):
+            self.remove_unused_params(self.cost)
+
+    def remove_unused_params(self, expression):
+        """Removes unused parameters not in `expression`
+
+        Args:
+            expression (TensorVariable): The tensor expression to be checked
+        """
+        stdout = str(aesara.pprint(expression))
+        stdout = str.replace(stdout, "(", " ")
+        stdout = str.replace(stdout, ")", " ")
+        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        params = []
+        beta_params = []
+        for param in self.params:
+            if param.status == 0:
+                if param.name in symbols:
+                    params.append(param)
+                else:
+                    print(
+                        f"{__name__}.py: PyCMTensorWarning: "
+                        f"{param} is unused, removing from computational graph. "
+                        f"To explicity keep in model, set status=1."
+                    )
+
+        for param in self.beta_params:
+            if param.status == 0:
+                if param.name in symbols:
+                    beta_params.append(param)
+
+        self.params = params
+        self.beta_params = beta_params
+
     def add_regularizers(self, l_reg):
         if hasattr(self, "cost"):
             self.cost += l_reg
