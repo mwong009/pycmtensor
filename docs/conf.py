@@ -120,7 +120,7 @@ html_theme_options = {
     "path_to_docs": "docs/",
     "home_page_in_toc": True,
     "use_edit_page_button": True,
-    "show_toc_level": 2,
+    "show_toc_level": 1,
 }
 
 # html_logo = "path/to/myimage.png"
