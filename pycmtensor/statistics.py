@@ -56,14 +56,8 @@ def rob_stderror(h, bhhh, params):
     return robstderr
 
 
-def correlation_matrix(model, db):
-    H = aesara.function(
-        inputs=model.inputs,
-        outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-    )
-
-    h = H(*db.input_data())
+def correlation_matrix(model):
+    h = model.H()
 
     varCovar = variance_covariance(h)
     d = np.diag(varCovar)
@@ -82,20 +76,8 @@ def correlation_matrix(model, db):
     return df
 
 
-def rob_correlation_matrix(model, db):
-    H = aesara.function(
-        inputs=model.inputs,
-        outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-    )
-    BH = aesara.function(
-        inputs=model.inputs,
-        outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-    )
-    robVarCovar = rob_variance_covariance(
-        h=H(*db.input_data()), bhhh=BH(*db.input_data())
-    )
+def rob_correlation_matrix(model):
+    robVarCovar = rob_variance_covariance(h=model.H(), bhhh=model.BH())
     rd = np.diag(robVarCovar)
     if (rd > 0).all():
         diag = np.diag(np.sqrt(rd))
