@@ -156,7 +156,9 @@ class Expressions:
 class Beta(Expressions, bioexp.Beta):
     def __init__(self, name, value, lb, ub, status):
         bioexp.Beta.__init__(self, name, value, lb, ub, status)
-        self.sharedVar = aesara.shared(value=np.array(value, dtype=floatX), name=name)
+        self.sharedVar = aesara.shared(
+            value=np.array(value, dtype=floatX), borrow=True, name=name
+        )
         self.sharedVar.__dict__.update({"status": status, "lb": lb, "ub": ub})
 
     def __call__(self):
@@ -190,7 +192,7 @@ class Weights(Expressions):
             else:
                 value = np.zeros(size, dtype=floatX)
 
-        self.sharedVar = aesara.shared(value=value, name=name)
+        self.sharedVar = aesara.shared(value=value, name=name, borrow=True)
         self.shape = self.sharedVar.shape
         self.sharedVar.__dict__.update({"status": self.status})
 
