@@ -4,7 +4,7 @@
 
 Python Tensor based package for Deep neural net assisted Discrete Choice Modelling.
 
-![](https://img.shields.io/badge/pycmtensor-0.5.0-orange)
+![](https://img.shields.io/badge/pycmtensor-0.5.1-orange)
 
 ![](https://img.shields.io/pypi/v/pycmtensor.svg)
 [![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?version=latest)

@@ -1,8 +1,15 @@
-## Unreleased
+## v0.5.1 (2022-03-04)
 
 ### Fix
 
+- **expressions**: change dunder calls to aesara.tensor methods
+- **models**: compact unused Betas message
+- **Beta**: add borrow=True to sharedVariables
 - **configparser**: renamed from config to prevent doc conflicts
+
+### Feat
+
+- **params**: add routine to remove unused params from computational graph
 
 ## v0.5.0 (2022-03-02)
 
