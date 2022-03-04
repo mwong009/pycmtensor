@@ -112,7 +112,7 @@ class Results:
     def print_beta_statistics(self):
         self.betaResults = get_beta_statistics(self.model, self.database)
         print("Statistical Analysis:")
-        print(self.betaResults.to_string())
+        print(self.betaResults.to_string() + f"\n")
 
     def print_nn_weights(self):
         if self.model.get_weight_size() == 0:
@@ -128,7 +128,8 @@ class Results:
 
     def print_correlation_matrix(self):
         self.correlationMatrix = correlation_matrix(self.model)
-        print(self.correlationMatrix.to_string())
+        print("Correlation matrix:")
+        print(self.correlationMatrix.to_string() + f"\n")
 
     def __str__(self):
         return self.print_results + self.beta_results.to_string()
