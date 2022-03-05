@@ -1,5 +1,7 @@
 # database.py
 
+import logging
+
 import aesara
 import aesara.tensor as aet
 import biogeme.database as biodb
@@ -11,6 +13,7 @@ floatX = aesara.config.floatX
 class Database(biodb.Database):
     def __init__(self, name, pandasDatabase, choiceVar):
         super().__init__(name, pandasDatabase)
+        self.logger = logging.getLogger(__name__)
         assert choiceVar in self.data.columns
         for name, variable in self.variables.items():
             if name in self.data.columns:
@@ -19,6 +22,7 @@ class Database(biodb.Database):
                 else:
                     variable.x = aet.vector(name)
         self.choiceVar = self[choiceVar]
+        self.logger.info("Choice variable set as {}".format(self.choiceVar))
 
     def __getstate__(self):
         return self.__dict__
