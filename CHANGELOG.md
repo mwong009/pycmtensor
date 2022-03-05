@@ -1,3 +1,19 @@
+## v0.5.3 (2022-03-05)
+
+### Fix
+
+- **pycmtensor**: fix various training config
+- **logger**: add logging functionality pycmtensor.logger
+- **results**: skip precompute routine if H and BHHH already exist
+
+### Perf
+
+- set fixed learning rate
+
+### Feat
+
+- **logging**: add logging to __init__
+
 ## v0.5.2 (2022-03-04)
 
 ### Perf
