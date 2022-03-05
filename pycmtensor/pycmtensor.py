@@ -1,5 +1,6 @@
 # pymctensor.py
 
+import logging
 import timeit
 
 import aesara
@@ -7,13 +8,16 @@ import aesara.tensor as aet
 import dill as pickle
 import numpy as np
 
-from pycmtensor.functions import errors, full_loglikelihood
-from pycmtensor.models import PyCMTensorModel
-from pycmtensor.utils import learn_rate_tempering, tqdm_nb_check
+from pycmtensor import logger as log
+from pycmtensor.logger import PyCMTensorError
+
+from .functions import errors, full_loglikelihood
+from .models import PyCMTensorModel
+from .utils import learn_rate_tempering, tqdm_nb_check
 
 
 def build_functions(model, db, optimizer=None):
-    print("Building model...")
+    log.info("Building model...")
     start_time = timeit.default_timer()
     lr = aet.scalar("learning_rate")
     index = aet.lscalar("index")
@@ -83,58 +87,77 @@ def build_functions(model, db, optimizer=None):
     return model
 
 
+def inspect_model(model):
+    if not isinstance(model, PyCMTensorModel):
+        msg = f"{model} is not a valid PyCMTensorModel model."
+        log.error(msg)
+        raise PyCMTensorError(msg)
+    return model
+
+
 def train(
     model,
     database,
     optimizer,
     batch_size=256,
     max_epoch=2000,
-    lr_init=0.01,
+    base_lr=0.01,
     seed=999,
     debug=False,
     notebook=False,
 ):
-    tqdm = tqdm_nb_check(notebook)
-    assert isinstance(model, PyCMTensorModel), f"{model} is an invalid model."
-    db = database
-    model.seed = seed
-    rng = np.random.default_rng(model.seed)
-    model = build_functions(model, db, optimizer)
+    inspect_model(model)
+    model = build_functions(model, database, optimizer)
 
-    n_samples = len(db.data)
-    n_batches = n_samples // batch_size
-    patience = 20000
-    patience_increase = 2
-    validation_threshold = 1.003
-    validation_frequency = min(n_batches, patience / 2)
+    # model config
+    model.config["seed"] = seed
+    model.config["max_epoch"] = max_epoch
+    model.config["batch_size"] = batch_size
+    model.config["base_lr"] = base_lr
+
+    # training state
+    epoch = 0
+    tqdm = tqdm_nb_check(notebook)
+    rng = np.random.default_rng(seed)
+
+    # training hyperparameters
+    n_samples = database.get_rows()
+    step_size = n_samples // batch_size
+    max_iter = max_epoch * step_size
+    patience = max_iter // 2
+    patience_increase = model.config["patience_increase"]
+    validation_threshold = model.config["validation_threshold"]
+    validation_frequency = min(step_size, patience / 2)
+
+    # flags
     done_looping = False
     early_stopping = False
-    total_iter = max_epoch * n_batches
-    epoch = 0
 
     start_time = timeit.default_timer()
-    print("dataset: {} ({})".format(db.name, n_samples))
-    print("batch size: {}".format(batch_size))
-    print("batches per epoch: {}".format(n_batches))
-    print("validation frequency: {}\n".format(validation_frequency))
-    print("Training model...")
+    log.info(f"Training model...")
+    print(
+        f"dataset: {database.name} (n={n_samples})\n"
+        + f"batch size: {batch_size}\n"
+        + f"iterations per epoch: {step_size}"
+    )
 
     model.null_ll = model.loglikelihood()
     model.best_ll_score = 1 - model.output_errors()
     model.best_ll = model.null_ll
+    best_model = model
 
     if debug is False:
         pbar0 = tqdm(
             bar_format=(
-                "Loglikelihood:  {postfix[0][ll]:.6f}  Score: {postfix[1][sc]:.3f}"
+                "Loglikelihood:  {postfix[0][ll]:.3f}  Score: {postfix[1][sc]:.3f}"
             ),
             postfix=[{"ll": model.null_ll}, {"sc": model.best_ll_score}],
             position=0,
             leave=True,
         )
         pbar = tqdm(
-            total=total_iter,
-            desc="Epoch {0:4d}/{1}".format(0, total_iter),
+            total=max_iter,
+            desc="Epoch {0:4d}/{1}".format(0, max_iter),
             unit_scale=True,
             position=1,
             leave=True,
@@ -143,8 +166,8 @@ def train(
     while (epoch < max_epoch) and (not done_looping):
         epoch = epoch + 1
 
-        for batch_index in range(n_batches):
-            iter = (epoch - 1) * n_batches + batch_index
+        for batch_index in range(step_size):
+            iter = (epoch - 1) * step_size + batch_index
 
             lr = base_lr
             i = rng.integers(0, step_size)
@@ -156,18 +179,20 @@ def train(
             if (iter + 1) % validation_frequency == 0:
                 ll = model.loglikelihood()
                 if ll > model.best_ll:
-                    model.best_ll = ll
+                    if ll > (model.best_ll * validation_threshold):
+                        patience = max(patience, iter * patience_increase)
+                        patience = min(patience, max_iter)
+
                     model.best_epoch = epoch
                     model.best_ll_score = 1 - model.output_errors()
+                    model.best_ll = ll
+
+                    best_model = model
 
                     if debug is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
                         pbar0.postfix[1]["sc"] = model.best_ll_score
                         pbar0.update()
-
-                    if ll > (model.best_ll * validation_threshold):
-                        patience = max(patience, iter * patience_increase)
-                        best_model = model
 
             if debug is False:
                 pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
@@ -182,17 +207,17 @@ def train(
     end_time = timeit.default_timer()
     model.train_time = end_time - start_time
     model.epochs_per_sec = round(epoch / model.train_time, 3)
-    model.max_iterations = iter
+    model.iterations = iter
 
     with open(model.name + ".pkl", "wb") as f:
         pickle.dump(model, f)  # save model to pickle
 
     if early_stopping:
-        print("Maximum patience reached. Early stopping...")
+        log.warning("Maximum patience reached. Early stopping...")
     print(
         (
-            "Optimization complete with accuracy of {0:6.3f}%"
-            " with maximum loglikelihood reached @ epoch {1}.\n"
+            "Optimization complete with accuracy of {0:6.3f}%."
+            " Max loglikelihood reached @ epoch {1}.\n"
         ).format(model.best_ll_score * 100.0, model.best_epoch)
     )
     if debug is False:

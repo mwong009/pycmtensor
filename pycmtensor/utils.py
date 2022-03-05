@@ -1,7 +1,16 @@
 # utils.py
+"""Collection of useful functions and methods"""
 
 
-def tqdm_nb_check(notebook):
+def tqdm_nb_check(notebook: bool):
+    """Check if `__main__` is running from a notebook or not.
+
+    Args:
+        notebook (book): Boolean flag from `train{}` if program is running in a Jupyter Notebook.
+
+    Returns:
+        `tqdm`: Returns the tqdm module if not running in a notebook, else returns a tqdm.notebook module.
+    """
     assert isinstance(notebook, bool)
     if notebook:
         from tqdm.notebook import tqdm
@@ -12,12 +21,12 @@ def tqdm_nb_check(notebook):
 
 
 def learn_rate_tempering(iter, patience, lr_init):
-    """Tempering learning rate as a function of iteration step
+    """Tempering learning rate as a function of iteration step.
 
     Args:
         iter (int): Iteration step.
         patience (int): The maximum number of iterations.
-        lr_init (float): Initial learning rate
+        lr_init (float): Initial learning rate.
 
     Returns:
         float: A new learning rate value
