@@ -146,8 +146,8 @@ def train(
         for batch_index in range(n_batches):
             iter = (epoch - 1) * n_batches + batch_index
 
-            lr = learn_rate_tempering(iter, patience, lr_init)
-            i = rng.integers(0, n_batches)
+            lr = base_lr
+            i = rng.integers(0, step_size)
             shift = rng.integers(0, batch_size)
             # train model
             model.loglikelihood_estimation(i, batch_size, shift, lr)
