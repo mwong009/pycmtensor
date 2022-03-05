@@ -1,10 +1,15 @@
 # models.py
 
+import logging
+
 import aesara
 import aesara.tensor as aet
 
-from pycmtensor.expressions import Beta, Weights
-from pycmtensor.functions import logit, neg_loglikelihood
+from pycmtensor import logger as log
+
+from .configparser import config
+from .expressions import Beta, Weights
+from .functions import logit, neg_loglikelihood
 
 
 class PyCMTensorModel:
@@ -13,10 +18,11 @@ class PyCMTensorModel:
         self.params = []  # keep track of params
         self.beta_params = []
         self.inputs = db.tensors()
+        self.config = config
 
     def append_to_params(self, params):
         """[Depreciated] Use add_params() instead."""
-        print(f"Depreciated method append_to_params(). Use add_params() instead.")
+        log.warning(f"Depreciated method append_to_params(). Use add_params() instead.")
         return self.add_params(params)
 
     def add_params(self, params):
@@ -57,12 +63,12 @@ class PyCMTensorModel:
                 else:
                     unused_params.append(param.name)
         if len(unused_params) > 0:
-            print(
-                f"PyCMTensorWarning: "
-                + f"Removing unused Betas from computational graph:"
-                + "".join(f" {p}" for p in unused_params)
-                + f". To explicity keep params in model, set param status=1."
+            msg = (
+                f"Unused Betas from computational graph:"
+                + f"".join(f" {p}" for p in unused_params)
+                + f" removed. To explicity keep params in model, set param status=1."
             )
+            log.warning(msg)
 
         for param in self.beta_params:
             if param.status == 0:
@@ -76,7 +82,7 @@ class PyCMTensorModel:
         if hasattr(self, "cost"):
             self.cost += l_reg
         else:
-            print("Error in reading cost function")
+            log.error("No valid cost function defined.")
 
     def get_weights(self):
         return [p for p in self.params if ((p().ndim > 1) and (p.status != 1))]

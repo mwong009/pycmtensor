@@ -7,13 +7,15 @@ import aesara.tensor as aet
 import biogeme.database as biodb
 import numpy as np
 
+from pycmtensor import logger as log
+from pycmtensor.logger import PyCMTensorError
+
 floatX = aesara.config.floatX
 
 
 class Database(biodb.Database):
     def __init__(self, name, pandasDatabase, choiceVar):
         super().__init__(name, pandasDatabase)
-        self.logger = logging.getLogger(__name__)
         assert choiceVar in self.data.columns
         for name, variable in self.variables.items():
             if name in self.data.columns:
@@ -22,7 +24,7 @@ class Database(biodb.Database):
                 else:
                     variable.x = aet.vector(name)
         self.choiceVar = self[choiceVar]
-        self.logger.info("Choice variable set as {}".format(self.choiceVar))
+        log.info(f"Choice variable set as '{self.choiceVar}'")
 
     def __getstate__(self):
         return self.__dict__
@@ -43,7 +45,9 @@ class Database(biodb.Database):
         elif hasattr(self.variables[item], "y"):
             return self.variables[item].y
         else:
-            raise NotImplementedError(f"Variable {item} not found")
+            msg = f"Variable {item} not found"
+            log.error(msg)
+            raise PyCMTensorError(msg)
 
     def compile_data(self):
         self.sharedData = {}
@@ -56,6 +60,14 @@ class Database(biodb.Database):
                     self.sharedData[name] = aet.cast(shared_data, "int32")
                 else:
                     self.sharedData[name] = shared_data
+
+    def get_rows(self):
+        """Get the number of observations (row) in the database
+
+        Returns:
+            int: The number of rows in the dataset
+        """
+        return len(self.data)
 
     def get_x_tensors(self):
         x_tensors = []
@@ -147,4 +159,4 @@ class Database(biodb.Database):
                         self.data[d] /= default
                         scale = default
                 if verbose:
-                    print("scaling {} by {}".format(d, scale))
+                    log.info(f"scaling {d} by {scale}")

@@ -6,34 +6,27 @@ import multiprocessing
 import os
 import sys
 
+from pycmtensor import logger as log
+
 
 class PyCMTensorConfig:
     """Object that holds the configuration settings."""
 
     def __init__(self):
-        self._pycmtensor_dict = {}
-        self["PATIENCE"] = 20000
-        self["PATIENCE_INCREASE"] = 2
-        self["VALIDATION_FREQUENCY"] = 10000
-        self["VALIDATION_THRESHOLD"] = 1.003
-        self["SEED"] = 999
-        self["MAX_EPOCH"] = 2000
-        self["CWD"] = os.getcwd()
-        self["PROCESSOR_IDENTIFIER"] = os.environ["PROCESSOR_IDENTIFIER"]
-        self["PYTHON_VERSION"] = sys.version
-        self["LOG_LEVEL"] = logging.WARNING
-
-        self.logger = logging.getLogger(__name__)
+        self._config = {
+            "patience_increase": 2,
+            "validation_threshold": 1.005,
+            "cwd": os.getcwd(),
+            "processor_identifier": os.environ["PROCESSOR_IDENTIFIER"],
+            "python_version": sys.version,
+            "seed": 999,
+        }
 
     def __getitem__(self, item):
-        return self._pycmtensor_dict[item]
+        return self._config[item]
 
     def __setitem__(self, key, val):
-        if key == "SEED":
-            assert (val >= 0) and (
-                val < 65536
-            ), f"Seed value must be between 0 and 65535"
-        self._pycmtensor_dict[key] = val
+        self._config[key] = val
 
     def __getstate__(self):
         return self.__dict__
@@ -42,7 +35,7 @@ class PyCMTensorConfig:
         self.__dict__.update(state)
 
     def __repr__(self):
-        return f"{self._pycmtensor_dict}"
+        return "".join(f"{key}: {val}\n" for key, val in self._config.items())
 
     def generate_config_file(self):
         ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
@@ -57,7 +50,7 @@ class PyCMTensorConfig:
         aesararc_dir = os.path.expanduser("~")
         aesara_config = os.path.join(aesararc_dir, ".aesararc")
         if os.path.isfile(aesara_config):
-            self.logger.log(logging.DEBUG, ".aesararc file found in user dir")
+            log.debug(".aesararc file found in user dir")
         else:
 
             with open(os.path.join(aesararc_dir, ".aesararc"), "w") as f:
@@ -76,3 +69,6 @@ class PyCMTensorConfig:
 
         self["MKL_NUM_THREADS"] = num_cores
         self["OMP_NUM_THREADS"] = num_cores
+
+
+config = PyCMTensorConfig()

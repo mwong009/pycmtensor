@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
+from pycmtensor import logger as log
 from pycmtensor.functions import bhhh, hessians
 from pycmtensor.statistics import *
 
@@ -37,7 +38,7 @@ class Results:
         self.model = model
         self.database = database
         self.show_weights = show_weights
-        sample_size = len(database.data)
+        n_samples = database.get_rows()
         n_params = len(model.get_betas())
         n_weights = model.get_weight_size()
         k = n_params + n_weights
@@ -48,19 +49,19 @@ class Results:
         self.build_time = time_format(model.build_time)
         self.train_time = time_format(model.train_time)
         self.epochs_per_sec = model.epochs_per_sec
-        self.seed = model.seed
+        self.seed = model.config["seed"]
 
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
         self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
         self.ll_ratio_test = -2.0 * (null_loglike - max_loglike)
 
         self.akaike = 2.0 * (k - max_loglike)
-        self.bayesian = -2.0 * max_loglike + k * np.log(sample_size)
+        self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
         self.g_norm = gradient_norm(model, database)
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
-        self.sample_size = sample_size
+        self.sample_size = n_samples
         self.excluded_data = database.excludedData
         self.best_epoch = model.best_epoch
         self.best_ll_score = model.best_ll_score
@@ -111,13 +112,13 @@ class Results:
         )
 
     def print_beta_statistics(self):
-        self.betaResults = get_beta_statistics(self.model, self.database)
+        self.betaResults = get_beta_statistics(self.model)
         print("Statistical Analysis:")
         print(self.betaResults.to_string() + f"\n")
 
     def print_nn_weights(self):
         if self.model.get_weight_size() == 0:
-            print("No weights to show")
+            log.warning("No weights to show")
         else:
             self.weights = self.model.output_estimated_weights()
             if self.show_weights:
@@ -165,7 +166,7 @@ class Predict:
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
-def get_beta_statistics(model, db):
+def get_beta_statistics(model):
     h = model.H()
     bh = model.BHHH()
 
