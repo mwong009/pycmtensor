@@ -1,7 +1,6 @@
 # config.py
 
 import glob
-import logging
 import multiprocessing
 import os
 import sys
@@ -18,9 +17,14 @@ class PyCMTensorConfig:
             "patience_increase": 2,
             "validation_threshold": 1.003,
             "cwd": os.getcwd(),
-            "processor_identifier": os.environ["PROCESSOR_IDENTIFIER"],
             "python_version": sys.version,
             "seed": 999,
+            "cyclic_lr_step_size": 8,
+            "base_lr": 0.0001,
+            "max_lr": 0.01,
+            "max_epoch": 2000,
+            "batch_size": 64,
+            "cyclic_lr_mode": "triangular2",
         }
 
     def __getitem__(self, item):

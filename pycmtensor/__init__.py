@@ -7,5 +7,4 @@ from .configparser import config
 from .database import *
 from .pycmtensor import *
 
-config.generate_config_file()
 config.set_num_threads()
