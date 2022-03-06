@@ -1,3 +1,15 @@
+## v0.6.0 (2022-03-06)
+
+### Feat
+
+- **scheduler.py**: add new scheduler (CyclicLR) for adaptive LR
+- **trackers**: add tracking to monitor training loss/score
+
+### Fix
+
+- **config**: loadout config from train() to configparser
+- **utils**: fix TypeError check
+
 ## v0.5.3 (2022-03-05)
 
 ### Fix
