@@ -4,46 +4,25 @@
 
 - **scheduler.py**: add new scheduler (CyclicLR) for adaptive LR
 - **trackers**: add tracking to monitor training loss/score
+- **logging**: add logging to __init__
+- **params**: add routine to remove unused params from computational graph
 
 ### Fix
 
 - **config**: loadout config from train() to configparser
 - **utils**: fix TypeError check
-
-## v0.5.3 (2022-03-05)
-
-### Fix
-
 - **pycmtensor**: fix various training config
 - **logger**: add logging functionality pycmtensor.logger
 - **results**: skip precompute routine if H and BHHH already exist
-
-### Perf
-
-- set fixed learning rate
-
-### Feat
-
-- **logging**: add logging to __init__
-
-## v0.5.2 (2022-03-04)
-
-### Perf
-
-- **statistics**: precompute H and BHHH to results
-
-## v0.5.1 (2022-03-04)
-
-### Fix
-
 - **expressions**: change dunder calls to aesara.tensor methods
 - **models**: compact unused Betas message
 - **Beta**: add borrow=True to sharedVariables
 - **configparser**: renamed from config to prevent doc conflicts
 
-### Feat
+### Perf
 
-- **params**: add routine to remove unused params from computational graph
+- set fixed learning rate
+- **statistics**: precompute H and BHHH to results
 
 ## v0.5.0 (2022-03-02)
 
@@ -61,11 +40,6 @@
 - **dependencies**: move ipywidgets and pydot to dependencies
 - renamed .rst to .md fix FileNotFoundError
 - **result**: print more verbose results and options
-
-## v0.4.1 (2022-02-27)
-
-### Fix
-
 - **Database**: add name to shared_data
 - **train**: model instance now load initiated model class (not input Class as argument)
 - **Database**: set choiceVar to mandatory argument
