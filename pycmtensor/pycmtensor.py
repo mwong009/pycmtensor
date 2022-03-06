@@ -1,4 +1,5 @@
 # pymctensor.py
+""" Core functionality """
 
 import timeit
 
@@ -17,6 +18,19 @@ from .utils import tqdm_nb_check
 
 
 def build_functions(model, db, optimizer=None):
+    """Build callable objects that will calculate ``outputs`` from ``inputs``.
+
+    Args:
+        model (PyCMTensorModel): must be of a :class:`PyCMTensorModel` model class object.
+        db (Database): the :class:`Database` object.
+        optimizer (Optimizer, optional): optimizer object class to use. If ``None`` is given, skips the build of loglikelihood_estimation function.
+
+    Returns:
+        PyCMTensorModel: the updated ``model`` instance.
+
+    Note:
+        :func:`build_functions` is called internally from :func:`train`. Generally you do not need to call this in your program.
+    """
     log.info("Building model...")
     start_time = timeit.default_timer()
     lr = aet.scalar("learning_rate")
@@ -55,24 +69,26 @@ def build_functions(model, db, optimizer=None):
         name="p_y_given_x",
     )
 
-    model.output_choices = aesara.function(
+    model.output_predictions = aesara.function(
         inputs=[],
         outputs=model.pred,
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        name="predict",
+        name="output_predictions",
     )
 
     model.output_estimated_betas = aesara.function(
         inputs=[],
         outputs=model.get_beta_values(),
         on_unused_input="ignore",
+        name="output_betas",
     )
 
     model.output_estimated_weights = aesara.function(
         inputs=[],
         outputs=model.get_weight_values(),
         on_unused_input="ignore",
+        name="output_weights",
     )
 
     model.output_errors = aesara.function(
@@ -80,7 +96,7 @@ def build_functions(model, db, optimizer=None):
         outputs=errors(model.p_y_given_x, model.y),
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        name="errors",
+        name="output_errors",
     )
     end_time = timeit.default_timer()
     model.build_time = round(end_time - start_time, 3)
@@ -88,6 +104,29 @@ def build_functions(model, db, optimizer=None):
 
 
 def inspect_model(model):
+    """Raises and error if `model` is not a valid ``PyCMTensorModel`` class.
+
+    Args:
+        model (PyCMTensorModel): the constructed model class.
+
+    Raises:
+        PyCMTensorError: logs an error if the model class is an invalid class.
+
+    Returns:
+        PyCMTensorModel: Returns the ``model`` object.
+
+    Example:
+        .. code-block :: python
+
+            import pycmtensor as cmt
+            from pycmtensor.models import MNLModel
+            db = cmt.Database(pandasDatabase=some_pandas_data)
+            ...
+
+            model = MNLogit(u=U, av=AV, database=db, name="mymodel")
+            inpect_model(model)
+
+    """
     if not isinstance(model, PyCMTensorModel):
         msg = f"{model} is not a valid PyCMTensorModel model."
         log.error(msg)
@@ -106,6 +145,37 @@ def train(
     debug=False,
     notebook=False,
 ):
+    """Default training algorithm. Returns the best model ``model`` object.
+
+    Args:
+        model (PyCMTensorModel): the ``model`` object to train.
+        database (Database): the ``database`` object containing the data and tensor variables.
+        optimizer (Optimizer): the type of optimizer to use to train the model.
+        batch_size (`int`, optional): batch size per iteration. Defaults to 256.
+        max_epoch (`int`, optional): maximum number of epochs to train. Defaults to 2000.
+        base_lr (`float`, optional): the base learning rate to use. Defaults to 0.01.
+        seed (`int`, optional): the random seed value. Defaults to 999.
+        debug (`bool`, optional): outputs more verbosity if True. Defaults to False.
+        notebook (`bool`, optional): set this flag to True if running on a `Jupyter Notebook <https://jupyter.org/>`_. Defaults to False.
+
+    Returns:
+        PyCMTensorModel: the output is a trained ``model`` object. Call :class:`~pycmtensor.results.Results` to generate model results.
+
+    Example:
+        .. code-block :: python
+
+            import pycmtensor as cmt
+            from pycmtensor.models import MNLModel
+            from pycmtensor.optimizers import Adam
+            db = cmt.Database(pandasDatabase=some_pandas_data)
+            ...
+
+            model = MNLogit(u=U, av=AV, database=db, name="mymodel")
+            model = cmt.train(model, database=db, optimizer=Adam)
+            ...
+    """
+
+    # [train-start]
     inspect_model(model)
     model = build_functions(model, database, optimizer)
 
@@ -230,3 +300,4 @@ def train(
         pbar.close()
 
     return best_model
+    # [train-end]
