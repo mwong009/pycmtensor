@@ -1,6 +1,5 @@
 # pymctensor.py
 
-import logging
 import timeit
 
 import aesara
@@ -13,7 +12,8 @@ from pycmtensor.logger import PyCMTensorError
 
 from .functions import errors, full_loglikelihood
 from .models import PyCMTensorModel
-from .utils import learn_rate_tempering, tqdm_nb_check
+from .trackers import IterationTracker
+from .utils import tqdm_nb_check
 
 
 def build_functions(model, db, optimizer=None):
@@ -119,12 +119,13 @@ def train(
     epoch = 0
     tqdm = tqdm_nb_check(notebook)
     rng = np.random.default_rng(seed)
+    tracker = IterationTracker()
 
     # training hyperparameters
     n_samples = database.get_rows()
     step_size = n_samples // batch_size
     max_iter = max_epoch * step_size
-    patience = max_iter // 2
+    patience = model.config["patience"]
     patience_increase = model.config["patience_increase"]
     validation_threshold = model.config["validation_threshold"]
     validation_frequency = min(step_size, patience / 2)
@@ -167,7 +168,7 @@ def train(
         epoch = epoch + 1
 
         for batch_index in range(step_size):
-            iter = (epoch - 1) * step_size + batch_index
+            iter = (epoch - 1) * step_size + batch_index + 1
 
             lr = base_lr
             i = rng.integers(0, step_size)
@@ -176,16 +177,19 @@ def train(
             model.loglikelihood_estimation(i, batch_size, shift, lr)
 
             # validation step
-            if (iter + 1) % validation_frequency == 0:
+            if iter % validation_frequency == 0:
                 ll = model.loglikelihood()
+                ll_score = 1 - model.output_errors()
+                tracker.add(iter, "full_ll", ll)
+                tracker.add(iter, "score", ll_score)
                 if ll > model.best_ll:
-                    if ll > (model.best_ll * validation_threshold):
+                    if ll > (model.best_ll / validation_threshold):
                         patience = max(patience, iter * patience_increase)
                         patience = min(patience, max_iter)
 
                     model.best_epoch = epoch
-                    model.best_ll_score = 1 - model.output_errors()
                     model.best_ll = ll
+                    model.best_ll_score = ll_score
 
                     best_model = model
 
@@ -208,6 +212,7 @@ def train(
     model.train_time = end_time - start_time
     model.epochs_per_sec = round(epoch / model.train_time, 3)
     model.iterations = iter
+    model.tracker = tracker
 
     with open(model.name + ".pkl", "wb") as f:
         pickle.dump(model, f)  # save model to pickle

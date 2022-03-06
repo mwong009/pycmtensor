@@ -14,8 +14,9 @@ class PyCMTensorConfig:
 
     def __init__(self):
         self._config = {
+            "patience": 9000,
             "patience_increase": 2,
-            "validation_threshold": 1.005,
+            "validation_threshold": 1.003,
             "cwd": os.getcwd(),
             "processor_identifier": os.environ["PROCESSOR_IDENTIFIER"],
             "python_version": sys.version,
