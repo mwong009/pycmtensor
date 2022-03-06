@@ -13,6 +13,7 @@ from pycmtensor.logger import PyCMTensorError
 
 from .functions import errors, full_loglikelihood
 from .models import PyCMTensorModel
+from .scheduler import CyclicLR
 from .trackers import IterationTracker
 from .utils import tqdm_nb_check
 
@@ -33,11 +34,11 @@ def build_functions(model, db, optimizer=None):
     """
     log.info("Building model...")
     start_time = timeit.default_timer()
-    lr = aet.scalar("learning_rate")
-    index = aet.lscalar("index")
-    batch_size = aet.lscalar("batch_size")
-    shift = aet.lscalar("shift")
     if optimizer is not None:
+        lr = aet.scalar("learning_rate")
+        index = aet.lscalar("index")
+        batch_size = aet.lscalar("batch_size")
+        shift = aet.lscalar("shift")
         db.compile_data()
         opt = optimizer(model.params)
         updates = opt.update(model.cost, model.params, lr)
@@ -100,6 +101,37 @@ def build_functions(model, db, optimizer=None):
     )
     end_time = timeit.default_timer()
     model.build_time = round(end_time - start_time, 3)
+    # return model
+
+
+def inspect_model(model):
+    """Raises and error if `model` is not a valid ``PyCMTensorModel`` class.
+
+    Args:
+        model (PyCMTensorModel): the constructed model class.
+
+    Raises:
+        PyCMTensorError: logs an error if the model class is an invalid class.
+
+    Returns:
+        PyCMTensorModel: Returns the ``model`` object.
+
+    Example:
+        .. code-block :: python
+
+            import pycmtensor as cmt
+            from pycmtensor.models import MNLModel
+            db = cmt.Database(pandasDatabase=some_pandas_data)
+            ...
+
+            model = MNLogit(u=U, av=AV, database=db, name="mymodel")
+            inpect_model(model)
+
+    """
+    if not isinstance(model, PyCMTensorModel):
+        msg = f"{model} is not a valid PyCMTensorModel model."
+        log.error(msg)
+        raise PyCMTensorError(msg)
     return model
 
 
@@ -138,8 +170,8 @@ def train(
     model,
     database,
     optimizer,
-    batch_size=256,
-    max_epoch=2000,
+    batch_size=None,
+    max_epoch=None,
     base_lr=0.01,
     seed=999,
     debug=False,
@@ -151,12 +183,12 @@ def train(
         model (PyCMTensorModel): the ``model`` object to train.
         database (Database): the ``database`` object containing the data and tensor variables.
         optimizer (Optimizer): the type of optimizer to use to train the model.
-        batch_size (`int`, optional): batch size per iteration. Defaults to 256.
-        max_epoch (`int`, optional): maximum number of epochs to train. Defaults to 2000.
-        base_lr (`float`, optional): the base learning rate to use. Defaults to 0.01.
-        seed (`int`, optional): the random seed value. Defaults to 999.
-        debug (`bool`, optional): outputs more verbosity if True. Defaults to False.
-        notebook (`bool`, optional): set this flag to True if running on a `Jupyter Notebook <https://jupyter.org/>`_. Defaults to False.
+        batch_size (int): batch size per iteration. Defaults to 256.
+        max_epoch (int): maximum number of epochs to train. Defaults to 2000.
+        base_lr (float): the base learning rate to use. Defaults to 0.01.
+        seed (int, optional): the random seed value. Defaults to 999.
+        debug (bool, optional): outputs more verbosity if True. Defaults to False.
+        notebook (bool, optional): set this flag to True if running on a `Jupyter Notebook <https://jupyter.org/>`_. Defaults to False.
 
     Returns:
         PyCMTensorModel: the output is a trained ``model`` object. Call :class:`~pycmtensor.results.Results` to generate model results.
@@ -176,29 +208,41 @@ def train(
     """
 
     # [train-start]
+    # pre-run routine
     inspect_model(model)
-    model = build_functions(model, database, optimizer)
+    build_functions(model, database, optimizer)
 
-    # model config
-    model.config["seed"] = seed
-    model.config["max_epoch"] = max_epoch
-    model.config["batch_size"] = batch_size
-    model.config["base_lr"] = base_lr
+    # load model config
+    seed = model.config["seed"]
+    cyclic_lr_step_size = model.config["cyclic_lr_step_size"]
+    cyclic_lr_mode = model.config["cyclic_lr_mode"]
+    base_lr = model.config["base_lr"]
+    max_lr = np.maximum(base_lr, model.config["max_lr"])
+
+    if max_epoch is None:
+        max_epoch = model.config["max_epoch"]
+    else:
+        model.config["max_epoch"] = max_epoch
+    if batch_size is None:
+        batch_size = model.config["batch_size"]
+    else:
+        model.config["batch_size"] = batch_size
 
     # training state
     epoch = 0
     tqdm = tqdm_nb_check(notebook)
     rng = np.random.default_rng(seed)
     tracker = IterationTracker()
+    scheduler = CyclicLR(base_lr, max_lr, cyclic_lr_step_size, mode=cyclic_lr_mode)
 
     # training hyperparameters
     n_samples = database.get_rows()
-    step_size = n_samples // batch_size
-    max_iter = max_epoch * step_size
+    n_batches = n_samples // batch_size
+    max_iter = max_epoch * n_batches
     patience = model.config["patience"]
     patience_increase = model.config["patience_increase"]
     validation_threshold = model.config["validation_threshold"]
-    validation_frequency = min(step_size, patience / 2)
+    validation_frequency = min(n_batches, patience / 2)
 
     # flags
     done_looping = False
@@ -209,7 +253,7 @@ def train(
     print(
         f"dataset: {database.name} (n={n_samples})\n"
         + f"batch size: {batch_size}\n"
-        + f"iterations per epoch: {step_size}"
+        + f"iterations per epoch: {n_batches}"
     )
 
     model.null_ll = model.loglikelihood()
@@ -236,15 +280,15 @@ def train(
 
     while (epoch < max_epoch) and (not done_looping):
         epoch = epoch + 1
+        if epoch < max_epoch // 2:
+            epoch_lr = scheduler.get_lr(epoch)
+        for batch_index in range(n_batches):
+            iter = (epoch - 1) * n_batches + batch_index + 1
 
-        for batch_index in range(step_size):
-            iter = (epoch - 1) * step_size + batch_index + 1
-
-            lr = base_lr
-            i = rng.integers(0, step_size)
+            i = rng.integers(0, n_batches)
             shift = rng.integers(0, batch_size)
             # train model
-            model.loglikelihood_estimation(i, batch_size, shift, lr)
+            model.loglikelihood_estimation(i, batch_size, shift, epoch_lr)
 
             # validation step
             if iter % validation_frequency == 0:
@@ -252,6 +296,7 @@ def train(
                 ll_score = 1 - model.output_errors()
                 tracker.add(iter, "full_ll", ll)
                 tracker.add(iter, "score", ll_score)
+                tracker.add(iter, "lr", epoch_lr)
                 if ll > model.best_ll:
                     if ll > (model.best_ll / validation_threshold):
                         patience = max(patience, iter * patience_increase)
