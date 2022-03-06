@@ -18,6 +18,7 @@
 # absolute, like shown here.
 #
 import os
+import shutil
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
@@ -89,16 +90,20 @@ suppress_warnings = ["autoapi"]
 # -- Options for autoapi -----------------------------------------------------
 
 autoapi_add_toctree_entry = True
+autoapi_python_class_content = "both"
 autoapi_type = "python"
+autoapi_keep_files = True
+graphviz_dot = shutil.which("dot")
 autoapi_dirs = ["../pycmtensor"]
 autoapi_options = [
     "members",
     "undoc-members",
     "private-members",
     "show-inheritance",
-    "show-module-summary",
-    "special-members",
-    "imported-members",
+    "show-inheritance-diagram",
+    # "show-module-summary",
+    # "special-members",
+    # "imported-members",
 ]
 
 # -- Options for HTML output -------------------------------------------------

@@ -3,7 +3,7 @@
 
 ```{toctree}
 :caption: TOPIC AREAS
-:maxdepth: 1
+:maxdepth: 2
 
 installation
 usage
