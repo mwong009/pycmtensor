@@ -162,7 +162,7 @@ class Predict:
 
     def choices(self):
         db = self.database
-        data_obj = self.model.output_choices().T
+        data_obj = self.model.output_predictions().T
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
