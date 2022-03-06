@@ -1,13 +1,11 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "0.5.0"
+__version__ = "0.5.3"
 
-from pycmtensor.config import PyCMTensorConfig
+from .configparser import config
+from .database import *
+from .pycmtensor import *
 
-config = PyCMTensorConfig()
 config.generate_config_file()
 config.set_num_threads()
-
-from pycmtensor.database import *
-from pycmtensor.pycmtensor import *

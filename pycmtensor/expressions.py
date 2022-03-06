@@ -2,6 +2,7 @@ import aesara
 import aesara.tensor as aet
 import biogeme.expressions as bioexp
 import numpy as np
+from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
 floatX = aesara.config.floatX
@@ -12,7 +13,7 @@ class Expressions:
         pass
 
     def __add__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() + other
         elif isinstance(other, Beta):
             return self() + other()
@@ -20,7 +21,7 @@ class Expressions:
             return super().__add__(other)
 
     def __radd__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other + self()
         elif isinstance(other, Beta):
             return other() + self()
@@ -28,7 +29,7 @@ class Expressions:
             return super().__radd__(other)
 
     def __sub__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() - other
         elif isinstance(other, Beta):
             return self() - other()
@@ -36,7 +37,7 @@ class Expressions:
             return super().__sub__(other)
 
     def __rsub__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other - self()
         elif isinstance(other, Beta):
             return other() - self()
@@ -44,7 +45,7 @@ class Expressions:
             return super().__rsub__(other)
 
     def __mul__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             if self().ndim > 1:
                 return aet.dot(other, self().T)
             else:
@@ -55,7 +56,7 @@ class Expressions:
             return super().__mul__(other)
 
     def __rmul__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             if self.sharedVar.ndim > 1:
                 return aet.dot(other, self().T)
             else:
@@ -66,7 +67,7 @@ class Expressions:
             return super().__rmul__(other)
 
     def __div__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() / other
         elif isinstance(other, Beta):
             return self() / other()
@@ -74,7 +75,7 @@ class Expressions:
             return super().__div__(other)
 
     def __rdiv__(self, other):
-        if isinstance(other, TensorVariable):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other / self()
         elif isinstance(other, Beta):
             return other() / self()
@@ -82,73 +83,74 @@ class Expressions:
             return super().__rdiv__(other)
 
     def __neg__(self):
-        if isinstance(self, TensorVariable):
+        if isinstance(self, (TensorVariable, TensorSharedVariable)):
             return -self
         elif isinstance(self, Beta):
             return -self()
         return super().__neg__(self)
 
     def __pow__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() ** other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.pow(self(), other)
         elif isinstance(other, Beta):
-            return self() ** other()
+            return aet.pow(self(), other())
         else:
             return super().__pow__(other)
 
     def __rpow__(self, other):
-        if isinstance(other, TensorVariable):
-            return other ** self()
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+
+            return aet.pow(other, self())
         elif isinstance(other, Beta):
-            return other() ** self()
+            return aet.pow(other(), self())
         else:
             return super().__rpow__(other)
 
     def __lt__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() < other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.lt(self(), other)
         elif isinstance(other, Beta):
-            return self() < other()
+            return aet.lt(self(), other())
         else:
             return super().__lt__(other)
 
     def __le__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() <= other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.le(self(), other)
         elif isinstance(other, Beta):
-            return self() <= other()
+            return aet.le(self(), other())
         else:
             return super().__le__(other)
 
     def __gt__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() > other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.gt(self(), other)
         elif isinstance(other, Beta):
-            return self() > other()
+            return aet.gt(self(), other())
         else:
             return super().__gt__(other)
 
     def __ge__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() >= other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.ge(self(), other)
         elif isinstance(other, Beta):
-            return self() >= other()
+            return aet.ge(self(), other())
         else:
             return super().__ge__(other)
 
     def __eq__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() == other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.eq(self(), other)
         elif isinstance(other, Beta):
-            return self() == other()
+            return aet.eq(self(), other())
         else:
             return super().__eq__(other)
 
     def __ne__(self, other):
-        if isinstance(other, TensorVariable):
-            return self() != other
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            return aet.neq(self(), other)
         elif isinstance(other, Beta):
-            return self() != other()
+            return aet.neq(self(), other())
         else:
             return super().__ne__(other)
 
@@ -156,7 +158,9 @@ class Expressions:
 class Beta(Expressions, bioexp.Beta):
     def __init__(self, name, value, lb, ub, status):
         bioexp.Beta.__init__(self, name, value, lb, ub, status)
-        self.sharedVar = aesara.shared(value=np.array(value, dtype=floatX), name=name)
+        self.sharedVar = aesara.shared(
+            value=np.array(value, dtype=floatX), borrow=True, name=name
+        )
         self.sharedVar.__dict__.update({"status": status, "lb": lb, "ub": ub})
 
     def __call__(self):
@@ -190,7 +194,7 @@ class Weights(Expressions):
             else:
                 value = np.zeros(size, dtype=floatX)
 
-        self.sharedVar = aesara.shared(value=value, name=name)
+        self.sharedVar = aesara.shared(value=value, name=name, borrow=True)
         self.shape = self.sharedVar.shape
         self.sharedVar.__dict__.update({"status": self.status})
 

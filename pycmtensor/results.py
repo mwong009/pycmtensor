@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
+from pycmtensor import logger as log
 from pycmtensor.functions import bhhh, hessians
 from pycmtensor.statistics import *
 
@@ -34,7 +35,10 @@ class Results:
         else:
             self.name = model.name
 
-        sample_size = len(database.data)
+        self.model = model
+        self.database = database
+        self.show_weights = show_weights
+        n_samples = database.get_rows()
         n_params = len(model.get_betas())
         n_weights = model.get_weight_size()
         k = n_params + n_weights
@@ -45,21 +49,19 @@ class Results:
         self.build_time = time_format(model.build_time)
         self.train_time = time_format(model.train_time)
         self.epochs_per_sec = model.epochs_per_sec
-        self.seed = model.seed
+        self.seed = model.config["seed"]
 
-        self.beta_results = get_beta_statistics(model, database)
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
         self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
         self.ll_ratio_test = -2.0 * (null_loglike - max_loglike)
 
         self.akaike = 2.0 * (k - max_loglike)
-        self.bayesian = -2.0 * max_loglike + k * np.log(sample_size)
+        self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
         self.g_norm = gradient_norm(model, database)
-        self.correlationMatrix = correlation_matrix(model, database)
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
-        self.sample_size = sample_size
+        self.sample_size = n_samples
         self.excluded_data = database.excludedData
         self.best_epoch = model.best_epoch
         self.best_ll_score = model.best_ll_score
@@ -89,20 +91,47 @@ class Results:
         )
 
         print(self.print_results)
+        if not (hasattr(self, "H") and hasattr(self, "BHHH")):
+            self.precompute_hessians_and_bhhh()
 
+    def precompute_hessians_and_bhhh(self):
+        db = self.database
+        model = self.model
+        self.model.H = aesara.function(
+            inputs=[],
+            outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        )
+
+        self.model.BHHH = aesara.function(
+            inputs=[],
+            outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+        )
+
+    def print_beta_statistics(self):
+        self.betaResults = get_beta_statistics(self.model)
         print("Statistical Analysis:")
-        print(self.beta_results.to_string(), "\n")
+        print(self.betaResults.to_string() + f"\n")
 
-        if model.get_weight_size() != 0:
-            self.weights = model.output_estimated_weights()
-            if show_weights:
-                for w, value in zip(model.get_weights(), self.weights):
+    def print_nn_weights(self):
+        if self.model.get_weight_size() == 0:
+            log.warning("No weights to show")
+        else:
+            self.weights = self.model.output_estimated_weights()
+            if self.show_weights:
+                for w, value in zip(self.model.get_weights(), self.weights):
                     random = "zeros"
                     if w.random_init:
                         random = "random"
-                    print(f"{w.name} {w.size} init: {random}\n{value}\n")
-        else:
-            self.weights = None
+                    print(f"{w.name} {w.size} init: {random}\n" + f"{value}\n")
+
+    def print_correlation_matrix(self):
+        self.correlationMatrix = correlation_matrix(self.model)
+        print("Correlation matrix:")
+        print(self.correlationMatrix.to_string() + f"\n")
 
     def __str__(self):
         return self.print_results + self.beta_results.to_string()
@@ -133,27 +162,13 @@ class Predict:
 
     def choices(self):
         db = self.database
-        data_obj = self.model.output_choices().T
+        data_obj = self.model.output_predictions().T
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
-def get_beta_statistics(model, db):
-    H = aesara.function(
-        inputs=[],
-        outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-    )
-
-    BHHH = aesara.function(
-        inputs=[],
-        outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-    )
-
-    h = H()
-    bh = BHHH()
+def get_beta_statistics(model):
+    h = model.H()
+    bh = model.BHHH()
 
     pandas_stats = pd.DataFrame(
         columns=[

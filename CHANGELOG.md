@@ -1,3 +1,38 @@
+## v0.5.3 (2022-03-05)
+
+### Fix
+
+- **pycmtensor**: fix various training config
+- **logger**: add logging functionality pycmtensor.logger
+- **results**: skip precompute routine if H and BHHH already exist
+
+### Perf
+
+- set fixed learning rate
+
+### Feat
+
+- **logging**: add logging to __init__
+
+## v0.5.2 (2022-03-04)
+
+### Perf
+
+- **statistics**: precompute H and BHHH to results
+
+## v0.5.1 (2022-03-04)
+
+### Fix
+
+- **expressions**: change dunder calls to aesara.tensor methods
+- **models**: compact unused Betas message
+- **Beta**: add borrow=True to sharedVariables
+- **configparser**: renamed from config to prevent doc conflicts
+
+### Feat
+
+- **params**: add routine to remove unused params from computational graph
+
 ## v0.5.0 (2022-03-02)
 
 ### Feat
