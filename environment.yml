@@ -6,7 +6,7 @@ dependencies:
     - python==3.9.7
     - pip>=21.2.4
     - git>=2.34.1
-    - m2w64-toolchain=
+    - m2w64-toolchain
     - numpy>=1.21.5
     - libpython
     - mkl
