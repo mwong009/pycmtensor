@@ -135,37 +135,6 @@ def inspect_model(model):
     return model
 
 
-def inspect_model(model):
-    """Raises and error if `model` is not a valid ``PyCMTensorModel`` class.
-
-    Args:
-        model (PyCMTensorModel): the constructed model class.
-
-    Raises:
-        PyCMTensorError: logs an error if the model class is an invalid class.
-
-    Returns:
-        PyCMTensorModel: Returns the ``model`` object.
-
-    Example:
-        .. code-block :: python
-
-            import pycmtensor as cmt
-            from pycmtensor.models import MNLModel
-            db = cmt.Database(pandasDatabase=some_pandas_data)
-            ...
-
-            model = MNLogit(u=U, av=AV, database=db, name="mymodel")
-            inpect_model(model)
-
-    """
-    if not isinstance(model, PyCMTensorModel):
-        msg = f"{model} is not a valid PyCMTensorModel model."
-        log.error(msg)
-        raise PyCMTensorError(msg)
-    return model
-
-
 def train(
     model,
     database,
