@@ -46,7 +46,7 @@ def neg_loglikelihood(prob, y):
     Returns:
         TensorVariable: a symbolic description of the average negative loglikelihood.
     """
-    nll = -aet.mean(full_loglikelihood(prob, y))
+    nll = -(full_loglikelihood(prob, y) / y.shape[0])
     return nll
 
 
@@ -60,7 +60,7 @@ def full_loglikelihood(prob, y):
     Returns:
         TensorVariable: a symbolic description of the full loglikelihood.
     """
-    ll = aet.log(prob)[y, aet.arange(y.shape[0])]
+    ll = aet.sum(aet.log(prob)[y, aet.arange(y.shape[0])])
     return ll
 
 
@@ -111,7 +111,10 @@ def hessians(prob, y, params):
     """
     params = [p() for p in params if (p.status != 1)]
     for p in params:
-        assert p.ndim == 0, f"{p.name}, ndim={p.ndim}"
+        if p.ndim != 0:
+            msg = f"{p.name} is not a valid {p.ndim}-diamension Beta parameter."
+            log.error(msg)
+            raise ValueError(msg)
     grads = aet.grad(full_loglikelihood(prob, y), params, disconnected_inputs="ignore")
     _h = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
@@ -167,9 +170,10 @@ def gradient_norm(prob, y, params):
     """
     params = [p() for p in params if (p.status != 1)]
     for p in params:
-        msg = f"{p.name} is not a valid {p.ndim}-diamension Beta parameter."
-        log.error(msg)
-        raise ValueError(msg)
+        if p.ndim != 0:
+            msg = f"{p.name} is not a valid {p.ndim}-diamension Beta parameter."
+            log.error(msg)
+            raise ValueError(msg)
     grads = aet.grad(neg_loglikelihood(prob, y), params, disconnected_inputs="ignore")
     norm = linalg.norm(grads)
     return norm
