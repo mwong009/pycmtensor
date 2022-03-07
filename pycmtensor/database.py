@@ -107,7 +107,12 @@ class Database(biodb.Database):
                 y_data.append(self.data[y_tensor.name][start:end])
         return y_data
 
-    def tensors(self):
+    def get_tensors(self):
+        """Returns all the tensors (x, y) in the database
+
+        Returns:
+            list: ``x`` and ``y`` tensors are returned as a list
+        """
         return self.get_x_tensors() + self.get_y_tensors()
 
     def input_data(self, index=None, batch_size=None, shift=None):

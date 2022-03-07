@@ -17,7 +17,7 @@ class PyCMTensorModel:
         self.name = "PyCMTensorModel"
         self.params = []  # keep track of params
         self.beta_params = []
-        self.inputs = db.tensors()
+        self.inputs = db.get_tensors()
         self.config = config
 
     def append_to_params(self, params):
