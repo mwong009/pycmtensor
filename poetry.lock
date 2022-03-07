@@ -303,9 +303,6 @@ category = "dev"
 optional = false
 python-versions = ">=3.7"
 
-[package.dependencies]
-tomli = {version = "*", optional = true, markers = "extra == \"toml\""}
-
 [package.extras]
 toml = ["tomli"]
 
@@ -776,7 +773,7 @@ python-versions = "*"
 
 [[package]]
 name = "mkl"
-version = "2022.0.2"
+version = "2022.0.3"
 description = "Intel® oneAPI Math Kernel Library"
 category = "main"
 optional = false
@@ -1767,7 +1764,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "bb8fadfb5dbb196ea2fcb0b3a42f9b7c7a283063eca53d68c237d7a955b83844"
+content-hash = "0cd4575c9a2aa275a7a3359ef32baa77ad40dec246ecadd805ffed1809321162"
 
 [metadata.files]
 aesara = [
@@ -2284,10 +2281,8 @@ mistune = [
     {file = "mistune-0.8.4.tar.gz", hash = "sha256:59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e"},
 ]
 mkl = [
-    {file = "mkl-2022.0.2-py2.py3-none-manylinux1_i686.whl", hash = "sha256:0d400f3818ec67d9643dec0faf738271b28532f2ff25edc15002c951b2aed442"},
-    {file = "mkl-2022.0.2-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:c5c79d9287cdcfb650986e3123fdb81e9dc110af90c7eef38afafc11b4224678"},
-    {file = "mkl-2022.0.2-py2.py3-none-win32.whl", hash = "sha256:37f47a202ac68d1da217b31573ae0534db3542327d1807a56b54158f3e6bb41f"},
-    {file = "mkl-2022.0.2-py2.py3-none-win_amd64.whl", hash = "sha256:07fa7c2dfab146d1411ccd6e3e2fa6e3ab9efa8186706e0421c7d49d7986efe0"},
+    {file = "mkl-2022.0.3-py2.py3-none-win32.whl", hash = "sha256:24d5c35ff42199d318c6fd24ad4b58f9d00eb91bb18dbf8acf11ba435cf57e75"},
+    {file = "mkl-2022.0.3-py2.py3-none-win_amd64.whl", hash = "sha256:706f74f142f7f7f7ed184eadb1472b95bce6f61bfd1a35e41daa362d089cec93"},
 ]
 mkl-service = [
     {file = "mkl_service-2.4.0-0-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:a26a4823bd1445c9065ef7bb1b5cec04a2663055d79e753969f876bc27aa41b2"},
