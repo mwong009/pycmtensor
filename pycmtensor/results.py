@@ -60,7 +60,7 @@ class Results:
 
         self.akaike = 2.0 * (k - max_loglike)
         self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
-        self.g_norm = gradient_norm(model, database)
+        self.g_norm = model.gnorm()
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
