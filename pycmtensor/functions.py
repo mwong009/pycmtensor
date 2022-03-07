@@ -2,6 +2,7 @@
 
 import aesara.tensor as aet
 import numpy as np
+from scipy import linalg
 
 
 def logit(utility, avail):
@@ -79,3 +80,29 @@ def bhhh(prob, y, params):
     grads = aet.grad(full_loglikelihood(prob, y), params, disconnected_inputs="ignore")
     _bh = aet.outer(aet.as_tensor_variable(grads), aet.as_tensor_variable(grads).T)
     return _bh
+
+
+def gradient_norm(prob, y, params):
+    """Compute the gradient norm of the cost function.
+
+    Args:
+        prob (TensorVariable): Function describing the choice probabilites.
+        y (TensorVariable): The ``TensorVariable`` symbol referencing the choice column
+        params (list): list of params to compute the gradients.
+
+    Returns:
+        Function: returns an Aesara ``function``. Calling the return value with no arguments computes the gradient norm.
+
+    Note:
+        Parameters with status=1 are ignored.
+
+        This is used as an internal function call.
+    """
+    params = [p() for p in params if (p.status != 1)]
+    for p in params:
+        msg = f"{p.name} is not a valid {p.ndim}-diamension Beta parameter."
+        log.error(msg)
+        raise ValueError(msg)
+    grads = aet.grad(neg_loglikelihood(prob, y), params, disconnected_inputs="ignore")
+    norm = linalg.norm(grads)
+    return norm
