@@ -1,6 +1,6 @@
 # models.py
 
-import logging
+import traceback
 
 import aesara
 import aesara.tensor as aet
@@ -26,22 +26,35 @@ class PyCMTensorModel:
         return self.add_params(params)
 
     def add_params(self, params):
-        assert isinstance(params, (dict, list)), f"params must be of type dict or list"
-        if isinstance(params, list):
-            d = {}
-            for param in params:
-                d[str(param)] = param
-            params = d
+        if not isinstance(params, (dict, list)):
+            msg = "params must be of Type dict or list"
+            log.error(msg)
+            raise TypeError(msg)
 
-        for _, param in params.items():
+        if isinstance(params, list):
+            params = {str(p): p for p in params}
+
+        # update model params into list
+        params = self.check_duplicate_param_names(params)
+        for param in params:
             if isinstance(param, (Beta, Weights)):
-                # update model params into list
                 self.params.append(param)
                 if isinstance(param, (Beta)):
                     self.beta_params.append(param)
 
         if hasattr(self, "cost"):
             self.remove_unused_params(self.cost)
+
+    def check_duplicate_param_names(self, params):
+        x = [p for _, p in params.items() if isinstance(p, (Beta, Weights))]
+        # check for duplicate params
+        seen = set()
+        dup = {p.name for p in x if p.name in seen or (seen.add(p.name) or False)}
+        if len(dup) > 0:
+            msg = f"duplicate param names defined in model: {dup}."
+            log.error(msg)
+            raise NameError(msg)
+        return x
 
     def remove_unused_params(self, expression):
         """Removes unused parameters not present in `expression`
