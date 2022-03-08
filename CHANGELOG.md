@@ -1,3 +1,19 @@
+## v0.6.1 (2022-03-08)
+
+### Fix
+
+- re-enable generate_config_file()
+- **results**: fix typo in gnorm() function call
+- add critial to list of logger functions
+- **functions**: compute sum of full ll then divide by shape in neg ll
+- **functions**: makes avail in logit() an optional parameter
+- **functions**: moved gradient norm function to function.py module
+- remove duplicate function
+
+### Refactor
+
+- **database**: rename tensors() to get_tensors()
+
 ## v0.6.0 (2022-03-06)
 
 ### Feat
