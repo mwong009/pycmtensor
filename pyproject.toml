@@ -13,7 +13,7 @@ documentation = ""
 keywords = ["pycmtensor"]
 
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT",
     "Natural Language :: English",
@@ -50,7 +50,7 @@ rstcheck = "^3.3.1"
 # Testing
 pytest = "^7.0.1"
 tox = "^3.24.0"
-coverage = "^6.3.2"
+pytest-cov = "^3.0.0"
 
 # Documentation
 Sphinx = "^4.4.0"
@@ -86,21 +86,14 @@ version_files = [
 ]
 
 [tool.pytest]
-addopts = """
---strict-markers
-
--r sxX
---show-capture=log
-
---cov-report=xml
---cov-report=html
---cov-report=term-missing:skip-covered
---no-cov-on-fail
-"""
-
 markers = []
 
 [tool.pytest.ini_options]
+addopts = """
+    --cov=pycmtensor 
+    --cov-report=html 
+    --cov-report=term tests/
+"""
 filterwarnings = [
     "error",
     "ignore::UserWarning",
