@@ -32,8 +32,9 @@ def logit(utility: list, avail: list = None):
     if avail != None:
         AV = aet.stacklists(avail)
         assert U.ndim == AV.ndim
-        prob = prob * AV
-    return prob / aet.sum(prob, axis=0, keepdims=1)
+        prob *= AV
+        prob = prob / aet.sum(prob, axis=0, keepdims=1)
+    return prob
 
 
 def neg_loglikelihood(prob, y):
