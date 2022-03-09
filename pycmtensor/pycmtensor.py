@@ -9,13 +9,11 @@ import dill as pickle
 import numpy as np
 
 from pycmtensor import logger as log
-from pycmtensor.functions import bhhh, gradient_norm, hessians
-from pycmtensor.logger import PyCMTensorError
-from pycmtensor.scheduler import ConstantLR, CyclicLR
 
-from .functions import errors, full_loglikelihood
+from .functions import bhhh, errors, full_loglikelihood, gradient_norm, hessians
+from .logger import PyCMTensorError
 from .models import PyCMTensorModel
-from .scheduler import CyclicLR
+from .scheduler import ConstantLR, CyclicLR
 from .trackers import IterationTracker
 from .utils import tqdm_nb_check
 
@@ -100,6 +98,26 @@ def build_functions(model, db, optimizer=None):
         on_unused_input="ignore",
         givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
         name="output_errors",
+    )
+    model.H = aesara.function(
+        inputs=[],
+        outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
+        on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+    )
+
+    model.BHHH = aesara.function(
+        inputs=[],
+        outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
+        on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
+    )
+
+    model.gnorm = aesara.function(
+        inputs=[],
+        outputs=gradient_norm(model.p_y_given_x, model.y, model.beta_params),
+        on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
     )
     end_time = timeit.default_timer()
     model.build_time = round(end_time - start_time, 3)

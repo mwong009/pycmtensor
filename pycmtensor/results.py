@@ -1,13 +1,11 @@
 # results.py
 
-import aesara
 import dill as pickle
 import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
 from pycmtensor import logger as log
-from pycmtensor.functions import bhhh, gradient_norm, hessians
 from pycmtensor.statistics import *
 
 
@@ -45,9 +43,6 @@ class Results:
 
         null_loglike = model.null_ll
         max_loglike = model.best_ll
-
-        if not (hasattr(self, "H") and hasattr(self, "BHHH")):
-            self.precompute_fns()
 
         self.build_time = time_format(model.build_time)
         self.train_time = time_format(model.train_time)
@@ -95,30 +90,6 @@ class Results:
             + f"Final gradient norm: {self.g_norm:.3f}\n"
         )
         print(self.print_results)
-
-    def precompute_fns(self):
-        model = self.model
-        db = self.database
-        self.model.H = aesara.function(
-            inputs=[],
-            outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-            on_unused_input="ignore",
-            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        )
-
-        self.model.BHHH = aesara.function(
-            inputs=[],
-            outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
-            on_unused_input="ignore",
-            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        )
-
-        self.model.gnorm = aesara.function(
-            inputs=[],
-            outputs=gradient_norm(model.p_y_given_x, model.y, model.beta_params),
-            on_unused_input="ignore",
-            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        )
 
     def generate_beta_statistics(self):
         return get_beta_statistics(self.model)
