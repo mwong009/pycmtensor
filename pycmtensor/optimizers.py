@@ -37,7 +37,6 @@ class Adam(Optimizer):
 
     def update(self, cost, params, lr=0.001):
         params = [p() for p in params if p.status != 1]
-        one = np.array(1.0).astype(floatX)
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
@@ -46,11 +45,11 @@ class Adam(Optimizer):
         v_prev = self._v
 
         t_new = t + 1.0
-        a_t = aet.sqrt(one - self.b2**t_new) / (one - self.b1**t_new)
+        a_t = aet.sqrt(1.0 - self.b2**t_new) / (1.0 - self.b1**t_new)
 
         for m, v, param, grad in zip(m_prev, v_prev, params, grads):
-            m_t = self.b1 * m + (one - self.b1) * grad
-            v_t = self.b2 * v + (one - self.b2) * grad**2
+            m_t = self.b1 * m + (1.0 - self.b1) * grad
+            v_t = self.b2 * v + (1.0 - self.b2) * grad**2
             g_t = lr * a_t * m_t / (aet.sqrt(v_t) + self.epsilon)
             p_t = param - g_t
             updates.append((m, m_t))
