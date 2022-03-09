@@ -335,11 +335,12 @@ class AdaGrad(Optimizer):
 
 
 class SGD(Optimizer):
-    def __init__(self, name="SGD", params=None):
+    def __init__(self, name="SGD", params=[]):
         """An optimizer that implements the stochastic gradient algorithm.
 
         Args:
-            params (list): a list of :class:`expressions.TensorVariable` type objects.
+            params (list, optional): a list of :class:`expressions.TensorVariable` type
+                objects.
         """
         super().__init__(params, name)
 
