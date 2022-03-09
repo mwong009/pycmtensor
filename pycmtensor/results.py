@@ -71,6 +71,8 @@ class Results:
         self.null_loglike = null_loglike
         self.max_loglike = max_loglike
 
+        self.beta_statistics = self.generate_beta_statistics()
+
         self.print_results = (
             f"Results for model: {self.name}\n"
             + f"Build time: {self.build_time}\n"
@@ -92,7 +94,6 @@ class Results:
             + f"Bayesian Information Criterion: {self.bayesian:.2f}\n"
             + f"Final gradient norm: {self.g_norm:.3f}\n"
         )
-
         print(self.print_results)
 
     def precompute_fns(self):
@@ -119,10 +120,12 @@ class Results:
             givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
         )
 
+    def generate_beta_statistics(self):
+        return get_beta_statistics(self.model)
+
     def print_beta_statistics(self):
-        self.betaResults = get_beta_statistics(self.model)
         print("Statistical Analysis:")
-        print(self.betaResults.to_string() + f"\n")
+        print(self.generate_beta_statistics().to_string() + f"\n")
 
     def print_nn_weights(self):
         if self.model.get_weight_size() == 0:
@@ -142,7 +145,10 @@ class Results:
         print(self.correlationMatrix.to_string() + f"\n")
 
     def __str__(self):
-        return self.print_results + self.beta_results.to_string()
+        rval = self.print_results
+        if hasattr(self, "beta_results"):
+            rval += self.generate_beta_statistics().to_string()
+        return rval
 
 
 class Predict:
