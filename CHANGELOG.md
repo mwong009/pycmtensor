@@ -1,3 +1,17 @@
+## v0.6.2 (2022-03-09)
+
+### Refactor
+
+- **pycmtensor**: moved H and BHHH functions to pycmtensor
+
+### Fix
+
+- **scheduler**: enable option for Schedulers
+- **results**: minor typos and fixes
+- **functions**: skip normalization step if AV not given
+- **config**: rebuild config using configparser
+- **models**: checks for duplicate param names on add_params()
+
 ## v0.6.1 (2022-03-08)
 
 ### Fix
