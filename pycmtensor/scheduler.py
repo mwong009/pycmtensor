@@ -1,7 +1,15 @@
 import numpy as np
 
 
-class CyclicLR:
+class ConstantLR:
+    def __init__(self, base_lr=0.01, **kwargs):
+        self.base_lr = base_lr
+
+    def get_lr(self):
+        return self.base_lr
+
+
+class CyclicLR(ConstantLR):
     def __init__(
         self, base_lr=0.001, max_lr=0.01, step_size=8, mode="triangular2", gamma=1.0
     ):

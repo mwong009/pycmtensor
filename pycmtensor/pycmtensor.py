@@ -9,7 +9,9 @@ import dill as pickle
 import numpy as np
 
 from pycmtensor import logger as log
+from pycmtensor.functions import bhhh, gradient_norm, hessians
 from pycmtensor.logger import PyCMTensorError
+from pycmtensor.scheduler import ConstantLR, CyclicLR
 
 from .functions import errors, full_loglikelihood
 from .models import PyCMTensorModel
@@ -183,8 +185,12 @@ def train(
 
     # load model config
     seed = model.config["seed"]
-    cyclic_lr_step_size = model.config["cyclic_lr_step_size"]
-    cyclic_lr_mode = model.config["cyclic_lr_mode"]
+    Scheduler = ConstantLR
+    if model.config["learning_scheduler"] == "CyclicLR":
+        Scheduler = CyclicLR
+        cyclic_lr_mode = model.config["cyclic_lr_mode"]
+        cyclic_lr_step_size = model.config["cyclic_lr_step_size"]
+
     base_lr = model.config["base_lr"]
     max_lr = np.maximum(base_lr, model.config["max_lr"])
 
@@ -202,7 +208,9 @@ def train(
     tqdm = tqdm_nb_check(notebook)
     rng = np.random.default_rng(seed)
     tracker = IterationTracker()
-    scheduler = CyclicLR(base_lr, max_lr, cyclic_lr_step_size, mode=cyclic_lr_mode)
+    lr_scheduler = Scheduler(
+        base_lr, max_lr, step_size=cyclic_lr_step_size, mode=cyclic_lr_mode
+    )
 
     # training hyperparameters
     n_samples = database.get_rows()
@@ -250,12 +258,12 @@ def train(
     while (epoch < max_epoch) and (not done_looping):
         epoch = epoch + 1
         if epoch < max_epoch // 2:
-            epoch_lr = scheduler.get_lr(epoch)
+            epoch_lr = lr_scheduler.get_lr(epoch)
         for batch_index in range(n_batches):
             iter = (epoch - 1) * n_batches + batch_index + 1
-
             i = rng.integers(0, n_batches)
             shift = rng.integers(0, batch_size)
+
             # train model
             model.loglikelihood_estimation(i, batch_size, shift, epoch_lr)
 

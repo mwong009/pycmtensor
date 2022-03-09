@@ -81,6 +81,7 @@ def _config():
         "max_lr": 0.01,
         "max_epoch": 2000,
         "batch_size": 64,
+        "learning_scheduler": "CyclicLR",
         "cyclic_lr_mode": "triangular2",
         "cyclic_lr_step_size": 8,
     }
