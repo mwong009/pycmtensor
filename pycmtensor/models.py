@@ -5,9 +5,9 @@ import traceback
 import aesara
 import aesara.tensor as aet
 
+from pycmtensor import config
 from pycmtensor import logger as log
 
-from .configparser import config
 from .expressions import Beta, Weights
 from .functions import logit, neg_loglikelihood
 

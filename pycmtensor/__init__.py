@@ -3,10 +3,9 @@
 __author__ = """Melvin Wong"""
 __version__ = "0.6.1"
 
-from .configparser import config
+from .config import Config
 
-config.set_num_threads()
-config.generate_config_file()
+config = Config()
 
 from .database import *
 from .pycmtensor import *

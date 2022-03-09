@@ -1,12 +1,13 @@
+import sys
+
 import pytest
 
-from pycmtensor.configparser import config
+from pycmtensor.config import Config
 
 
 def test_generate_config_file():
-    config
-    config.set_num_threads()
-    config.generate_config_file()
+    config = Config()
 
-    # check if at least one blas flag found
-    assert len(config["BLAS_FLAGS"]) > 0
+    # check if config can be accessed
+    assert config["python_version"] == sys.version
+    print(config)
