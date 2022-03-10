@@ -21,7 +21,7 @@ def generate_blas_flags():
     if "CONDA_PREFIX" in os.environ:
         ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
         mkt_rt_bins = glob.glob(os.path.join(ld_dir, "mkl_rt*"))
-        blas_flags = np.__config__.blas_mkl_info["libraries"]
+        blas_flags = []
         for b in mkt_rt_bins:
             if b.endswith(".dll"):
                 b = b[:-4]
@@ -56,16 +56,15 @@ def init_aesararc():
     """
     HOMEPATH = os.path.expanduser("~")
     aesararc_config_file = os.path.join(HOMEPATH, ".aesararc")
-    if not os.path.isfile(aesararc_config_file):
-        aesararc_config = configparser.ConfigParser()
-        aesararc_config.add_section("global")
-        aesararc_config["global"] = {"device": "cpu", "floatX": "float64"}
-        aesararc_config.add_section("blas")
-        ldflags = "".join(f"{ld_path} " for ld_path in generate_ld_path_flags())
-        ldflags += "".join(f"{blas} " for blas in generate_blas_flags())
-        aesararc_config["blas"]["ldflags"] = ldflags
-        with open(aesararc_config_file, "w") as f:
-            aesararc_config.write(f)
+    aesararc_config = configparser.ConfigParser()
+    aesararc_config.add_section("global")
+    aesararc_config["global"] = {"device": "cpu", "floatX": "float64"}
+    aesararc_config.add_section("blas")
+    ldflags = "".join(f"{ld_path} " for ld_path in generate_ld_path_flags())
+    ldflags += "".join(f"{blas} " for blas in generate_blas_flags())
+    aesararc_config["blas"]["ldflags"] = ldflags
+    with open(aesararc_config_file, "w") as f:
+        aesararc_config.write(f)
 
 
 def _config():

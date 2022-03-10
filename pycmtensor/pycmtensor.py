@@ -63,18 +63,16 @@ def build_functions(model, db, optimizer=None):
     )
 
     model.output_probabilities = aesara.function(
-        inputs=[],
-        outputs=model.p_y_given_x,
+        inputs=model.inputs,
+        outputs=model.p_y_given_x.T,  # returns (N x J) matrix
         on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
         name="p_y_given_x",
     )
 
     model.output_predictions = aesara.function(
-        inputs=[],
-        outputs=model.pred,
+        inputs=model.inputs,
+        outputs=model.pred.T,  # returns (N x 1) matrix
         on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
         name="output_predictions",
     )
 

@@ -499,7 +499,7 @@ python-versions = "*"
 
 [[package]]
 name = "intel-openmp"
-version = "2022.0.3"
+version = "2021.4.0"
 description = "Intel OpenMP* Runtime Library"
 category = "main"
 optional = false
@@ -777,14 +777,14 @@ python-versions = "*"
 
 [[package]]
 name = "mkl"
-version = "2022.0.3"
+version = "2021.4.0"
 description = "Intel® oneAPI Math Kernel Library"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-intel-openmp = ">=2022.0.0,<2023.0.0"
+intel-openmp = ">=2021.0.0,<2022.0.0"
 tbb = ">=2021.0.0,<2022.0.0"
 
 [[package]]
@@ -1696,7 +1696,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "unidecode"
-version = "1.3.3"
+version = "1.3.4"
 description = "ASCII transliterations of Unicode text"
 category = "main"
 optional = false
@@ -1783,7 +1783,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.10"
-content-hash = "8fd3dd4c96fa78433f661dd589ad03db63a8a39e204c81130ea8201866e78217"
+content-hash = "084e6d276bed55e37b1a1d2be7314caacc3bb1eeda2a43668d50deb517e97522"
 
 [metadata.files]
 aesara = [
@@ -2147,8 +2147,11 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 intel-openmp = [
-    {file = "intel_openmp-2022.0.3-py2.py3-none-win32.whl", hash = "sha256:32de57b65d3cd2da29a057b5a57d98d70736cfc73c9d9bc4cb52563c56be2e75"},
-    {file = "intel_openmp-2022.0.3-py2.py3-none-win_amd64.whl", hash = "sha256:6585f004740f2271a353cf58732060c161c8f82826b58832a27501b36c106f0d"},
+    {file = "intel_openmp-2021.4.0-py2.py3-none-macosx_10_15_x86_64.macosx_11_0_x86_64.whl", hash = "sha256:41c01e266a7fdb631a7609191709322da2bbf24b252ba763f125dd651bcc7675"},
+    {file = "intel_openmp-2021.4.0-py2.py3-none-manylinux1_i686.whl", hash = "sha256:3b921236a38384e2016f0f3d65af6732cf2c12918087128a9163225451e776f2"},
+    {file = "intel_openmp-2021.4.0-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:e2240ab8d01472fed04f3544a878cda5da16c26232b7ea1b59132dbfb48b186e"},
+    {file = "intel_openmp-2021.4.0-py2.py3-none-win32.whl", hash = "sha256:6e863d8fd3d7e8ef389d52cf97a50fe2afe1a19247e8c0d168ce021546f96fc9"},
+    {file = "intel_openmp-2021.4.0-py2.py3-none-win_amd64.whl", hash = "sha256:eef4c8bcc8acefd7f5cd3b9384dbf73d59e2c99fc56545712ded913f43c4a94f"},
 ]
 ipykernel = [
     {file = "ipykernel-6.9.1-py3-none-any.whl", hash = "sha256:4fae9df6e192837552b2406a6052d707046dd2e153860be73c68484bacba18ed"},
@@ -2298,8 +2301,11 @@ mistune = [
     {file = "mistune-0.8.4.tar.gz", hash = "sha256:59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e"},
 ]
 mkl = [
-    {file = "mkl-2022.0.3-py2.py3-none-win32.whl", hash = "sha256:24d5c35ff42199d318c6fd24ad4b58f9d00eb91bb18dbf8acf11ba435cf57e75"},
-    {file = "mkl-2022.0.3-py2.py3-none-win_amd64.whl", hash = "sha256:706f74f142f7f7f7ed184eadb1472b95bce6f61bfd1a35e41daa362d089cec93"},
+    {file = "mkl-2021.4.0-py2.py3-none-macosx_10_15_x86_64.macosx_11_0_x86_64.whl", hash = "sha256:67460f5cd7e30e405b54d70d1ed3ca78118370b65f7327d495e9c8847705e2fb"},
+    {file = "mkl-2021.4.0-py2.py3-none-manylinux1_i686.whl", hash = "sha256:636d07d90e68ccc9630c654d47ce9fdeb036bb46e2b193b3a9ac8cfea683cce5"},
+    {file = "mkl-2021.4.0-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:398dbf2b0d12acaf54117a5210e8f191827f373d362d796091d161f610c1ebfb"},
+    {file = "mkl-2021.4.0-py2.py3-none-win32.whl", hash = "sha256:439c640b269a5668134e3dcbcea4350459c4a8bc46469669b2d67e07e3d330e8"},
+    {file = "mkl-2021.4.0-py2.py3-none-win_amd64.whl", hash = "sha256:ceef3cafce4c009dd25f65d7ad0d833a0fbadc3d8903991ec92351fe5de1e718"},
 ]
 mkl-service = [
     {file = "mkl_service-2.4.0-0-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:a26a4823bd1445c9065ef7bb1b5cec04a2663055d79e753969f876bc27aa41b2"},
@@ -2816,8 +2822,8 @@ typing-extensions = [
     {file = "typing_extensions-4.1.1.tar.gz", hash = "sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42"},
 ]
 unidecode = [
-    {file = "Unidecode-1.3.3-py3-none-any.whl", hash = "sha256:a5a8a4b6fb033724ffba8502af2e65ca5bfc3dd53762dedaafe4b0134ad42e3c"},
-    {file = "Unidecode-1.3.3.tar.gz", hash = "sha256:8521f2853fd250891dc27d156a9d30e61c4e76319da963c4a1c27083a909ac30"},
+    {file = "Unidecode-1.3.4-py3-none-any.whl", hash = "sha256:afa04efcdd818a93237574791be9b2817d7077c25a068b00f8cff7baa4e59257"},
+    {file = "Unidecode-1.3.4.tar.gz", hash = "sha256:8e4352fb93d5a735c788110d2e7ac8e8031eb06ccbfe8d324ab71735015f9342"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.8-py2.py3-none-any.whl", hash = "sha256:000ca7f471a233c2251c6c7023ee85305721bfdf18621ebff4fd17a8653427ed"},
