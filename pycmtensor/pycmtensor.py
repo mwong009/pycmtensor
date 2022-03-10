@@ -161,8 +161,6 @@ def train(
     optimizer,
     batch_size=None,
     max_epoch=None,
-    base_lr=0.01,
-    seed=999,
     debug=False,
     notebook=False,
 ):
@@ -174,8 +172,6 @@ def train(
         optimizer (Optimizer): the type of optimizer to use to train the model.
         batch_size (int): batch size per iteration. Defaults to 256.
         max_epoch (int): maximum number of epochs to train. Defaults to 2000.
-        base_lr (float): the base learning rate to use. Defaults to 0.01.
-        seed (int, optional): the random seed value. Defaults to 999.
         debug (bool, optional): outputs more verbosity if True. Defaults to False.
         notebook (bool, optional): set this flag to True if running on a `Jupyter Notebook <https://jupyter.org/>`_. Defaults to False.
 
@@ -294,6 +290,9 @@ def train(
                 tracker.add(iter, "lr", epoch_lr)
                 if ll > model.best_ll:
                     if ll > (model.best_ll / validation_threshold):
+                        log.info(
+                            f"epoch {epoch} log likelihood {ll} score {ll_score} learning rate{epoch_lr}"
+                        )
                         patience = max(patience, iter * patience_increase)
                         patience = min(patience, max_iter)
 
@@ -313,7 +312,7 @@ def train(
                 pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
                 pbar.update()
 
-            if patience <= iter:
+            if patience < iter:
                 done_looping = True
                 early_stopping = True
                 break
