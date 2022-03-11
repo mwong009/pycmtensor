@@ -153,28 +153,22 @@ def inspect_model(model):
     return model
 
 
-def train(
-    model,
-    database,
-    optimizer,
-    batch_size=None,
-    max_epoch=None,
-    debug=False,
-    notebook=False,
-):
+def train(model, database, optimizer, **kwargs):
     """Default training algorithm. Returns the best model ``model`` object.
 
     Args:
         model (PyCMTensorModel): the ``model`` object to train.
         database (Database): the ``database`` object containing the data and tensor variables.
         optimizer (Optimizer): the type of optimizer to use to train the model.
-        batch_size (int): batch size per iteration. Defaults to 256.
-        max_epoch (int): maximum number of epochs to train. Defaults to 2000.
-        debug (bool, optional): outputs more verbosity if True. Defaults to False.
-        notebook (bool, optional): set this flag to True if running on a `Jupyter Notebook <https://jupyter.org/>`_. Defaults to False.
 
     Returns:
         PyCMTensorModel: the output is a trained ``model`` object. Call :class:`~pycmtensor.results.Results` to generate model results.
+
+    Note:
+        **kwargs can be any of the following: 'patience', 'patience_increase',
+        'validation_threshold', 'seed', 'base_lr', 'max_lr', 'batch_size',
+        'max_epoch', 'debug', 'notebook', 'learning_scheduler', 'cyclic_lr_mode',
+        'cyclic_lr_step_size'.
 
     Example:
         .. code-block :: python
@@ -186,7 +180,7 @@ def train(
             ...
 
             model = MNLogit(u=U, av=AV, database=db, name="mymodel")
-            model = cmt.train(model, database=db, optimizer=Adam)
+            model = cmt.train(model, database=db, optimizer=Adam, notebook=False)
             ...
     """
 
@@ -195,36 +189,38 @@ def train(
     inspect_model(model)
     build_functions(model, database, optimizer)
 
-    # load model config
-    seed = model.config["seed"]
-    Scheduler = ConstantLR
-    if model.config["learning_scheduler"] == "CyclicLR":
-        Scheduler = CyclicLR
+    # load arguments into model.config()
+    for key, val in kwargs.items():
+        if key in model.config():
+            if type(val) != type(model.config[key]):
+                raise TypeError(
+                    f"{key}={val} must be of type {type(model.config[key])}"
+                )
+            model.config[key] = val
+        else:
+            raise NotImplementedError(f"Invalid option in kwargs {key}={val}")
+
+    # load learning rate scheduler
+    if model.config["learning_scheduler"] in sch.__dict__:
+        Scheduler = getattr(sch, model.config["learning_scheduler"])
+    else:
+        lrs = model.config["learning_scheduler"]
+        raise NotImplementedError(f"Invalid option for learning_scheduler: {lrs}")
+
+    if Scheduler == CyclicLR:
         cyclic_lr_mode = model.config["cyclic_lr_mode"]
         cyclic_lr_step_size = model.config["cyclic_lr_step_size"]
 
+    # create learning rate scheduler
     base_lr = model.config["base_lr"]
     max_lr = np.maximum(base_lr, model.config["max_lr"])
-
-    if max_epoch is None:
-        max_epoch = model.config["max_epoch"]
-    else:
-        model.config["max_epoch"] = max_epoch
-    if batch_size is None:
-        batch_size = model.config["batch_size"]
-    else:
-        model.config["batch_size"] = batch_size
-
-    # training state
-    epoch = 0
-    tqdm = tqdm_nb_check(notebook)
-    rng = np.random.default_rng(seed)
-    tracker = IterationTracker()
     lr_scheduler = Scheduler(
         base_lr, max_lr, step_size=cyclic_lr_step_size, mode=cyclic_lr_mode
     )
 
     # training hyperparameters
+    max_epoch = model.config["max_epoch"]
+    batch_size = model.config["batch_size"]
     n_samples = database.get_rows()
     n_batches = n_samples // batch_size
     max_iter = max_epoch * n_batches
@@ -237,20 +233,24 @@ def train(
     done_looping = False
     early_stopping = False
 
-    start_time = timeit.default_timer()
-    log.info(f"Training model...")
-    print(
-        f"dataset: {database.name} (n={n_samples})\n"
-        + f"batch size: {batch_size}\n"
-        + f"iterations per epoch: {n_batches}"
-    )
+    # disables verbose printout if debig is true
+    if model.config["debug"] is False:
+        log.info(f"Training model...")
+        print(
+            f"dataset: {database.name} (n={n_samples})\n"
+            + f"batch size: {batch_size}\n"
+            + f"iterations per epoch: {n_batches}"
+        )
 
+    # set inital model solutions
     model.null_ll = model.loglikelihood()
     model.best_ll_score = 1 - model.output_errors()
     model.best_ll = model.null_ll
     best_model = model
 
-    if debug is False:
+    # disables tqdm if debug is True
+    if model.config["debug"] is False:
+        tqdm = tqdm_nb_check(model.config["notebook"])
         pbar0 = tqdm(
             bar_format=(
                 "Loglikelihood:  {postfix[0][ll]:.3f}  Score: {postfix[1][sc]:.3f}"
@@ -286,6 +286,7 @@ def train(
                 tracker.add(iter, "full_ll", ll)
                 tracker.add(iter, "score", ll_score)
                 tracker.add(iter, "lr", epoch_lr)
+
                 if ll > model.best_ll:
                     if ll > (model.best_ll / validation_threshold):
                         log.info(
@@ -300,12 +301,14 @@ def train(
 
                     best_model = model
 
-                    if debug is False:
+                    # update tqdm if debug is False
+                    if model.config["debug"] is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
                         pbar0.postfix[1]["sc"] = model.best_ll_score
                         pbar0.update()
 
-            if debug is False:
+            # update tqdm if debug is False
+            if model.config["debug"] is False:
                 pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
                 pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
                 pbar.update()
@@ -324,14 +327,15 @@ def train(
     with open(model.name + ".pkl", "wb") as f:
         pickle.dump(model, f)  # save model to pickle
 
-    if early_stopping:
-        log.warning("Maximum patience reached. Early stopping...")
-    print(
-        (
-            "Optimization complete with accuracy of {0:6.3f}%."
-            " Max loglikelihood reached @ epoch {1}.\n"
-        ).format(model.best_ll_score * 100.0, model.best_epoch)
-    )
+    if model.config["debug"] is False:
+        if early_stopping:
+            log.warning("Maximum patience reached. Early stopping...")
+        print(
+            (
+                "Optimization complete with accuracy of {0:6.3f}%."
+                " Max loglikelihood reached @ epoch {1}.\n"
+            ).format(model.best_ll_score * 100.0, model.best_epoch)
+        )
     if debug is False:
         pbar0.close()
         pbar.close()

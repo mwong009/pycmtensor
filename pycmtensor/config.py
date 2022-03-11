@@ -78,8 +78,10 @@ def _config():
         "seed": 999,
         "base_lr": 0.0001,
         "max_lr": 0.01,
-        "max_epoch": 2000,
         "batch_size": 64,
+        "max_epoch": 2000,
+        "debug": False,
+        "notebook": False,
         "learning_scheduler": "CyclicLR",
         "cyclic_lr_mode": "triangular2",
         "cyclic_lr_step_size": 8,
@@ -118,3 +120,6 @@ class Config:
             self.config[name] = val
         else:
             raise NameError(f"{name} not found in config file.")
+
+    def __call__(self):
+        return self.config
