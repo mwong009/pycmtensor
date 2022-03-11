@@ -15,10 +15,10 @@ from .functions import logit, neg_loglikelihood
 class PyCMTensorModel:
     def __init__(self, db):
         self.name = "PyCMTensorModel"
+        self.config = config
         self.params = []  # keep track of params
         self.beta_params = []
         self.inputs = db.get_tensors()
-        self.config = config
 
     def parse_expression(self, expression):
         """Returns a list of symbols from the expression
@@ -62,17 +62,25 @@ class PyCMTensorModel:
         return symbols
 
     def add_params(self, params):
+        """Method to load local variables defined in the main program
+
+        Args:
+            params (dict or list): a dict or list of items that is generated from calling :class:`expressions.Beta` or :class:`expressions.Weights`
+        """
         if not isinstance(params, (dict, list)):
             msg = "params must be of Type dict or list"
             log.error(msg)
             raise TypeError(msg)
 
+        # create a dict of str(param): param, if params is given as a list
         if isinstance(params, list):
             params = {str(p): p for p in params}
 
-        # update model params into list
+        # remove duplicates
         params = self.check_duplicate_param_names(params)
-        for param in params:
+
+        # keep track of params
+        for _, param in params.items():
             if isinstance(param, (Beta, Weights)):
                 self.params.append(param)
                 if isinstance(param, (Beta)):
@@ -82,15 +90,15 @@ class PyCMTensorModel:
         self.remove_unused_params(expression="cost")
 
     def check_duplicate_param_names(self, params):
-        x = [p for _, p in params.items() if isinstance(p, (Beta, Weights))]
-        # check for duplicate params
+        x = [p for n, p in params.items() if isinstance(p, (Beta, Weights))]
+        # check for duplicate params, raise error and abort if duplicate found
         seen = set()
         dup = {p.name for p in x if p.name in seen or (seen.add(p.name) or False)}
         if len(dup) > 0:
             msg = f"duplicate param names defined in model: {dup}."
             log.error(msg)
             raise NameError(msg)
-        return x
+        return params
 
     def remove_unused_params(self, expression):
         """Removes unused parameters not present in `expression`
@@ -110,9 +118,9 @@ class PyCMTensorModel:
                     unused_params.append(param.name)
         if len(unused_params) > 0:
             msg = (
-                f"Unused Betas from computational graph:"
-                + f"".join(f" {p}" for p in unused_params)
-                + f" removed. To explicity keep params in model, set param status=1."
+                f"Unused Betas removed from computational graph: {{"
+                + f" ,".join(f"{p}" for p in unused_params)
+                + f"}}. To keep Betas in model, set Beta.status=1"
             )
             log.warning(msg)
 
