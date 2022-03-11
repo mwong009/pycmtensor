@@ -142,12 +142,12 @@ class Predict:
 
     def probs(self):
         db = self.database
-        data_obj = self.model.output_probabilities().T
+        data_obj = self.model.output_probabilities(*db.input_data(self.model.inputs))
         return pd.DataFrame(data_obj, columns=self.columns)
 
     def choices(self):
         db = self.database
-        data_obj = self.model.output_predictions().T
+        data_obj = self.model.output_predictions(*db.input_data(self.model.inputs))
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
