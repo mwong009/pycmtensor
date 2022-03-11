@@ -9,6 +9,7 @@ import dill as pickle
 import numpy as np
 
 from pycmtensor import logger as log
+from pycmtensor import scheduler as sch
 
 from .functions import bhhh, errors, full_loglikelihood, gradient_norm, hessians
 from .logger import PyCMTensorError
@@ -48,10 +49,10 @@ def build_functions(model, db, optimizer=None):
             outputs=model.cost,
             updates=updates,
             on_unused_input="ignore",
-            givens=[
-                (t, data[index * batch_size + shift : (index + 1) * batch_size + shift])
+            givens={
+                t: data[index * batch_size + shift : (index + 1) * batch_size + shift]
                 for t, data in zip(model.inputs, db.input_shared_data())
-            ],
+            },
         )
 
     model.loglikelihood = aesara.function(
@@ -267,13 +268,23 @@ def train(model, database, optimizer, **kwargs):
             leave=True,
         )
 
+    # training state and tracker
+    epoch = 0
+    iter = 0
+    tracker = IterationTracker()
+    rng = np.random.default_rng(model.config["seed"])
+    start_time = timeit.default_timer()
+
+    # training run step
     while (epoch < max_epoch) and (not done_looping):
-        epoch = epoch + 1
-        if epoch < max_epoch // 2:
+
+        epoch = epoch + 1  # increment epoch
+        if epoch < max_epoch // 2:  # set the learning rate for this epoch
             epoch_lr = lr_scheduler.get_lr(epoch)
-        for batch_index in range(n_batches):
-            iter = (epoch - 1) * n_batches + batch_index + 1
-            i = rng.integers(0, n_batches)
+
+        for _ in range(n_batches):  # loop over n_batches
+            iter += 1  # increment iteration
+            i = rng.integers(0, n_batches)  # select random index and shift slices
             shift = rng.integers(0, batch_size)
 
             # train model
@@ -281,8 +292,10 @@ def train(model, database, optimizer, **kwargs):
 
             # validation step
             if iter % validation_frequency == 0:
-                ll = model.loglikelihood()
-                ll_score = 1 - model.output_errors()
+                ll = model.loglikelihood()  # record the loglikelihood
+                ll_score = 1 - model.output_errors()  # record the score
+
+                # track the progress of the training into the tracker log
                 tracker.add(iter, "full_ll", ll)
                 tracker.add(iter, "score", ll_score)
                 tracker.add(iter, "lr", epoch_lr)
@@ -318,6 +331,7 @@ def train(model, database, optimizer, **kwargs):
                 early_stopping = True
                 break
 
+    # end of training step
     end_time = timeit.default_timer()
     model.train_time = end_time - start_time
     model.epochs_per_sec = round(epoch / model.train_time, 3)
@@ -336,7 +350,9 @@ def train(model, database, optimizer, **kwargs):
                 " Max loglikelihood reached @ epoch {1}.\n"
             ).format(model.best_ll_score * 100.0, model.best_epoch)
         )
-    if debug is False:
+
+    # update tqdm if debug is False
+    if model.config["debug"] is False:
         pbar0.close()
         pbar.close()
 
