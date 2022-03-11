@@ -213,8 +213,7 @@ class RMSProp(Optimizer):
             rho (float, optional): discounting factor for the history/coming gradient.
                 Defaults to ``0.9``.
 
-        .. [#] Hinton, 2012. rmsprop: Divide the gradient by a running average of its
-        recent magnitude. http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
+        .. [#] Hinton, 2012. rmsprop: Divide the gradient by a running average of its recent magnitude. http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
         """
         super().__init__(params, name="RMSProp", rho=rho)
 

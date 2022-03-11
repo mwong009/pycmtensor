@@ -89,6 +89,10 @@ master_doc = "index"
 
 suppress_warnings = ["autoapi"]
 
+# -- Options for myst-nb -----------------------------------------------------
+
+jupyter_execute_notebooks = "off"
+
 # -- Options for autoapi -----------------------------------------------------
 
 
