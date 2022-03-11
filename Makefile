@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/black
+.PHONY: clean clean-build clean-pyc clean-test docs cleandocs help install lint lint/isort lint/black build
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -47,24 +47,16 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint/flake8: ## check style with flake8
-	flake8 pycmtensor tests
 lint/black: ## check style with black
-	black --check pycmtensor tests
+	poetry run black .
 
-lint: lint/flake8 lint/black ## check style
+lint/isort: ## isort the imports
+	poetry run isort .
+
+lint: lint/black lint/isort ## check style
 
 test: ## run tests quickly with the default Python
-	python setup.py test
-
-test-all: ## run tests on every Python version with tox
-	tox
-
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source pycmtensor setup.py test
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+	poetry run pytest
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
@@ -76,14 +68,6 @@ cleandocs:
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
-
-release: dist ## package and upload a release
-	twine upload dist/*
-
-dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
 	poetry install
