@@ -20,10 +20,46 @@ class PyCMTensorModel:
         self.inputs = db.get_tensors()
         self.config = config
 
-    def append_to_params(self, params):
-        """[Depreciated] Use add_params() instead."""
-        log.warning(f"Depreciated method append_to_params(). Use add_params() instead.")
-        return self.add_params(params)
+    def parse_expression(self, expression):
+        """Returns a list of symbols from the expression
+
+        Args:
+            expression (str): the name of the expression
+
+        Returns:
+            list: a list of str words found in expression.
+
+        Note:
+            the return list is used to check against unused params, see :meth:`remove_unused_params`
+        """
+        if hasattr(self, expression):
+            _expression = getattr(self, expression)
+        stdout = str(aesara.pprint(_expression))
+        for s in [
+            "(",
+            ")",
+            ",",
+            "[",
+            "]",
+            "{",
+            "}",
+            "=",
+            "Shape",
+            "AdvancedSubtensor",
+            "Reshape",
+            "join",
+            "sum",
+            "dtype",
+            "ARange",
+            ":",
+            "int64",
+            "axis",
+            "None",
+        ]:
+            stdout = str.replace(stdout, s, " ")
+        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        symbols = list(set(symbols))
+        return symbols
 
     def add_params(self, params):
         if not isinstance(params, (dict, list)):
@@ -42,8 +78,8 @@ class PyCMTensorModel:
                 if isinstance(param, (Beta)):
                     self.beta_params.append(param)
 
-        if hasattr(self, "cost"):
-            self.remove_unused_params(self.cost)
+        # remove unused Beta params
+        self.remove_unused_params(expression="cost")
 
     def check_duplicate_param_names(self, params):
         x = [p for _, p in params.items() if isinstance(p, (Beta, Weights))]
@@ -62,10 +98,7 @@ class PyCMTensorModel:
         Args:
             expression (TensorVariable): The tensor expression to be checked
         """
-        stdout = str(aesara.pprint(expression))
-        stdout = str.replace(stdout, "(", " ")
-        stdout = str.replace(stdout, ")", " ")
-        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        symbols = self.parse_expression(expression)
         params = []
         beta_params = []
         unused_params = []
