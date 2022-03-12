@@ -1,20 +1,15 @@
 name: pycmtensor-dev
-channels:
-    - conda-forge
-    - defaults
 dependencies:
     - python==3.9.7
-    - pip>=21.2.4
-    - git>=2.34.1
-    - m2w64-toolchain
-    - numpy>=1.21.5
-    - libpython
-    - mkl
-    # - cxx-compiler==1.3.0
-    # - libblas>=3.9.0
+    - pip
+    - git
+    - numpy=1.21.5
+    - mkl>2021.0.0,<2022.0.0
+    - conda-forge::libpython
+    - conda-forge::m2w64-toolchain
+    - conda-forge::cxx-compiler
+    - conda-forge::libblas
 # conda install nb_conda_kernels
-# conda env create -f environment.yml
-# conda activate pycmtensor-dev
-# pip install . , or
+# conda env create -f environment.yml, or
+# conda env update -n base -f environment.yml
 # pip install git+https://github.com/mwong009/pycmtensor.git -U
-# conda remove --name pycmtensor-dev --all
