@@ -1,6 +1,6 @@
 # PyCMTensor
 
-![](https://img.shields.io/badge/version-0.6.2-orange)
+![](https://img.shields.io/badge/version-0.6.3-orange)
 [![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?version=latest)
 [![](https://pyup.io/repos/github/mwong009/pycmtensor/shield.svg)](https://pyup.io/repos/github/mwong009/pycmtensor)
 ![Licence](https://img.shields.io/badge/Licence-MIT-blue)

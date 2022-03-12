@@ -1,3 +1,16 @@
+## v0.6.3 (2022-03-12)
+
+### Refactor
+
+- **models**: parse_expressions() checks word values from the cost expression
+
+### Fix
+
+- **database**: cleanup unused methods and enable manual selection of input_data
+- **config**: consolidate training config options to kwargs
+- **blas**: fix load blas to config
+- **pycmtensor**: removed console output when patience=100; epoch=max_epoch
+
 ## v0.6.2 (2022-03-09)
 
 ### Refactor
