@@ -1,13 +1,13 @@
 # models.py
 
-import logging
+import traceback
 
 import aesara
 import aesara.tensor as aet
 
+from pycmtensor import config
 from pycmtensor import logger as log
 
-from .configparser import config
 from .expressions import Beta, Weights
 from .functions import logit, neg_loglikelihood
 
@@ -15,33 +15,90 @@ from .functions import logit, neg_loglikelihood
 class PyCMTensorModel:
     def __init__(self, db):
         self.name = "PyCMTensorModel"
+        self.config = config
         self.params = []  # keep track of params
         self.beta_params = []
-        self.inputs = db.tensors()
-        self.config = config
+        self.inputs = db.get_tensors()
 
-    def append_to_params(self, params):
-        """[Depreciated] Use add_params() instead."""
-        log.warning(f"Depreciated method append_to_params(). Use add_params() instead.")
-        return self.add_params(params)
+    def parse_expression(self, expression):
+        """Returns a list of symbols from the expression
+
+        Args:
+            expression (str): the name of the expression
+
+        Returns:
+            list: a list of str words found in expression.
+
+        Note:
+            the return list is used to check against unused params, see :meth:`remove_unused_params`
+        """
+        if hasattr(self, expression):
+            _expression = getattr(self, expression)
+        stdout = str(aesara.pprint(_expression))
+        for s in [
+            "(",
+            ")",
+            ",",
+            "[",
+            "]",
+            "{",
+            "}",
+            "=",
+            "Shape",
+            "AdvancedSubtensor",
+            "Reshape",
+            "join",
+            "sum",
+            "dtype",
+            "ARange",
+            ":",
+            "int64",
+            "axis",
+            "None",
+        ]:
+            stdout = str.replace(stdout, s, " ")
+        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        symbols = list(set(symbols))
+        return symbols
 
     def add_params(self, params):
-        assert isinstance(params, (dict, list)), f"params must be of type dict or list"
-        if isinstance(params, list):
-            d = {}
-            for param in params:
-                d[str(param)] = param
-            params = d
+        """Method to load local variables defined in the main program
 
+        Args:
+            params (dict or list): a dict or list of items that is generated from calling :class:`expressions.Beta` or :class:`expressions.Weights`
+        """
+        if not isinstance(params, (dict, list)):
+            msg = "params must be of Type dict or list"
+            log.error(msg)
+            raise TypeError(msg)
+
+        # create a dict of str(param): param, if params is given as a list
+        if isinstance(params, list):
+            params = {str(p): p for p in params}
+
+        # remove duplicates
+        params = self.check_duplicate_param_names(params)
+
+        # keep track of params
         for _, param in params.items():
             if isinstance(param, (Beta, Weights)):
-                # update model params into list
                 self.params.append(param)
                 if isinstance(param, (Beta)):
                     self.beta_params.append(param)
 
-        if hasattr(self, "cost"):
-            self.remove_unused_params(self.cost)
+        # remove unused Beta params
+        self.remove_unused_params(expression="cost")
+
+    def check_duplicate_param_names(self, params):
+        x = [p for n, p in params.items() if isinstance(p, (Beta, Weights))]
+        # check for duplicate params, raise error and abort if duplicate found
+        seen = set()
+        dup = {p.name for p in x if p.name in seen or (seen.add(p.name) or False)}
+        if len(dup) > 0:
+            msg = f"duplicate param names defined in model: {dup}."
+            log.error(msg)
+            raise NameError(msg)
+        return params
 
     def remove_unused_params(self, expression):
         """Removes unused parameters not present in `expression`
@@ -49,10 +106,7 @@ class PyCMTensorModel:
         Args:
             expression (TensorVariable): The tensor expression to be checked
         """
-        stdout = str(aesara.pprint(expression))
-        stdout = str.replace(stdout, "(", " ")
-        stdout = str.replace(stdout, ")", " ")
-        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        symbols = self.parse_expression(expression)
         params = []
         beta_params = []
         unused_params = []
@@ -64,9 +118,9 @@ class PyCMTensorModel:
                     unused_params.append(param.name)
         if len(unused_params) > 0:
             msg = (
-                f"Unused Betas from computational graph:"
-                + f"".join(f" {p}" for p in unused_params)
-                + f" removed. To explicity keep params in model, set param status=1."
+                f"Unused Betas removed from computational graph: {{"
+                + f" ,".join(f"{p}" for p in unused_params)
+                + f"}}. To keep Betas in model, set Beta.status=1"
             )
             log.warning(msg)
 

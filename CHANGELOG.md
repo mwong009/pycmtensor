@@ -1,37 +1,71 @@
-## v0.5.3 (2022-03-05)
+## v0.6.3 (2022-03-12)
+
+### Refactor
+
+- **models**: parse_expressions() checks word values from the cost expression
 
 ### Fix
 
-- **pycmtensor**: fix various training config
-- **logger**: add logging functionality pycmtensor.logger
-- **results**: skip precompute routine if H and BHHH already exist
+- **database**: cleanup unused methods and enable manual selection of input_data
+- **config**: consolidate training config options to kwargs
+- **blas**: fix load blas to config
+- **pycmtensor**: removed console output when patience=100; epoch=max_epoch
 
-### Perf
+## v0.6.2 (2022-03-09)
 
-- set fixed learning rate
+### Refactor
+
+- **pycmtensor**: moved H and BHHH functions to pycmtensor
+
+### Fix
+
+- **scheduler**: enable option for Schedulers
+- **results**: minor typos and fixes
+- **functions**: skip normalization step if AV not given
+- **config**: rebuild config using configparser
+- **models**: checks for duplicate param names on add_params()
+
+## v0.6.1 (2022-03-08)
+
+### Fix
+
+- re-enable generate_config_file()
+- **results**: fix typo in gnorm() function call
+- add critial to list of logger functions
+- **functions**: compute sum of full ll then divide by shape in neg ll
+- **functions**: makes avail in logit() an optional parameter
+- **functions**: moved gradient norm function to function.py module
+- remove duplicate function
+
+### Refactor
+
+- **database**: rename tensors() to get_tensors()
+
+## v0.6.0 (2022-03-06)
 
 ### Feat
 
+- **scheduler.py**: add new scheduler (CyclicLR) for adaptive LR
+- **trackers**: add tracking to monitor training loss/score
 - **logging**: add logging to __init__
-
-## v0.5.2 (2022-03-04)
-
-### Perf
-
-- **statistics**: precompute H and BHHH to results
-
-## v0.5.1 (2022-03-04)
+- **params**: add routine to remove unused params from computational graph
 
 ### Fix
 
+- **config**: loadout config from train() to configparser
+- **utils**: fix TypeError check
+- **pycmtensor**: fix various training config
+- **logger**: add logging functionality pycmtensor.logger
+- **results**: skip precompute routine if H and BHHH already exist
 - **expressions**: change dunder calls to aesara.tensor methods
 - **models**: compact unused Betas message
 - **Beta**: add borrow=True to sharedVariables
 - **configparser**: renamed from config to prevent doc conflicts
 
-### Feat
+### Perf
 
-- **params**: add routine to remove unused params from computational graph
+- set fixed learning rate
+- **statistics**: precompute H and BHHH to results
 
 ## v0.5.0 (2022-03-02)
 
@@ -49,11 +83,6 @@
 - **dependencies**: move ipywidgets and pydot to dependencies
 - renamed .rst to .md fix FileNotFoundError
 - **result**: print more verbose results and options
-
-## v0.4.1 (2022-02-27)
-
-### Fix
-
 - **Database**: add name to shared_data
 - **train**: model instance now load initiated model class (not input Class as argument)
 - **Database**: set choiceVar to mandatory argument

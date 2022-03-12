@@ -1,13 +1,11 @@
 # results.py
 
-import aesara
 import dill as pickle
 import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
 from pycmtensor import logger as log
-from pycmtensor.functions import bhhh, hessians
 from pycmtensor.statistics import *
 
 
@@ -57,7 +55,7 @@ class Results:
 
         self.akaike = 2.0 * (k - max_loglike)
         self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
-        self.g_norm = gradient_norm(model, database)
+        self.g_norm = model.gnorm()
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
@@ -67,6 +65,8 @@ class Results:
         self.best_ll_score = model.best_ll_score
         self.null_loglike = null_loglike
         self.max_loglike = max_loglike
+
+        self.beta_statistics = self.generate_beta_statistics()
 
         self.print_results = (
             f"Results for model: {self.name}\n"
@@ -89,32 +89,14 @@ class Results:
             + f"Bayesian Information Criterion: {self.bayesian:.2f}\n"
             + f"Final gradient norm: {self.g_norm:.3f}\n"
         )
-
         print(self.print_results)
-        if not (hasattr(self, "H") and hasattr(self, "BHHH")):
-            self.precompute_hessians_and_bhhh()
 
-    def precompute_hessians_and_bhhh(self):
-        db = self.database
-        model = self.model
-        self.model.H = aesara.function(
-            inputs=[],
-            outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-            on_unused_input="ignore",
-            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        )
-
-        self.model.BHHH = aesara.function(
-            inputs=[],
-            outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
-            on_unused_input="ignore",
-            givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        )
+    def generate_beta_statistics(self):
+        return get_beta_statistics(self.model)
 
     def print_beta_statistics(self):
-        self.betaResults = get_beta_statistics(self.model)
         print("Statistical Analysis:")
-        print(self.betaResults.to_string() + f"\n")
+        print(self.generate_beta_statistics().to_string() + f"\n")
 
     def print_nn_weights(self):
         if self.model.get_weight_size() == 0:
@@ -134,7 +116,10 @@ class Results:
         print(self.correlationMatrix.to_string() + f"\n")
 
     def __str__(self):
-        return self.print_results + self.beta_results.to_string()
+        rval = self.print_results
+        if hasattr(self, "beta_results"):
+            rval += self.generate_beta_statistics().to_string()
+        return rval
 
 
 class Predict:
@@ -157,12 +142,12 @@ class Predict:
 
     def probs(self):
         db = self.database
-        data_obj = self.model.output_probabilities().T
+        data_obj = self.model.output_probabilities(*db.input_data(self.model.inputs))
         return pd.DataFrame(data_obj, columns=self.columns)
 
     def choices(self):
         db = self.database
-        data_obj = self.model.output_predictions().T
+        data_obj = self.model.output_predictions(*db.input_data(self.model.inputs))
         return pd.DataFrame(data_obj, columns=[db.choiceVar])
 
 
