@@ -11,7 +11,8 @@ def tqdm_nb_check(notebook: bool):
     Returns:
         `tqdm`: Returns the tqdm module if not running in a notebook, else returns a tqdm.notebook module.
     """
-    assert isinstance(notebook, bool)
+    if not isinstance(notebook, bool):
+        raise TypeError(f"{notebook} is not a {bool.__name__} type")
     if notebook:
         from tqdm.notebook import tqdm
     else:

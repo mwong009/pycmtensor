@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycmtensor"
-version = "0.5.3"
+version = "0.6.3"
 description = "Python Tensor based package for Deep neural net assisted Discrete Choice Modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
@@ -13,8 +13,9 @@ documentation = ""
 keywords = ["pycmtensor"]
 
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT",
     "Natural Language :: English",
     "Programming Language :: Python :: 3.8",
@@ -26,11 +27,12 @@ python = ">=3.8,<3.10"
 aesara = "^2.4.0"
 biogeme = "^3.2.8"
 dill = "^0.3.4"
-numpy = "^1.21.5"
+numpy = ">=1.21.5,<1.22.0"
 pandas = "^1.3.5"
 scipy = ">=1.7.1,<1.8.0"
 Cython = "^0.29.28"
 tqdm = "^4.62.3"
+mkl = "^2021.0.0"
 mkl-service = "^2.4.0"
 ipykernel = "^6.9.1"
 ipywidgets = "^7.6.5"
@@ -49,6 +51,7 @@ rstcheck = "^3.3.1"
 # Testing
 pytest = "^7.0.1"
 tox = "^3.24.0"
+pytest-cov = "^3.0.0"
 
 # Documentation
 Sphinx = "^4.4.0"
@@ -75,7 +78,7 @@ quiet = false
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.5.3"
+version = "0.6.3"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
@@ -84,24 +87,23 @@ version_files = [
 ]
 
 [tool.pytest]
-addopts = """
---strict-markers
-
--r sxX
---show-capture=log
-
---cov-report=xml
---cov-report=html
---cov-report=term-missing:skip-covered
---no-cov-on-fail
-"""
-
 markers = []
+# poetry run pytest
 
 [tool.pytest.ini_options]
+addopts = """
+    --cov=pycmtensor 
+    --cov-report=html 
+    --cov-report=term tests/
+"""
 filterwarnings = [
     "error",
     "ignore::UserWarning",
     # note the use of single quote below to denote "raw" strings in TOML
     'ignore:function ham\(\) is deprecated:DeprecationWarning',
 ]
+
+[tool.coverage.run]
+omit = [".*", "*/site-packages/*", "tests/*", "docs/*"]
+# command:
+# poetry run coverage run -m pytest && poetry run coverage report

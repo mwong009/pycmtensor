@@ -76,18 +76,6 @@ class Database(biodb.Database):
                 x_tensors.append(variable.x)
         return x_tensors
 
-    def get_x_data(self, index=None, batch_size=None, shift=None):
-        x_data = []
-        x_tensors = self.get_x_tensors()
-        for x_tensor in x_tensors:
-            if index == None:
-                x_data.append(self.data[x_tensor.name])
-            else:
-                start = index * batch_size + shift
-                end = (index + 1) * batch_size + shift
-                x_data.append(self.data[x_tensor.name][start:end])
-        return x_data
-
     def get_y_tensors(self):
         y_tensors = []
         for _, variable in self.variables.items():
@@ -95,46 +83,57 @@ class Database(biodb.Database):
                 y_tensors.append(variable.y)
         return y_tensors
 
-    def get_y_data(self, index=None, batch_size=None, shift=None):
-        y_data = []
-        y_tensors = self.get_y_tensors()
-        for y_tensor in y_tensors:
-            if index == None:
-                y_data.append(self.data[y_tensor.name])
-            else:
-                start = index * batch_size + shift
-                end = (index + 1) * batch_size + shift
-                y_data.append(self.data[y_tensor.name][start:end])
-        return y_data
+    def get_tensors(self):
+        """Returns all the tensors (x, y) in the database
 
-    def tensors(self):
+        Returns:
+            list: ``x`` and ``y`` tensors are returned as a list
+        """
         return self.get_x_tensors() + self.get_y_tensors()
 
-    def input_data(self, index=None, batch_size=None, shift=None):
+    def input_data(self, inputs=None, index=None, batch_size=None, shift=None):
         """Outputs a list of pandas table data corresponding to the
         Symbolic variables
 
         Args:
+            inputs (list, optional): if inputs are given, returns the sharedVariable that exists in inputs. If None, return all sharedVariable in this database.
             index (int, optional): Starting index slice.
             batch_size (int, optional): Size of slice.
             shift (int, optional): Add a random shift of the index.
 
         Returns:
-            list: list of database (input) data
+            list: list of pandas array data
         """
-        return self.get_x_data(index, batch_size, shift) + self.get_y_data(
-            index, batch_size, shift
-        )
+        data = []
+        if inputs is not None:
+            tensors = inputs
+        else:
+            tensors = self.get_tensors()
+        for tensor in tensors:
+            if index == None:
+                data.append(self.data[tensor.name])
+            else:
+                start = index * batch_size + shift
+                end = (index + 1) * batch_size + shift
+                data.append(self.data[tensor.name][start:end])
 
-    def input_shared_data(self):
+        return data
+
+    def input_shared_data(self, inputs: list = None):
         """Outputs a list of sharedVariable data corresponding to the symbolic
         variables
 
+        Args:
+            inputs (list, optional): if inputs are given, returns the sharedVariable that exists in inputs. If None, return all sharedVariable in this database.
+
         Returns:
-            list: a list  of sharedVariable database (input) data
+            list: a list of sharedVariable tensor data
         """
         shared_data = []
-        tensors = self.get_x_tensors() + self.get_y_tensors()
+        if inputs is not None:
+            tensors = inputs
+        else:
+            tensors = self.get_tensors()
         for tensor in tensors:
             shared_data.append(self.sharedData[tensor.name])
         return shared_data
@@ -146,6 +145,7 @@ class Database(biodb.Database):
             scale = 1.0
             if variables is None:
                 varlist = self.get_x_tensors()
+                varlist = [v.name for v in varlist]
             else:
                 varlist = variables
             if d in varlist:

@@ -21,6 +21,8 @@ import os
 import shutil
 import sys
 
+import sphinx
+
 sys.path.insert(0, os.path.abspath(".."))
 
 import pycmtensor
@@ -87,7 +89,22 @@ master_doc = "index"
 
 suppress_warnings = ["autoapi"]
 
+# -- Options for myst-nb -----------------------------------------------------
+
+jupyter_execute_notebooks = "off"
+
 # -- Options for autoapi -----------------------------------------------------
+
+
+def skip_config_classes(app, what, name, obj, skip, options):
+    if what == "data":
+        skip = True
+    return skip
+
+
+def setup(sphinx):
+    sphinx.connect("autoapi-skip-member", skip_config_classes)
+
 
 autoapi_add_toctree_entry = True
 autoapi_python_class_content = "both"
@@ -105,7 +122,6 @@ autoapi_options = [
     # "special-members",
     # "imported-members",
 ]
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

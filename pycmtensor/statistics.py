@@ -92,17 +92,3 @@ def rob_correlation_matrix(model):
         data=matrix,
     )
     return df
-
-
-def gradient_norm(model, db):
-    cost = neg_loglikelihood(model.p_y_given_x, model.y)
-    gparams = [p() for p in model.beta_params if (p.status != 1)]
-    grads = aet.grad(cost, gparams, disconnected_inputs="ignore")
-
-    gnorm_fn = aesara.function(
-        inputs=model.inputs,
-        outputs=linalg.norm(grads),
-        on_unused_input="ignore",
-    )
-
-    return gnorm_fn(*db.input_data())
