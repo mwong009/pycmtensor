@@ -145,6 +145,7 @@ class Database(biodb.Database):
             scale = 1.0
             if variables is None:
                 varlist = self.get_x_tensors()
+                varlist = [v.name for v in varlist]
             else:
                 varlist = variables
             if d in varlist:
