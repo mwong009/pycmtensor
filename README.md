@@ -51,9 +51,7 @@ conda install -c conda-forge pip git m2w64-toolchain libpython blas mkl-service 
 conda install -c conda-forge pip git blas mkl-service numpy
 ```
 
-```{Note}
-MacOS user should also install `Clang` for a fast compiled code.
-```
+Note: MacOS user should also install `Clang` for a fast compiled code.
 
 ### Pip 
 
@@ -95,9 +93,8 @@ For a full list of submodules and description, refer to [API Reference](/autoapi
 
 Using the [swissmetro dataset](https://biogeme.epfl.ch/data.html) from Biogeme, we define a simple MNL model. 
 
-```{Note}
-The following is a replication of the results from Biogeme using the `Adam` optimization algorithm. For further examples including the ResLogit model, refer **here**.
-```
+Note:The following is a replication of the results from Biogeme using the `Adam` optimization algorithm. For further examples including the ResLogit model, refer **here**.
+
 
 1. Import the dataset and perform some data santiation
 	```Python
