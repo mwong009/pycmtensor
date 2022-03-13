@@ -8,7 +8,7 @@ name: Upload python package to PyPI
 
 on:
   release:
-    types: [publish]
+    types: [published]
 
 jobs:
   deploy:
