@@ -136,7 +136,7 @@ html_theme_options = {
     "repository_branch": "Master",
     "use_issues_button": True,
     "path_to_docs": "docs/",
-    "home_page_in_toc": True,
+    "home_page_in_toc": False,
     "use_edit_page_button": True,
     "show_toc_level": 1,
 }
