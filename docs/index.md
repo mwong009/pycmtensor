@@ -3,10 +3,10 @@
 
 ---
 
-# Table of contents
+# Contents
 
 ```{toctree}
-:caption: TOPIC AREAS
+:caption: User guide
 :maxdepth: 2
 
 installation
@@ -23,7 +23,7 @@ autoapi/index
 ```
 
 ```{toctree}
-:caption: EXAMPLES
+:caption: Tutorials
 :maxdepth: 1
 
 examples/dcm.rst
