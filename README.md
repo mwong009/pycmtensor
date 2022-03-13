@@ -1,7 +1,7 @@
 # PyCMTensor
 
-[![GitHub version](https://badge.fury.io/gh/mwong009%2Fpycmtensor.svg)](https://badge.fury.io/gh/mwong009%2Fpycmtensor)
-[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?version=latest)
+[![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
+[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=develop)](https://pycmtensor.readthedocs.io/en/develop/?badge=develop)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor)
 ![Licence](https://img.shields.io/badge/Licence-MIT-blue)
 
@@ -137,7 +137,6 @@ The following is a replication of the results from Biogeme using the `Adam` opti
 	```
 
 8. Plot the training performance and accuracy
-	![](../viz/fig.png)
 
 8. Visualize the computation graph
 	```Python
@@ -145,7 +144,6 @@ The following is a replication of the results from Biogeme using the `Adam` opti
 	from aesara import printing
 	printing.pydotprint(mymodel.cost, "graph.png")
 	```
-	![](../viz/print.png)
 
 
 ## Credits

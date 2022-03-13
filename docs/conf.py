@@ -25,8 +25,6 @@ import sphinx
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import pycmtensor
-
 # -- Project information -----------------------------------------------------
 
 project = "PyCMTensor"
@@ -38,9 +36,9 @@ author = "Melvin Wong"
 # the built documents.
 #
 # The short X.Y version.
-version = pycmtensor.__version__
+version = "0.6.4"
 # The full version, including alpha/beta/rc tags.
-release = pycmtensor.__version__
+release = "0.6.4"
 
 # -- General configuration ---------------------------------------------
 
@@ -57,7 +55,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.graphviz",
     "sphinx.ext.inheritance_diagram",
-    # "m2r2",
     "myst_nb",
 ]
 
