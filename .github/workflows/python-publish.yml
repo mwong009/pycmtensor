@@ -22,10 +22,7 @@ jobs:
         python-version: '3.x'
     - name: Python Poetry Action
       uses: abatilo/actions-poetry@v2.1.3
-    - name : Set environment variables
-      run: |
-        export PYPI_USERNAME=__token__
-        export PYPI_PASSWORD=${{ secrets.PYPI_API_TOKEN }}
     - name: Publish to PyPi
       run: |
-        poetry publish --build --username $PYPI_USERNAME --password $PYPI_PASSWORD
+        poetry config pypi-token.pypi "${{ secrets.PYPI_API_TOKEN }}"
+        poetry publish --build
