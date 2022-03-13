@@ -56,7 +56,7 @@ lint/isort: ## isort the imports
 lint: lint/black lint/isort ## check style
 
 test: ## run tests quickly with the default Python
-	poetry run pytest
+	pytest --cov=pycmtensor --cov-report=html --cov-report=term tests/
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html

@@ -19,16 +19,23 @@ def generate_blas_flags():
             list: a list of blas flags prefixed with "-l"
     """
     if "CONDA_PREFIX" in os.environ:
-        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
-        mkt_rt_bins = glob.glob(os.path.join(ld_dir, "mkl_rt*"))
+        if sys.platform == "win32":
+            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
+        else:
+            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
+        mkt_rt_bins = glob.glob(os.path.join(ld_dir, "*mkl_rt*"))
         blas_flags = []
         for b in mkt_rt_bins:
             if b.endswith(".dll"):
                 b = b[:-4]
+            if sys.platform != "win32":
+                b = "mkl_rt"
             blas_flags = [f"-l{os.path.basename(b)}"]
         return blas_flags
     else:
-        raise NameError("Conda not installed.")
+        raise NameError(
+            "CONDA_PREFIX not found, please add CONDA_PREFIX to environment variables"
+        )
 
 
 def generate_ld_path_flags():
