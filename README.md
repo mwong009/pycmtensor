@@ -1,8 +1,8 @@
 # PyCMTensor
 
-![](https://img.shields.io/badge/version-0.6.3-orange)
+[![GitHub version](https://badge.fury.io/gh/mwong009%2Fpycmtensor.svg)](https://badge.fury.io/gh/mwong009%2Fpycmtensor)
 [![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?version=latest)
-[![](https://pyup.io/repos/github/mwong009/pycmtensor/shield.svg)](https://pyup.io/repos/github/mwong009/pycmtensor)
+![](https://img.shields.io/pypi/pyversions/pycmtensor)
 ![Licence](https://img.shields.io/badge/Licence-MIT-blue)
 
 A tensor-based choice modelling Python package with deep learning capabilities
