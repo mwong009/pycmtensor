@@ -3,7 +3,7 @@ name = "pycmtensor"
 version = "0.6.3"
 description = "Python Tensor based package for Deep neural net assisted Discrete Choice Modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
-license = "MIT Licence"
+license = "MIT License"
 readme = "README.md"
 
 homepage = ""
@@ -18,7 +18,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: MIT Licence",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3.9",
 ]
