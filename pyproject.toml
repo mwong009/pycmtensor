@@ -85,7 +85,6 @@ tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
     "pycmtensor/__init__.py",
-    "README.md",
 ]
 
 [tool.pytest]
