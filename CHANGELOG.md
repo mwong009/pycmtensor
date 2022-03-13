@@ -1,3 +1,9 @@
+## v0.6.4 (2022-03-13)
+
+### Fix
+
+- **project**: fix project metadata and ci
+
 ## v0.6.3 (2022-03-12)
 
 ### Refactor
