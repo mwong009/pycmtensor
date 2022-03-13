@@ -1,0 +1,5 @@
+sphinx-book-theme
+sphinx-autoapi
+myst-nb
+graphviz
+pydot
