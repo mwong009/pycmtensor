@@ -166,7 +166,7 @@ def train(model, database, optimizer, **kwargs):
         PyCMTensorModel: the output is a trained ``model`` object. Call :class:`~pycmtensor.results.Results` to generate model results.
 
     Note:
-        **kwargs can be any of the following: 'patience', 'patience_increase',
+        ``**kwargs`` can be any of the following: 'patience', 'patience_increase',
         'validation_threshold', 'seed', 'base_lr', 'max_lr', 'batch_size',
         'max_epoch', 'debug', 'notebook', 'learning_scheduler', 'cyclic_lr_mode',
         'cyclic_lr_step_size'.
