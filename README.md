@@ -20,38 +20,48 @@ The combination of `Biogeme` and `Aesara` allows one to incorporate neural netwo
 
 ## Features
 
-* Efficiently estimate complex choice models with neural networks using deep learning algorithms
-* Combines traditional econometric models (Multinomial Logit) with deep learning models (ResNets)
-* Similar programming syntax as `Biogeme`, allowing easy substitution between `Biogeme` and `PyCMTensor` methods
+* Estimate complex choice models with neural networks using deep learning algorithms
+* Combines traditional econometric models (e.g. Multinomial Logit) with deep learning models (ResNets)
+* Shares similar programming syntax with `Biogeme`, allowing easy transition between `Biogeme` and `PyCMTensor` methods
 * Uses tensor based mathematical operations from the advanced features found in the `Aesara` library
 
 ## Install
 
-To install PyCMTensor, you need [Conda](https://docs.conda.io/en/latest/miniconda.html) (Full Anaconda works fine, but **miniconda** is recommmended for a minimal installation)
+To install PyCMTensor, you need [Conda](https://docs.conda.io/en/latest/miniconda.html) (Full Anaconda works fine, but **miniconda** is recommmended for a minimal installation). 
+Check that your Conda is using `Python 3.9`.
 
 Once Conda is installed, install the required dependencies from conda by running the following 
 command in your terminal:
 
-```console
-$ conda install pip git cxx-compiler m2w64-toolchain libblas libpython mkl numpy
-```
+Windows
+		```console
+		conda install -c conda-forge pip git m2w64-toolchain libpython blas mkl-service numpy
+		```
+Linux/MacOS
+		```console
+		conda install -c conda-forge pip git blas mkl-service numpy
+		```
 
->Note: Mac OSX user should also install `Clang` for a fast compiled code.
+>Note: MacOS user should also install `Clang` for a fast compiled code.
 
 Then, run this command in your terminal to download and install the development branch of `PyCMTensor`:
-
 ```console
-$ pip install git+https://github.com/mwong009/pycmtensor.git@develop -U
+pip install pycmtensor -U
 ```
 
-The development branch is the most up-to-date version of `PyCMTensor`. If you want a stable branch, remove ``@develop`` at the end of the url.
+*Optional*: If you want the development version from the Github repository:
+```console
+pip install git+https://github.com/mwong009/pycmtensor.git@develop -U
+```
+
+The development branch is the most recent update of `PyCMTensor`. If you want a stable branch, remove ``@develop`` at the end of the ``.git`` url.
 
 ## How to use
 
 PyCMTensor uses syntax very similar to `Biogeme`. Users of `Biogeme` should be familiar 
 with the syntax.
 
-Start an interactive session (IPython or Jupyter Notebook) and import PyCMTensor:
+Start an interactive session (`IPython` or Jupyter Notebook) and import:
 ```Python
 import pycmtensor as cmt
 ```
@@ -125,8 +135,7 @@ The following is a replication of the results from Biogeme using the `Adam` opti
 
 6. Call the training function and save the trained model
 	```Python
-	model = cmt.train(mymodel, database=db, optimizer=Adam, batch_size=128, 
-	                  max_epoch=999)
+	model = cmt.train(mymodel, database=db, optimizer=Adam)
 	```
 
 7. Generate the statistics and correlation matrices
