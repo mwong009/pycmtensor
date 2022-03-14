@@ -90,7 +90,7 @@ def _config():
         "max_epoch": 2000,
         "debug": False,
         "notebook": False,
-        "learning_scheduler": "CyclicLR",
+        "learning_scheduler": "ConstantLR",
         "cyclic_lr_mode": "triangular2",
         "cyclic_lr_step_size": 8,
     }

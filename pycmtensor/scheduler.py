@@ -11,7 +11,13 @@ class ConstantLR:
 
 class CyclicLR(ConstantLR):
     def __init__(
-        self, base_lr=0.001, max_lr=0.01, step_size=8, mode="triangular2", gamma=1.0
+        self,
+        base_lr=0.001,
+        max_lr=0.01,
+        step_size=8,
+        mode="triangular2",
+        gamma=1.0,
+        **kwargs,
     ):
         self.base_lr = base_lr
         self.max_lr = max_lr
