@@ -1,5 +1,3 @@
-from tabnanny import verbose
-
 import aesara.tensor as aet
 import pandas as pd
 import pytest
