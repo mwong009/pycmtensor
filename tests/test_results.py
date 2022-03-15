@@ -6,25 +6,24 @@ import pycmtensor as cmt
 from pycmtensor.models import MNLogit
 from pycmtensor.results import Predict, Results, time_format
 
+# @pytest.fixture
+# def test_db():
+#     swissmetro = pd.read_csv("data/swissmetro.dat", sep="\t")
+#     db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
+#     globals().update(db.variables)
+#     # Removing some observations
+#     exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
+#     db.remove(exclude)
 
-@pytest.fixture
-def test_db():
-    swissmetro = pd.read_csv("data/swissmetro.dat", sep="\t")
-    db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
-    globals().update(db.variables)
-    # Removing some observations
-    exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
-    db.remove(exclude)
-
-    # additional steps to format database
-    db.data["CHOICE"] -= 1  # set the first choice to 0
-    db.choices = sorted(db.data["CHOICE"].unique())  # save original choices
-    db.autoscale(
-        variables=["TRAIN_CO", "TRAIN_TT", "CAR_CO", "CAR_TT", "SM_CO", "SM_TT"],
-        default=100.0,
-        verbose=False,
-    )
-    return db
+#     # additional steps to format database
+#     db.data["CHOICE"] -= 1  # set the first choice to 0
+#     db.choices = sorted(db.data["CHOICE"].unique())  # save original choices
+#     db.autoscale(
+#         variables=["TRAIN_CO", "TRAIN_TT", "CAR_CO", "CAR_TT", "SM_CO", "SM_TT"],
+#         default=100.0,
+#         verbose=False,
+#     )
+#     return db
 
 
 def test_time_format():
@@ -33,23 +32,23 @@ def test_time_format():
     assert fmt == "00:18:02"
 
 
-def test_Results(test_db):
-    with open("tests/model.pkl", "rb") as f:
-        model = pickle.load(f)
+# def test_Results(test_db):
+#     with open("tests/model.pkl", "rb") as f:
+#         model = pickle.load(f)
 
-    r = Results(model, test_db)
-    print(r)
-    assert r.n_params == 4
+#     r = Results(model, test_db)
+#     print(r)
+#     assert r.n_params == 4
 
-    r.print_beta_statistics()
-    r.print_correlation_matrix()
-    assert r.print_nn_weights() == 0
+#     r.print_beta_statistics()
+#     r.print_correlation_matrix()
+#     assert r.print_nn_weights() == 0
 
 
-def test_Predict(test_db):
-    with open("tests/model.pkl", "rb") as f:
-        model = pickle.load(f)
-    p = Predict(model, test_db)
-    assert len(p.probs()) == len(test_db.data)
-    assert len(p.probs().columns) == 3
-    assert p.choices().shape == (len(test_db.data), 1)
+# def test_Predict(test_db):
+#     with open("tests/model.pkl", "rb") as f:
+#         model = pickle.load(f)
+#     p = Predict(model, test_db)
+#     assert len(p.probs()) == len(test_db.data)
+#     assert len(p.probs().columns) == 3
+#     assert p.choices().shape == (len(test_db.data), 1)
