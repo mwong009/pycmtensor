@@ -19,17 +19,17 @@ def generate_blas_flags():
             list: a list of blas flags prefixed with "-l"
     """
     if "CONDA_PREFIX" in os.environ:
+        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
         if sys.platform == "win32":
             ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
-        else:
-            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
         mkt_rt_bins = glob.glob(os.path.join(ld_dir, "*mkl_rt*"))
         blas_flags = []
         for b in mkt_rt_bins:
-            if b.endswith(".dll"):
-                b = b[:-4]
             if sys.platform != "win32":
                 b = "mkl_rt"
+            else:
+                if b.endswith(".dll"):
+                    b = b[:-4]
             blas_flags = [f"-l{os.path.basename(b)}"]
         return blas_flags
     else:
@@ -76,20 +76,21 @@ def init_aesararc():
 
 def _config():
     """Defines the default model hyperparameters and config options"""
+    rng = np.random.default_rng()
     config = {
         "python_version": sys.version,
         "cwd": os.getcwd(),
         "patience": 9000,
         "patience_increase": 2,
         "validation_threshold": 1.003,
-        "seed": 999,
+        "seed": rng.integers(1, 9000),
         "base_lr": 0.0001,
         "max_lr": 0.01,
         "batch_size": 64,
         "max_epoch": 2000,
         "debug": False,
         "notebook": False,
-        "learning_scheduler": "CyclicLR",
+        "learning_scheduler": "ConstantLR",
         "cyclic_lr_mode": "triangular2",
         "cyclic_lr_step_size": 8,
     }

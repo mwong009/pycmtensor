@@ -1,9 +1,7 @@
 # models.py
 
-import traceback
-
-import aesara
 import aesara.tensor as aet
+from aesara import function, pprint
 
 from pycmtensor import config
 from pycmtensor import logger as log
@@ -34,7 +32,7 @@ class PyCMTensorModel:
         """
         if hasattr(self, expression):
             _expression = getattr(self, expression)
-        stdout = str(aesara.pprint(_expression))
+        stdout = str(pprint(_expression))
         for s in [
             "(",
             ")",
@@ -146,9 +144,7 @@ class PyCMTensorModel:
 
     def get_weight_size(self):
         if len(self.get_weights()) > 0:
-            fn = aesara.function(
-                [], sum([aet.prod(w.shape) for w in self.get_weights()])
-            )
+            fn = function([], sum([aet.prod(w.shape) for w in self.get_weights()]))
             return fn()
         else:
             return 0
@@ -196,4 +192,50 @@ class MNLogit(PyCMTensorModel):
         return f"{self.name}"
 
     def __repr__(self):
-        return aesara.pprint(self.cost)
+        return pprint(self.cost)
+
+
+class ResLogitLayer:
+    def __init__(self, input, w_in, w_out, activation_in=None, activation_out=None):
+        """Definition of the ResLogit neural net layer
+
+        Args:
+            input (list or TensorVariable): a list of tensors corresponding to the
+            vector of utilities, or a TensorVariable vector value.
+            w_in (_type_): _description_
+            w_out (_type_): _description_
+            activation_in (_type_, optional): _description_. Defaults to None.
+            activation_out (_type_, optional): _description_. Defaults to None.
+
+        Attributes:
+            output: the output of this layer. Pass this value onto the next layer or
+            into the final model.
+
+        Example:
+            U = ...
+            W_1 = Weights("W_1", (3, 10), 0)
+            W_2 = Weights("W_2", (10, 3), 0)
+            U = ResLogitLayer(U, W_1, W_2).output
+            mymodel = MNLogit(u=U, av=AV, database=db)
+        """
+        assert w_in.shape[1].eval() == w_out.shape[0].eval()
+        if isinstance(input, (list, tuple)):
+            assert (
+                len(input) == w_in.shape[0].eval()
+            ), f"index.0 of w_in must be of the same length as input"
+            input = aet.stacklists(input).flatten(2)
+
+        assert isinstance(w_in, (Weights)), "w_in must be Weights()"
+        assert isinstance(w_out, (Weights)), "w_out must be  Weights()"
+        self.w_in = w_in()
+        self.w_out = w_out()
+        if activation_in == None:
+            activation_in = aet.sigmoid
+        if activation_out == None:
+            activation_out = aet.sigmoid
+
+        h = activation_in(aet.dot(input.T, self.w_in))
+        output = activation_out(aet.dot(h, self.w_out)).T
+        self.input = input
+        self.weights = [self.w_in, self.w_out]
+        self.output = output + input
