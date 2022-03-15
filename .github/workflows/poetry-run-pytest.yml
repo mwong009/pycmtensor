@@ -67,3 +67,4 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         files: .coverage
+        path_to_write_report: ./coverage/codecov_report.txt
