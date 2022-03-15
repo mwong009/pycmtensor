@@ -51,7 +51,10 @@ def generate_ld_path_flags():
             list: a list of ld_path flags prefixed with "-L"
     """
     if "CONDA_PREFIX" in os.environ:
-        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
+        if sys.platform == "win32":
+            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
+        else:
+            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
         ld_path_flags = [f"-L{ld_dir}"]
         return ld_path_flags
     else:
