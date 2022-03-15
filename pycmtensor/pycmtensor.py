@@ -271,7 +271,8 @@ def train(model, database, optimizer, **kwargs):
     # training state and tracker
     epoch = 0
     iter = 0
-    tracker = IterationTracker()
+    track_index = 0
+    tracker = IterationTracker(iterations=max_iter)
     rng = np.random.default_rng(model.config["seed"])
     start_time = timeit.default_timer()
 
@@ -283,7 +284,6 @@ def train(model, database, optimizer, **kwargs):
             epoch_lr = lr_scheduler.get_lr(epoch)
 
         for _ in range(n_batches):  # loop over n_batches
-            iter += 1  # increment iteration
             i = rng.integers(0, n_batches)  # select random index and shift slices
             shift = rng.integers(0, batch_size)
 
@@ -296,9 +296,12 @@ def train(model, database, optimizer, **kwargs):
                 ll_score = 1 - model.output_errors()  # record the score
 
                 # track the progress of the training into the tracker log
-                tracker.add(iter, "full_ll", ll)
-                tracker.add(iter, "score", ll_score)
-                tracker.add(iter, "lr", epoch_lr)
+                tracker.add(track_index, "full_ll", ll)
+                tracker.add(track_index, "score", ll_score)
+                tracker.add(track_index, "lr", epoch_lr)
+                track_index += 1
+
+                # update the best model
                 if ll > model.best_ll:
                     if ll > (model.best_ll / validation_threshold):
                         log.info(
@@ -325,15 +328,18 @@ def train(model, database, optimizer, **kwargs):
                 pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
                 pbar.update()
 
-            if patience < iter:
+            if patience <= iter:
                 done_looping = True
                 early_stopping = True
                 break
+
+            iter += 1  # increment iteration
 
     # end of training step
     end_time = timeit.default_timer()
     model.train_time = end_time - start_time
     model.epochs_per_sec = round(epoch / model.train_time, 3)
+    model.iter_per_sec = round(iter / model.train_time, 3)
     model.iterations = iter
     model.tracker = tracker
 

@@ -47,6 +47,7 @@ class Results:
         self.build_time = time_format(model.build_time)
         self.train_time = time_format(model.train_time)
         self.epochs_per_sec = model.epochs_per_sec
+        self.iter_per_sec = model.iter_per_sec
         self.seed = model.config["seed"]
 
         self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
@@ -72,7 +73,7 @@ class Results:
             f"Results for model: {self.name}\n"
             + f"Build time: {self.build_time}\n"
             + f"Estimation time: {self.train_time}\n"
-            + f"Estimation rate: {self.epochs_per_sec} epochs/s\n"
+            + f"Estimation rate: {self.iter_per_sec} epochs/s\n"
             + f"Seed value: {self.seed}\n"
             + f"Number of Beta parameters: {self.n_params}\n"
             + (f"Tensor size: {self.n_weights}\n" if n_weights > 0 else "")
@@ -101,6 +102,7 @@ class Results:
     def print_nn_weights(self):
         if self.model.get_weight_size() == 0:
             log.warning("No weights to show")
+            return 0
         else:
             self.weights = self.model.output_estimated_weights()
             if self.show_weights:

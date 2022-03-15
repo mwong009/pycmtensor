@@ -95,7 +95,7 @@ markers = []
 [tool.pytest.ini_options]
 addopts = """
     --cov=pycmtensor 
-    --cov-report=html 
+    --cov-report=xml 
     --cov-report=term tests/
 """
 filterwarnings = [

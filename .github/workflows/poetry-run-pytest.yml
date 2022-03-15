@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        python-version: ['3.9', '3.10']
+        python-version: ['3.9']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -32,12 +32,12 @@ jobs:
     - name: Install conda dependencies (Windows)  
       if: matrix.os == 'windows-latest'
       run: |
-        conda install -c conda-forge libpython libblas m2w64-toolchain mkl-service numpy
+        conda install -c conda-forge libpython blas m2w64-toolchain mkl-service numpy
 
     - name: Install conda dependencies (Linux)  
       if: matrix.os != 'windows-latest'
       run: |
-        conda install mkl-service
+        conda install blas mkl-service
     
     - name: Install package dependencies
       run: |
@@ -59,3 +59,11 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         poetry run pytest
+
+    - name: Upload coverage to codecov.io
+      if: |
+        (matrix.os != 'windows-latest') &&
+        (matrix.python-version == '3.9')
+      uses: codecov/codecov-action@v2
+      with:
+        files: .coverage
