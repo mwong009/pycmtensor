@@ -19,9 +19,12 @@ def generate_blas_flags():
             list: a list of blas flags prefixed with "-l"
     """
     if "CONDA_PREFIX" in os.environ:
-        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
+
         if sys.platform == "win32":
             ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
+        else:
+            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
+
         mkt_rt_bins = glob.glob(os.path.join(ld_dir, "*mkl_rt*"))
         blas_flags = []
         for b in mkt_rt_bins:
