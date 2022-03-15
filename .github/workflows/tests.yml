@@ -40,6 +40,7 @@ jobs:
     
     - name: Show contents of .aesararc
       run: |
+        python -c "import sys; print(sys.platform)"
         cat ~/.aesararc
       shell: bash
       
@@ -82,6 +83,7 @@ jobs:
     
     - name: Show contents of .aesararc
       run: |
+        python -c "import sys; print(sys.platform)"
         cat ~/.aesararc
       shell: bash
     
