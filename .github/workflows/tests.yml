@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-install-windows:
-    name: build-install
+    name: build-install-windows
     runs-on: windows-latest
     strategy:
       matrix:
@@ -48,11 +48,12 @@ jobs:
       run: |
         poetry run pytest
 
-  build-install-linux:
-    name: build-install
+  build-install-linux-macos:
+    name: build-install-linux-macos
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ['3.9', '3.10']
     steps:
     - uses: actions/checkout@v2
@@ -94,7 +95,8 @@ jobs:
 
     - name: Upload coverage to codecov.io
       if: |
-        matrix.python-version == '3.9'
+        (matrix.os == 'ubuntu-latest') &&
+        (matrix.python-version == '3.9')
       uses: codecov/codecov-action@v2
       with:
         files: coverage.xml
