@@ -123,18 +123,15 @@ jobs:
         echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
       shell: bash
 
-    - name: Install conda dependencies 
-      run: |
-        conda install blas mkl-service Clang
-
     - name: Xcode (macos)
       if: matrix.os == 'macos-latest'
       run: |
         clang --version
         xcrun --show-sdk-path
-        # sudo rm -rf /Library/Developer/CommandLineTools
-        # xcode-select --install
-        # sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
+
+    - name: Install conda dependencies 
+      run: |
+        conda install blas mkl-service Clang
     
     - name: Install package dependencies
       run: |

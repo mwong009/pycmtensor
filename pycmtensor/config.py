@@ -43,6 +43,11 @@ def generate_blas_flags():
 
 
 def generate_cxx_flags():
+    """Finds and generates the gcc__cxxflags config option
+
+    Returns:
+        list: a list of cxx flags to pass to .aesararc
+    """
     sdk_path = subprocess.getoutput("xcrun --show-sdk-path")
     cxxflag = os.path.join(sdk_path, "usr", "include")
     return [f"-I{cxxflag}"]
