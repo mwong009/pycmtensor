@@ -154,7 +154,7 @@ def inspect_model(model):
     return model
 
 
-def train(model, database, optimizer, **kwargs):
+def train(model, database, optimizer, save_model=False, **kwargs):
     """Default training algorithm. Returns the best model ``model`` object.
 
     Args:
@@ -314,13 +314,13 @@ def train(model, database, optimizer, **kwargs):
                     model.best_ll = ll
                     model.best_ll_score = ll_score
 
-                    best_model = model
-
                     # update tqdm if debug is False
                     if model.config["debug"] is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
                         pbar0.postfix[1]["sc"] = model.best_ll_score
                         pbar0.update()
+
+                    best_model = model
 
             # update tqdm if debug is False
             if model.config["debug"] is False:
@@ -337,27 +337,28 @@ def train(model, database, optimizer, **kwargs):
 
     # end of training step
     end_time = timeit.default_timer()
-    model.train_time = end_time - start_time
-    model.epochs_per_sec = round(epoch / model.train_time, 3)
-    model.iter_per_sec = round(iter / model.train_time, 3)
-    model.iterations = iter
-    model.tracker = tracker
+    best_model.train_time = end_time - start_time
+    best_model.epochs_per_sec = round(epoch / model.train_time, 3)
+    best_model.iter_per_sec = round(iter / model.train_time, 3)
+    best_model.iterations = iter
+    best_model.tracker = tracker
 
-    with open(model.name + ".pkl", "wb") as f:
-        pickle.dump(model, f)  # save model to pickle
+    if save_model:
+        with open(best_model.name + ".pkl", "wb") as f:
+            pickle.dump(best_model, f)  # save model to pickle
 
-    if model.config["debug"] is False:
+    if best_model.config["debug"] is False:
         if early_stopping:
             log.warning("Maximum patience reached. Early stopping...")
         print(
             (
                 "Optimization complete with accuracy of {0:6.3f}%."
                 " Max loglikelihood reached @ epoch {1}.\n"
-            ).format(model.best_ll_score * 100.0, model.best_epoch)
+            ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
         )
 
     # update tqdm if debug is False
-    if model.config["debug"] is False:
+    if best_model.config["debug"] is False:
         pbar0.close()
         pbar.close()
 
