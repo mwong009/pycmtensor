@@ -19,3 +19,10 @@ def tqdm_nb_check(notebook: bool):
         from tqdm import tqdm
 
     return tqdm
+
+
+def save_to_pickle(model):
+    import dill as pickle
+
+    with open(model.name + ".pkl", "wb") as f:
+        pickle.dump(model, f)  # save model to pickle

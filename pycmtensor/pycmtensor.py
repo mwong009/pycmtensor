@@ -16,7 +16,7 @@ from .logger import PyCMTensorError
 from .models import PyCMTensorModel
 from .scheduler import CyclicLR
 from .trackers import IterationTracker
-from .utils import tqdm_nb_check
+from .utils import save_to_pickle, tqdm_nb_check
 
 
 def build_functions(model, db, optimizer=None):
@@ -159,8 +159,11 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
     Args:
         model (PyCMTensorModel): the ``model`` object to train.
-        database (Database): the ``database`` object containing the data and tensor variables.
+        database (Database): the ``database`` object containing the data and tensor
+        variables.
         optimizer (Optimizer): the type of optimizer to use to train the model.
+        save_model (bool): flag for saving model to a pickle file (disabled currently
+        because buggy)
 
     Returns:
         PyCMTensorModel: the output is a trained ``model`` object. Call :class:`~pycmtensor.results.Results` to generate model results.
@@ -179,9 +182,8 @@ def train(model, database, optimizer, save_model=False, **kwargs):
             from pycmtensor.optimizers import Adam
             db = cmt.Database(pandasDatabase=some_pandas_data)
             ...
-
             model = MNLogit(u=U, av=AV, database=db, name="mymodel")
-            model = cmt.train(model, database=db, optimizer=Adam, notebook=False)
+            model = cmt.train(model, database=db, optimizer=Adam)
             ...
     """
 
@@ -346,8 +348,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     best_model.tracker = tracker
 
     if save_model:
-        with open(best_model.name + ".pkl", "wb") as f:
-            pickle.dump(best_model, f)  # save model to pickle
+        save_to_pickle(best_model)
 
     if best_model.config["debug"] is False:
         if early_stopping:
