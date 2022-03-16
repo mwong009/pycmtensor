@@ -9,12 +9,12 @@ import dill as pickle
 import numpy as np
 
 from pycmtensor import logger as log
-from pycmtensor import scheduler as sch
+from pycmtensor import scheduler as schlr
 
 from .functions import bhhh, errors, full_loglikelihood, gradient_norm, hessians
 from .logger import PyCMTensorError
 from .models import PyCMTensorModel
-from .scheduler import ConstantLR, CyclicLR
+from .scheduler import CyclicLR
 from .trackers import IterationTracker
 from .utils import tqdm_nb_check
 
@@ -169,7 +169,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
         ``**kwargs`` can be any of the following: 'patience', 'patience_increase',
         'validation_threshold', 'seed', 'base_lr', 'max_lr', 'batch_size',
         'max_epoch', 'debug', 'notebook', 'learning_scheduler', 'cyclic_lr_mode',
-        'cyclic_lr_step_size'.
+        'cyclic_lr_step_size'. See config.py for more.
 
     Example:
         .. code-block :: python
@@ -190,7 +190,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     inspect_model(model)
     build_functions(model, database, optimizer)
 
-    # load arguments into model.config()
+    # load kwargs into model.config()
     for key, val in kwargs.items():
         if key in model.config():
             if type(val) != type(model.config[key]):
@@ -202,22 +202,24 @@ def train(model, database, optimizer, save_model=False, **kwargs):
             raise NotImplementedError(f"Invalid option in kwargs {key}={val}")
 
     # load learning rate scheduler
-    if model.config["learning_scheduler"] in sch.__dict__:
-        Scheduler = getattr(sch, model.config["learning_scheduler"])
+    if model.config["learning_scheduler"] in schlr.__dict__:
+        Scheduler = getattr(schlr, model.config["learning_scheduler"])
     else:
-        lrs = model.config["learning_scheduler"]
-        raise NotImplementedError(f"Invalid option for learning_scheduler: {lrs}")
-
-    if Scheduler == CyclicLR:
-        cyclic_lr_mode = model.config["cyclic_lr_mode"]
-        cyclic_lr_step_size = model.config["cyclic_lr_step_size"]
+        raise NotImplementedError(
+            f"Invalid option for learning_scheduler: {model.config['learning_scheduler']}"
+        )
 
     # create learning rate scheduler
-    base_lr = model.config["base_lr"]
-    max_lr = np.maximum(base_lr, model.config["max_lr"])
-    lr_scheduler = Scheduler(
-        base_lr, max_lr, step_size=cyclic_lr_step_size, mode=cyclic_lr_mode
-    )
+    scheduler_kwargs = {"base_lr": model.config["base_lr"]}
+    if Scheduler == CyclicLR:
+        scheduler_kwargs.update(
+            {
+                "max_lr": np.maximum(model.config["base_lr"], model.config["max_lr"]),
+                "step_size": model.config["cyclic_lr_step_size"],
+                "mode": model.config["cyclic_lr_mode"],
+            }
+        )
+    lr_scheduler = Scheduler(**scheduler_kwargs)
 
     # training hyperparameters
     max_epoch = model.config["max_epoch"]

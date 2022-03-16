@@ -4,6 +4,8 @@ import numpy as np
 class ConstantLR:
     def __init__(self, base_lr=0.01, **kwargs):
         self.base_lr = base_lr
+        for _, _ in kwargs:
+            pass
 
     def get_lr(self):
         return self.base_lr
@@ -11,14 +13,9 @@ class ConstantLR:
 
 class CyclicLR(ConstantLR):
     def __init__(
-        self,
-        base_lr=0.001,
-        max_lr=0.01,
-        step_size=8,
-        mode="triangular2",
-        gamma=1.0,
-        **kwargs,
+        self, base_lr, max_lr, step_size=8, mode="triangular2", gamma=1.0, **kwargs
     ):
+        super().__init__(base_lr, **kwargs)
         self.base_lr = base_lr
         self.max_lr = max_lr
         self.step_size = float(step_size)

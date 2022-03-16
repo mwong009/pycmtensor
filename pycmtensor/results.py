@@ -73,7 +73,7 @@ class Results:
             f"Results for model: {self.name}\n"
             + f"Build time: {self.build_time}\n"
             + f"Estimation time: {self.train_time}\n"
-            + f"Estimation rate: {self.iter_per_sec} epochs/s\n"
+            + f"Estimation rate: {self.iter_per_sec} iter/s\n"
             + f"Seed value: {self.seed}\n"
             + f"Number of Beta parameters: {self.n_params}\n"
             + (f"Tensor size: {self.n_weights}\n" if n_weights > 0 else "")
