@@ -1,0 +1,153 @@
+name: Tests
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-install-windows:
+    name: build-install-windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Display Python version
+      run: python --version
+    
+    - name: Add conda to path (Bash)
+      run: |
+        echo "$CONDA/condabin" >> $GITHUB_PATH
+        echo "$CONDA/Library/bin" >> $GITHUB_PATH
+        echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
+      shell: bash
+    
+    - name: Install conda dependencies
+      run: |
+        conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler  
+    - name: Install package dependencies
+      run: |
+        pip install poetry
+        poetry install
+        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
+    
+    - name: Show contents of .aesararc
+      run: |
+        python -c "import sys; print(sys.platform)"
+        cat ~/.aesararc
+      shell: bash
+      
+    - name: Test with pytest
+      run: |
+        poetry run pytest
+
+  build-install-linux:
+    name: build-install-linux
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Display Python version
+      run: python --version
+    
+    - name: Add conda to path (Bash)
+      run: |
+        echo "$CONDA/condabin" >> $GITHUB_PATH
+        echo "$CONDA/Library/bin" >> $GITHUB_PATH
+        echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Install conda dependencies 
+      run: |
+        conda install blas mkl-service conda-forge::cxx-compiler
+    
+    - name: Install package dependencies
+      run: |
+        pip install poetry
+        poetry install
+        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
+    
+    - name: Show contents of .aesararc
+      run: |
+        python -c "import sys; print(sys.platform)"
+        cat ~/.aesararc
+      shell: bash
+    
+    - name: Test with pytest
+      run: |
+        poetry run pytest
+      
+    - name: Upload coverage to codecov.io
+      if: |
+        (matrix.os == 'ubuntu-latest') &&
+        (matrix.python-version == '3.9')
+      uses: codecov/codecov-action@v2
+      with:
+        files: coverage.xml
+
+  build-install-macos:
+    name: build-install-macos
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Display Python version
+      run: python --version
+    
+    - name: Add conda to path (Bash)
+      run: |
+        echo "$CONDA/condabin" >> $GITHUB_PATH
+        echo "$CONDA/Library/bin" >> $GITHUB_PATH
+        echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Install conda dependencies 
+      run: |
+        conda install blas mkl-service Clang
+
+    - name: Xcode (macos)
+      if: matrix.os == 'macos-latest'
+      run: |
+        clang --version
+        xcrun --show-sdk-path
+        # sudo rm -rf /Library/Developer/CommandLineTools
+        # xcode-select --install
+        # sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
+    
+    - name: Install package dependencies
+      run: |
+        pip install poetry
+        poetry install
+        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
+    
+    - name: Show contents of .aesararc
+      run: |
+        python -c "import sys; print(sys.platform)"
+        cat ~/.aesararc
+      shell: bash
+    
+    - name: Test with pytest
+      run: |
+        poetry run pytest

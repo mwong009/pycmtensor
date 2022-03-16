@@ -1,8 +1,10 @@
 # PyCMTensor
 
-[![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
-[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=develop)](https://pycmtensor.readthedocs.io/en/develop/?badge=develop)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor)
+[![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
+[![Tests](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml)
+[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=develop)](https://pycmtensor.readthedocs.io/en/develop/?badge=develop)
+[![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor)
 ![Licence](https://img.shields.io/badge/Licence-MIT-blue)
 
 A tensor-based choice modelling Python package with deep learning capabilities. 

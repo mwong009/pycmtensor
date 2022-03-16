@@ -1,3 +1,9 @@
+## Unreleased
+
+### Perf
+
+- **IterationTracker**: use numpy array to store iteration data
+
 ## v0.6.5 (2022-03-14)
 
 ### Feat

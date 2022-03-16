@@ -3,16 +3,17 @@ dependencies:
     - python==3.9.7
     - pip
     - git
-    - numpy=1.21.5
-    - mkl>2021.0.0,<2022.0.0
+    - numpy
+    - mkl
     - conda-forge::libpython
-    - conda-forge::m2w64-toolchain
     - conda-forge::cxx-compiler
     - conda-forge::libblas
-# conda install nb_conda_kernels
+# conda install nb_conda_kernels -n base
 # conda env create -f environment.yml, or
 # conda env update -n base -f environment.yml
-# pip install git+https://github.com/mwong009/pycmtensor.git -U
+# pip install pycmtensor -U
 
-# windows -c anaconda -c conda-forge pip git numpy libpython libblas mkl-service
-# linux -c anaconda -c conda-forge pip git numpy libblas mkl-service
+# windows 
+# conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler
+# linux 
+# conda install blas mkl-service conda-forge::cxx-compiler
