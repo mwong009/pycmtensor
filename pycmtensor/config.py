@@ -4,6 +4,7 @@ import configparser
 import glob
 import multiprocessing
 import os
+import subprocess
 import sys
 
 import numpy as np
@@ -41,6 +42,12 @@ def generate_blas_flags():
         )
 
 
+def generate_cxx_flags():
+    sdk_path = subprocess.getoutput("xcrun --show-sdk-path")
+    cxxflag = os.path.join(sdk_path, "usr", "include")
+    return [f"-I{cxxflag}"]
+
+
 def generate_ld_path_flags():
     """Finds and generates the blas__ldflags config option for .aesararc
 
@@ -76,6 +83,11 @@ def init_aesararc():
     ldflags = "".join(f"{ld_path} " for ld_path in generate_ld_path_flags())
     ldflags += "".join(f"{blas} " for blas in generate_blas_flags())
     aesararc_config["blas"]["ldflags"] = ldflags
+    if sys.platform == "darwin":
+        aesararc_config.add_section("gcc")
+        aesararc_config["gcc"]["cxxflags"] = "".join(
+            f"{cxxflag} " for cxxflag in generate_cxx_flags()
+        )
     with open(aesararc_config_file, "w") as f:
         aesararc_config.write(f)
 

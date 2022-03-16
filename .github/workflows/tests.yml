@@ -132,9 +132,9 @@ jobs:
       run: |
         clang --version
         xcrun --show-sdk-path
-        sudo rm -rf /Library/Developer/CommandLineTools
-        xcode-select --install
-        sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
+        # sudo rm -rf /Library/Developer/CommandLineTools
+        # xcode-select --install
+        # sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
     
     - name: Install package dependencies
       run: |
