@@ -227,14 +227,19 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     lr_scheduler = Scheduler(**scheduler_kwargs)
 
     # training hyperparameters
-    max_epoch = model.config["max_epoch"]
     batch_size = model.config["batch_size"]
-    n_samples = database.get_rows()
-    n_batches = n_samples // batch_size
-    max_iter = max_epoch * n_batches
     patience = model.config["patience"]
     patience_increase = model.config["patience_increase"]
     validation_threshold = model.config["validation_threshold"]
+    n_samples = database.get_rows()
+    n_batches = n_samples // batch_size
+    max_epoch = max(model.config["max_epoch"], int(patience / n_batches))
+    if model.config["max_epoch"] < int(patience / n_batches):
+        log.warning(
+            f"max_epoch={model.config['max_epoch']} is smaller than expected value "
+            f"={int(patience / n_batches)}, setting default max_epoch={max_epoch}."
+        )
+    max_iter = max_epoch * n_batches
     validation_frequency = min(n_batches, patience / 2)
 
     # flags
@@ -311,7 +316,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 # update the best model
                 if ll > model.best_ll:
                     if ll > (model.best_ll / validation_threshold):
-                        log.info(
+                        log.debug(
                             f"epoch {epoch} log likelihood {ll} score {ll_score} learning rate{epoch_lr}"
                         )
                         patience = max(patience, iter * patience_increase)
