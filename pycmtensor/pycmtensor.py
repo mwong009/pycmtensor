@@ -201,7 +201,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 )
             model.config[key] = val
         else:
-            raise NotImplementedError(f"Invalid option in kwargs {key}={val}")
+            raise NotImplementedError(
+                f"Invalid option in kwargs {key}={val}\n"
+                + "Valid options are: {model.config}"
+            )
 
     # load learning rate scheduler
     if model.config["learning_scheduler"] in schlr.__dict__:
