@@ -96,7 +96,8 @@ class Database(biodb.Database):
         Symbolic variables
 
         Args:
-            inputs (list, optional): if inputs are given, returns the sharedVariable that exists in inputs. If None, return all sharedVariable in this database.
+            inputs (list, optional): if inputs are given, returns the pandas data that
+            exists in inputs. If None, return all pandas data in this database.
             index (int, optional): Starting index slice.
             batch_size (int, optional): Size of slice.
             shift (int, optional): Add a random shift of the index.

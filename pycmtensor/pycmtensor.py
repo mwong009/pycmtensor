@@ -65,7 +65,7 @@ def build_functions(model, db, optimizer=None):
 
     model.output_probabilities = aesara.function(
         inputs=model.inputs,
-        outputs=model.p_y_given_x.T,  # returns (N x J) matrix
+        outputs=model.prob().T,  # returns (N x J) matrix
         on_unused_input="ignore",
         name="p_y_given_x",
     )

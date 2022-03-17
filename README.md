@@ -34,10 +34,10 @@ PyCMTensor also include the ability to estimate models using 1st order stochasti
 
 ---
 
-## Install
+## Pre-install
 
 To install PyCMTensor, you need [Conda](https://docs.conda.io/en/latest/miniconda.html) (Full Anaconda works fine, but **miniconda** is recommmended for a minimal installation). 
-Ensure that Conda is using `Python 3.9`.
+Ensure that Conda is using at least `Python 3.9`.
 
 Once Conda is installed, install the required dependencies from conda by running the following 
 command in your terminal:
@@ -45,17 +45,17 @@ command in your terminal:
 **Windows**
 
 ```console
-conda install -c conda-forge pip git m2w64-toolchain libpython blas mkl-service numpy
+conda install pip git conda-forge::cxx-compiler conda-forge::libpython blas mkl-service numpy
 ```
 **Linux/MacOS**
 
 ```console
-conda install -c conda-forge pip git blas mkl-service numpy
+conda install blas mkl-service conda-forge::cxx-compiler
 ```
 
-Note: MacOS user should also install `Clang` for a fast compiled code.
+Note: MacOS user should also [install](https://www.ics.uci.edu/~pattis/common/handouts/macclion/clang.html) `Clang` for a fast compiled code.
 
-### Pip 
+### Install PyCMTensor
 
 Then, run this command in your terminal to download and install the latest branch of PyCMTensor from [PyPI](https://pypi.org/project/pycmtensor/):
 ```console
