@@ -202,7 +202,11 @@ Note:The following is a replication of the results from Biogeme using the `Adam`
 
 	![](https://github.com/mwong009/pycmtensor/blob/master/docs/_static/viz/fig.png)
 
-9. Visualize the computation graph
+9. Compute the elasticities
+
+	![](https://github.com/mwong009/pycmtensor/blob/master/docs/_static/viz/els.png)
+
+10. Visualize the computation graph
 	```Python
 	import aesara.d3viz as d3v
 	from aesara import printing
