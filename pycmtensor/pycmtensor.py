@@ -381,5 +381,9 @@ def train(model, database, optimizer, save_model=False, **kwargs):
         pbar0.close()
         pbar.close()
 
+    if debug:
+        for h in list(debug_log.handlers):
+            debug_log.removeHandler(h)
+
     return best_model
     # [train-end]
