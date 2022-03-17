@@ -116,9 +116,9 @@ class PyCMTensorModel:
                     unused_params.append(param.name)
         if len(unused_params) > 0:
             msg = (
-                f"Unused Betas removed from computational graph: {{"
+                f"Unused Betas removed from computational graph: ["
                 + f" ,".join(f"{p}" for p in unused_params)
-                + f"}}. To keep Betas in model, set Beta.status=1"
+                + f"]. To keep Betas in model, set Beta.status=1"
             )
             log.warning(msg)
 
