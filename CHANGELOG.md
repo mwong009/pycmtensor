@@ -1,4 +1,21 @@
-## Unreleased
+## v0.7.0 (2022-03-17)
+
+### Fix
+
+- **results**: remove unnessary `show_weights` option in Results
+- set default max_epoch on training run to adaptive rule
+- print valid config options when invalid options are given as args to train()
+- **scheduler**: modified cyclic_lr config loading sequence to fix unboundError
+- **train**: turn saving model off for now
+- **config**: generate os dependent ld_flags
+
+### Feat
+
+- **models**: add functionality to compute elasticities of choice vs attribute in models.py
+
+### Refactor
+
+- **utils**: refactored save_to_pickle and disables it
 
 ### Perf
 
