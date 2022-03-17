@@ -51,7 +51,7 @@ lint/black: ## check style with black
 lint/isort: ## isort the imports
 	poetry run isort .
 
-lint: lint/black lint/isort ## check style
+lint: lint/isort lint/black  ## check style
 
 test: ## run tests quickly with the default Python
 	pytest --cov=pycmtensor --cov-report=html --cov-report=term tests/
