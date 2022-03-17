@@ -155,6 +155,32 @@ class PyCMTensorModel:
     def get_beta_values(self):
         return [p() for p in self.beta_params]
 
+    def elasticities(self, prob_choice: int, wrt: str, database):
+        """build and calculate the elasticities of `prob_choice` wrt `wrt`
+
+        Args:
+            prob_choice (int): the index of the choice variable
+            wrt (str): the name of the attribute (column name)
+            database: the database object containing the tensor data
+
+        Returns:
+            list: a list of point elasticity values of `prob_choice` wrt `wrt`
+        """
+        y = self.prob(prob_choice)
+        for input in self.inputs:
+            if input.name == wrt or input == wrt:
+                x = input  # wrt to the symbolic reference
+        elasticity = aet.grad(aet.sum(y), x, disconnected_inputs="ignore") * x / y
+        fn = function(
+            inputs=[],
+            outputs=elasticity,
+            on_unused_input="ignore",
+            givens={
+                t: data for t, data in zip(self.inputs, database.input_shared_data())
+            },
+        )
+        return fn()
+
     def __repr__(self):
         return f"{self.name}"
 
