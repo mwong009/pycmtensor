@@ -210,7 +210,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     debug = model.config["debug"]
     if debug is True:
         debug_log = log.get_debug_logger()
-        debug_log.info("Debug mode is on.")
+        log.info("Debug mode is on.")
 
     # load learning rate scheduler
     if model.config["learning_scheduler"] in schlr.__dict__:
