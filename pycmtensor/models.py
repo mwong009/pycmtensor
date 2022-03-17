@@ -116,9 +116,9 @@ class PyCMTensorModel:
                     unused_params.append(param.name)
         if len(unused_params) > 0:
             msg = (
-                f"Unused Betas removed from computational graph: {{"
+                f"Unused Betas removed from computational graph: ["
                 + f" ,".join(f"{p}" for p in unused_params)
-                + f"}}. To keep Betas in model, set Beta.status=1"
+                + f"]. To keep Betas in model, set Beta.status=1"
             )
             log.warning(msg)
 
@@ -154,32 +154,6 @@ class PyCMTensorModel:
 
     def get_beta_values(self):
         return [p() for p in self.beta_params]
-
-    def elasticities(self, prob_choice: int, wrt: str, database):
-        """build and calculate the elasticities of `prob_choice` wrt `wrt`
-
-        Args:
-            prob_choice (int): the index of the choice variable
-            wrt (str): the name of the attribute (column name)
-            database: the database object containing the tensor data
-
-        Returns:
-            list: a list of point elasticity values of `prob_choice` wrt `wrt`
-        """
-        y = self.prob(prob_choice)
-        for input in self.inputs:
-            if input.name == wrt or input == wrt:
-                x = input  # wrt to the symbolic reference
-        elasticity = aet.grad(aet.sum(y), x, disconnected_inputs="ignore") * x / y
-        fn = function(
-            inputs=[],
-            outputs=elasticity,
-            on_unused_input="ignore",
-            givens={
-                t: data for t, data in zip(self.inputs, database.input_shared_data())
-            },
-        )
-        return fn()
 
     def __repr__(self):
         return f"{self.name}"
@@ -227,11 +201,13 @@ class ResLogitLayer:
 
         Args:
             input (list or TensorVariable): a list of tensors corresponding to the
-            vector of utilities, or a TensorVariable vector value.
-            w_in (_type_): _description_
-            w_out (_type_): _description_
-            activation_in (_type_, optional): _description_. Defaults to None.
-            activation_out (_type_, optional): _description_. Defaults to None.
+            vector of utilities, or a `TensorVariable` vector value.
+            w_in (Weights): the :class:`Weights` object for the input side
+            w_out (Weights): the :class:`Weights` object for the output side
+            activation_in (function, optional): the activation function to use. If
+            `None`, use `aet.sigmoid()`
+            activation_out (function, optional): the activation function to use. If
+            None, use `aet.sigmoid()`
 
         Attributes:
             output: the output of this layer. Pass this value onto the next layer or
@@ -261,7 +237,16 @@ class ResLogitLayer:
             activation_out = aet.sigmoid
 
         h = activation_in(aet.dot(input.T, self.w_in))
-        output = activation_out(aet.dot(h, self.w_out)).T
+        self.layer_output = activation_out(aet.dot(h, self.w_out)).T
         self.input = input
         self.weights = [self.w_in, self.w_out]
-        self.output = output + input
+        self.output = self.layer_output + self.input
+
+    def get_layer_outputs(self):
+        """Returns the layer output vector. Size of vector is equals to the size of the
+        input
+
+        Returns:
+            TensorVariable: this layer output
+        """
+        return self.layer_output

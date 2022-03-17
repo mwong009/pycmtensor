@@ -45,6 +45,20 @@ def get_default_logger(name, level):
     return logger
 
 
+def get_debug_logger(name="debug", level=DEBUG):
+    logger = logging.getLogger(name)
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter(
+            "{message:s}",
+            style="{",
+        )
+    )
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    return logger
+
+
 default_formatter = logging.Formatter(
     "[{asctime:s}] {levelname:s}: {message:s}",
     style="{",
