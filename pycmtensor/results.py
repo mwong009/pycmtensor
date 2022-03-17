@@ -19,7 +19,7 @@ def time_format(seconds):
 
 
 class Results:
-    def __init__(self, model, database, show_weights=False):
+    def __init__(self, model, database):
         """Generate the output results to stdout
 
         Args:
@@ -35,7 +35,6 @@ class Results:
 
         self.model = model
         self.database = database
-        self.show_weights = show_weights
         n_samples = database.get_rows()
         n_params = len(model.get_betas())
         n_weights = model.get_weight_size()
@@ -105,12 +104,11 @@ class Results:
             return 0
         else:
             self.weights = self.model.output_estimated_weights()
-            if self.show_weights:
-                for w, value in zip(self.model.get_weights(), self.weights):
-                    random = "zeros"
-                    if w.random_init:
-                        random = "random"
-                    print(f"{w.name} {w.size} init: {random}\n" + f"{value}\n")
+            for w, value in zip(self.model.get_weights(), self.weights):
+                random = "zeros"
+                if w.random_init:
+                    random = "random"
+                print(f"{w.name} {w.size} init: {random}\n" + f"{value}\n")
 
     def print_correlation_matrix(self):
         self.correlationMatrix = correlation_matrix(self.model)
