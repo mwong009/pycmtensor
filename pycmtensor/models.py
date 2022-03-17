@@ -227,11 +227,13 @@ class ResLogitLayer:
 
         Args:
             input (list or TensorVariable): a list of tensors corresponding to the
-            vector of utilities, or a TensorVariable vector value.
-            w_in (_type_): _description_
-            w_out (_type_): _description_
-            activation_in (_type_, optional): _description_. Defaults to None.
-            activation_out (_type_, optional): _description_. Defaults to None.
+            vector of utilities, or a `TensorVariable` vector value.
+            w_in (Weights): the :class:`Weights` object for the input side
+            w_out (Weights): the :class:`Weights` object for the output side
+            activation_in (function, optional): the activation function to use. If
+            `None`, use `aet.sigmoid()`
+            activation_out (function, optional): the activation function to use. If
+            None, use `aet.sigmoid()`
 
         Attributes:
             output: the output of this layer. Pass this value onto the next layer or
@@ -261,7 +263,16 @@ class ResLogitLayer:
             activation_out = aet.sigmoid
 
         h = activation_in(aet.dot(input.T, self.w_in))
-        output = activation_out(aet.dot(h, self.w_out)).T
+        self.layer_output = activation_out(aet.dot(h, self.w_out)).T
         self.input = input
         self.weights = [self.w_in, self.w_out]
-        self.output = output + input
+        self.output = self.layer_output + self.input
+
+    def get_layer_outputs(self):
+        """Returns the layer output vector. Size of vector is equals to the size of the
+        input
+
+        Returns:
+            TensorVariable: this layer output
+        """
+        return self.layer_output
