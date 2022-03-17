@@ -1,13 +1,11 @@
 # statistics.py
 
-import aesara
 import aesara.tensor as aet
 import numpy as np
 import pandas as pd
+from aesara import function
 from numpy import nan_to_num as nan2num
 from scipy import linalg, stats
-
-from pycmtensor.functions import neg_loglikelihood
 
 
 def variance_covariance(h):
@@ -92,3 +90,29 @@ def rob_correlation_matrix(model):
         data=matrix,
     )
     return df
+
+
+def elasticities(model, database, prob_choice: int, wrt: str):
+    """build and calculate the elasticities of `prob_choice` wrt `wrt`
+
+    Args:
+        model: the model object
+        database: the database which holds the dataset and tensor data
+        prob_choice (int): the index of the choice variable
+        wrt (str): the name of the attribute (column name)
+
+    Returns:
+        list: a list of point elasticity values of `prob_choice` wrt `wrt`
+    """
+    y = model.prob(prob_choice)
+    for input in model.inputs:
+        if input.name == wrt or input == wrt:
+            x = input  # wrt to the symbolic reference
+    elasticity = aet.grad(aet.sum(y), x, disconnected_inputs="ignore") * x / y
+    fn = function(
+        inputs=[],
+        outputs=elasticity,
+        on_unused_input="ignore",
+        givens={t: data for t, data in zip(model.inputs, database.input_shared_data())},
+    )
+    return fn()
