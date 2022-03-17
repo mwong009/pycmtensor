@@ -5,7 +5,6 @@ import timeit
 
 import aesara
 import aesara.tensor as aet
-import dill as pickle
 import numpy as np
 
 from pycmtensor import logger as log
@@ -206,6 +205,13 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 + "Valid options are: {model.config}"
             )
 
+    # debug mode runs the training at the bare minimum,
+    # i.e. without progress bars etc.
+    debug = model.config["debug"]
+    if debug is True:
+        debug_log = log.get_debug_logger()
+        debug_log.info("Debug mode is on.")
+
     # load learning rate scheduler
     if model.config["learning_scheduler"] in schlr.__dict__:
         Scheduler = getattr(schlr, model.config["learning_scheduler"])
@@ -246,15 +252,6 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     done_looping = False
     early_stopping = False
 
-    # disables verbose printout if debig is true
-    if model.config["debug"] is False:
-        log.info(f"Training model...")
-        print(
-            f"dataset: {database.name} (n={n_samples})\n"
-            + f"batch size: {batch_size}\n"
-            + f"iterations per epoch: {n_batches}"
-        )
-
     # set inital model solutions
     model.null_ll = model.loglikelihood()
     model.best_ll_score = 1 - model.output_errors()
@@ -283,10 +280,19 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     # training state and tracker
     epoch = 0
     iter = 0
+    last_logged = 0
     track_index = 0
     tracker = IterationTracker(iterations=max_iter)
     rng = np.random.default_rng(model.config["seed"])
     start_time = timeit.default_timer()
+
+    log.info(f"Training model...")
+    if debug is False:
+        print(
+            f"dataset: {database.name} (n={n_samples})\n"
+            + f"batch size: {batch_size}\n"
+            + f"iterations per epoch: {n_batches}"
+        )
 
     # training run step
     while (epoch < max_epoch) and (not done_looping):
@@ -302,7 +308,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
             # train model
             model.loglikelihood_estimation(i, batch_size, shift, epoch_lr)
 
-            # validation step
+            # validation step, validate every `validation_frequency`
             if iter % validation_frequency == 0:
                 ll = model.loglikelihood()  # record the loglikelihood
                 ll_score = 1 - model.output_errors()  # record the score
@@ -315,18 +321,21 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
                 # update the best model
                 if ll > model.best_ll:
-                    if ll > (model.best_ll / validation_threshold):
-                        log.debug(
-                            f"epoch {epoch} log likelihood {ll} score {ll_score} learning rate{epoch_lr}"
+                    if debug and (epoch > (last_logged + 10)):
+                        debug_log.debug(
+                            f"{epoch:4} log likelihood {ll:.2f} | score {ll_score:.2f} | learning rate {epoch_lr:.2e}"
                         )
-                        patience = max(patience, iter * patience_increase)
-                        patience = min(patience, max_iter)
+                        last_logged = epoch
+                    if ll > (model.best_ll / validation_threshold):
+                        patience = min(
+                            max(patience, iter * patience_increase), max_iter
+                        )
 
                     model.best_epoch = epoch
                     model.best_ll = ll
                     model.best_ll_score = ll_score
 
-                    # update tqdm if debug is False
+                    # update tqdm if not in debug mode
                     if model.config["debug"] is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
                         pbar0.postfix[1]["sc"] = model.best_ll_score
@@ -358,15 +367,14 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     if save_model:
         save_to_pickle(best_model)
 
-    if best_model.config["debug"] is False:
-        if early_stopping:
-            log.warning("Maximum patience reached. Early stopping...")
-        print(
-            (
-                "Optimization complete with accuracy of {0:6.3f}%."
-                " Max loglikelihood reached @ epoch {1}.\n"
-            ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
-        )
+    if early_stopping:
+        log.warning("Maximum patience reached. Early stopping...")
+    print(
+        (
+            "Optimization complete with accuracy of {0:6.3f}%."
+            " Max loglikelihood reached @ epoch {1}.\n"
+        ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
+    )
 
     # update tqdm if debug is False
     if best_model.config["debug"] is False:
