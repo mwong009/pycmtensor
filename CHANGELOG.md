@@ -1,3 +1,9 @@
+## v0.8.0 (2022-05-10)
+
+### Feat
+
+- **deps**: remove Biogeme dependencies
+
 ## v0.7.1 (2022-05-10)
 
 ### Fix
