@@ -11,8 +11,9 @@ def test_db():
     db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
     globals().update(db.variables)
     # Removing some observations
-    exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
-    db.remove(exclude)
+    # exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
+    # db.remove(exclude)
+    db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
 
     # additional steps to format database
     db.data["CHOICE"] -= 1  # set the first choice to 0
