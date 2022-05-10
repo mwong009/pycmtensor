@@ -1,10 +1,7 @@
 # database.py
 
-import logging
-
 import aesara
 import aesara.tensor as aet
-import biogeme.database as biodb
 import numpy as np
 
 from pycmtensor import logger as log
@@ -13,9 +10,17 @@ from pycmtensor.logger import PyCMTensorError
 floatX = aesara.config.floatX
 
 
-class Database(biodb.Database):
+class Variable:
+    def __init__(self, name):
+        self.name = name
+
+
+class Database:
     def __init__(self, name, pandasDatabase, choiceVar):
-        super().__init__(name, pandasDatabase)
+        self.name = name
+        self.data = pandasDatabase
+        self.variables = {col: Variable(col) for col in self.data.columns}
+
         assert choiceVar in self.data.columns
         for name, variable in self.variables.items():
             if name in self.data.columns:
