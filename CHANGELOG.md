@@ -1,3 +1,13 @@
+## v1.0.0 (2022-05-10)
+
+### Feat
+
+- **python**: update to python 3.10
+
+### Fix
+
+- **tests**: update tests files to reflect changes in biogeme removal
+
 ## v0.8.0 (2022-05-10)
 
 ### Feat
