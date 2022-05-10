@@ -45,7 +45,7 @@ def test_Results(test_db):
 
     r.print_beta_statistics()
     r.print_correlation_matrix()
-    assert r.print_nn_weights() == 0
+    assert r.print_nn_weights() == None
 
 
 # def test_Predict(test_db):
