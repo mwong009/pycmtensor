@@ -15,15 +15,15 @@ Read the documentation at <https://pycmtensor.readthedocs.io>
 PyCMTensor is a discrete choice model development platform which is designed with the use of deep learning in mind, enabling users to write more complex models using neural networks.
 PyCMTensor is build on [Aesara library](https://github.com/aesara-devs/aesara), and uses many features commonly found in deep learning packages such as Tensorflow and Keras.
 `Aesara` was chosen as the back end mathematical library because of its hackable, open-source nature.
-As users of [Biogeme](https://biogeme.epfl.ch), you will be familiar with the syntax of PyCMTensor and as it is built on top of existing `Biogeme` choice models.
+As users of [Biogeme](https://biogeme.epfl.ch), you will be familiar with the syntax of PyCMTensor.
 
-The combination of `Biogeme` and `Aesara` allows one to incorporate neural networks into discrete choice models that boosts accuracy of model estimates which still being able to produce all the same statistical analysis found in traditional choice modelling software.
+This package allows one to incorporate neural networks into discrete choice models that boosts accuracy of model estimates which still being able to produce all the same statistical analysis found in traditional choice modelling software.
 
-PyCMTensor aims to provide developers and researchers with deep learning tools for econometric modelling and travel behaviour modell with **reproducible** and **interpretable** results.
+PyCMTensor aims to provide developers and researchers with deep learning tools for econometric and travel behaviour modelling with **reproducible** and **interpretable** results.
 
 ### PyCMTensor and Biogeme
 
-PyCMTensor is meant to complement Biogeme where much more complex models are necessary, for example, integrating neural networks into discrete choice models.
+PyCMTensor improves on Biogeme in situations where much more complex models are necessary, for example, integrating neural networks into discrete choice models.
 PyCMTensor also include the ability to estimate models using 1st order stochastic gradient descent methods by default, such as Nesterov Accelerated Gradient, Adam, or RMSProp.
 ## Features
 

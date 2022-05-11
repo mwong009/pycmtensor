@@ -11,8 +11,9 @@ def test_db():
     db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
     globals().update(db.variables)
     # Removing some observations
-    exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
-    db.remove(exclude)
+    # exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
+    # db.remove(exclude)
+    db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
 
     # additional steps to format database
     db.data["CHOICE"] -= 1  # set the first choice to 0
@@ -31,7 +32,7 @@ def test_compile_data(test_db):
 
 
 def test_get_rows(test_db):
-    assert test_db.get_rows() == 6768
+    assert test_db.get_rows() == 10719
 
 
 def test_get_tensors(test_db):
@@ -44,7 +45,7 @@ def test_input_data(test_db):
     x = aet.vector("TRAIN_TT")
     x_data = test_db.input_data([x])
     assert len(x_data) == 1
-    assert len(x_data[0]) == 6768
+    assert len(x_data[0]) == 10719
 
     all_data = test_db.input_data()
     assert len(all_data) == len(test_db.data.columns)

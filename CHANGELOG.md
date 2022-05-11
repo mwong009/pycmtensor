@@ -1,3 +1,33 @@
+## v1.0.0 (2022-05-10)
+
+### Feat
+
+- **python**: update to python 3.10
+
+### Fix
+
+- **tests**: update tests files to reflect changes in biogeme removal
+
+## v0.8.0 (2022-05-10)
+
+### Feat
+
+- **deps**: remove Biogeme dependencies
+
+## v0.7.1 (2022-05-10)
+
+### Fix
+
+- **expressions**: remove Biogeme dependencies
+- **database**: remove dependencies of Biogeme
+- **debug**: remove debug handler after each run to prevent duplication
+- **models**: add function to return layer output -> get_layer_outputs()
+- **debug**: disables tqdm if debug mode is on and activates debug_log
+
+### Refactor
+
+- move elasticites from models to statistics for consistency
+
 ## v0.7.0 (2022-03-17)
 
 ### Fix

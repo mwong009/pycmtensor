@@ -1,7 +1,7 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "0.7.0"
+__version__ = "1.0.0"
 
 from .config import Config
 

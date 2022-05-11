@@ -1,6 +1,5 @@
 import aesara
 import aesara.tensor as aet
-import biogeme.expressions as bioexp
 import numpy as np
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
@@ -155,13 +154,17 @@ class Expressions:
             return super().__ne__(other)
 
 
-class Beta(Expressions, bioexp.Beta):
-    def __init__(self, name, value, lb, ub, status):
-        bioexp.Beta.__init__(self, name, value, lb, ub, status)
+class Beta(Expressions):
+    def __init__(self, name, value, lowerbound, upperbound, status):
+        self.name = name
+        self.initValue = value
+        self.lb = lowerbound
+        self.ub = upperbound
+        self.status = status
         self.sharedVar = aesara.shared(
             value=np.array(value, dtype=floatX), borrow=True, name=name
         )
-        self.sharedVar.__dict__.update({"status": status, "lb": lb, "ub": ub})
+        self.sharedVar.__dict__.update({"status": status, "lb": self.lb, "ub": self.ub})
 
     def __call__(self):
         return self.sharedVar
@@ -171,6 +174,13 @@ class Beta(Expressions, bioexp.Beta):
 
     def __repr__(self):
         return f"{self.name}({self.sharedVar.get_value()}, TensorSharedVariable)"
+
+    def getValue(self):
+        """Evaluates the value of the expression
+        :return: value of the expression
+        :rtype: float
+        """
+        return self.initValue
 
 
 class Weights(Expressions):

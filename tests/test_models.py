@@ -12,8 +12,9 @@ def database():
     sm = pd.read_csv("data/swissmetro.dat", sep="\t")
     db = Database(name="swissmetro", pandasDatabase=sm, choiceVar="CHOICE")
     globals().update(db.variables)
-    exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
-    db.remove(exclude)
+    # exclude = ((PURPOSE != 1) * (PURPOSE != 3) + (CHOICE == 0)) > 0
+    # db.remove(exclude)
+    db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
     db.data["CHOICE"] -= 1  # set the first choice to 0
     db.choices = sorted(db.data["CHOICE"].unique())  # save original choices
     db.autoscale(
