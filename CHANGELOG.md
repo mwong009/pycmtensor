@@ -1,3 +1,10 @@
+## v1.0.1 (2022-05-12)
+
+### Fix
+
+- **scheduler**: fix missing args in input parameters
+- **scheduler**: fix constantLR missing input paramerer
+
 ## v1.0.0 (2022-05-10)
 
 ### Feat
@@ -83,6 +90,10 @@
 - **config.py**: enable pre-writing of .aesararc config file on module load
 - **models**: add method prob() to MNLogit to output prob slices
 - **time_format**: enable logging of build and estimation time
+- **results**: add Predict class to output probs or discrete choices
+- **optimizers**: add AdaGram algorithm
+- **Database**: add __getattr__ build-in type to Database
+- **pycmtensor.py**: add model.output_choices to generate choices
 
 ### Fix
 
@@ -96,44 +107,18 @@
 - **PyCMTensor**: rename append_to_params to add_params for consistency
 - **PyCMTensor**: new method to add regularizers to cost function
 - **Expressions**: invokes different operator for Beta Beta maths
+- show excluded data in model est. output
+- **results**: standardized naming conventions in modules db->database
+- **tqdm**: add arg in train() to enable notebook progressbar
+- **swissmetro_test.ipynb**: update swissmetro example
 
 ### Refactor
 
 - **PyCMTensor**: refactoring models from pycmtensor.py
 - **Database**: refactor(Database): refactoring database.py from pycmtensor.py
-
-## v0.4.0 (2022-02-26)
+- **optimizers**: refactor base Optimizer class
+- moved Beta Weights to expressions.py
 
 ### Perf
 
 - **shared_data**: improve iteration speed by implementing shared() on input data
-
-### Fix
-
-- show excluded data in model est. output
-- **results**: standardized naming conventions in modules db->database
-- **tqdm**: add arg in train() to enable notebook progressbar
-
-### Feat
-
-- **results**: add Predict class to output probs or discrete choices
-- **optimizers**: add AdaGram algorithm
-
-### Refactor
-
-- **optimizers**: refactor base Optimizer class
-
-## v0.3.0 (2022-02-23)
-
-### Feat
-
-- **Database**: add __getattr__ build-in type to Database
-- **pycmtensor.py**: add model.output_choices to generate choices
-
-### Refactor
-
-- moved Beta Weights to expressions.py
-
-### Fix
-
-- **swissmetro_test.ipynb**: update swissmetro example
