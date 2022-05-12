@@ -7,7 +7,7 @@ class ConstantLR:
         for _, _ in kwargs:
             pass
 
-    def get_lr(self, **kwargs):
+    def get_lr(self, *args, **kwargs):
         return self.base_lr
 
 
