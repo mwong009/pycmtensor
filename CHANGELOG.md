@@ -1,8 +1,12 @@
+## Unreleased
+
+### Fix
+
+- **pycmtensor.py**: update training method
+- **config.py**: new config option verbosity: "high", "low"
+- **pycmtensor.py**: remove warnings for max_iter<patience
+
 ## v1.0.3 (2022-05-12)
-
-## v1.0.2 (2022-05-12)
-
-## v1.0.1 (2022-05-12)
 
 ### Fix
 
