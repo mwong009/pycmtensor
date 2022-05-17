@@ -111,6 +111,7 @@ def _config():
         "max_lr": 0.01,
         "batch_size": 64,
         "max_epoch": 2000,
+        "verbosity": "high",
         "debug": False,
         "notebook": False,
         "learning_scheduler": "ConstantLR",
