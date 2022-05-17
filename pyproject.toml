@@ -95,9 +95,9 @@ markers = []
 
 [tool.pytest.ini_options]
 addopts = """
+    --ignore-glob=*performance.py
     --cov=pycmtensor 
     --cov-report=xml 
-    --cov-report=term tests/
 """
 filterwarnings = [
     "error",

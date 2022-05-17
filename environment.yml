@@ -7,13 +7,11 @@ dependencies:
     - mkl
     - conda-forge::libpython
     - conda-forge::cxx-compiler
+    - conda-forge::m2w64-toolchain
     - conda-forge::libblas
-# conda install nb_conda_kernels -n base
-# conda env create -f environment.yml, or
-# conda env update -n base -f environment.yml
-# pip install pycmtensor -U
 
 # windows 
-# conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler
+# conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler conda-forge::m2w64-toolchain
+
 # linux 
 # conda install blas mkl-service conda-forge::cxx-compiler
