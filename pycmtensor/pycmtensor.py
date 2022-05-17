@@ -239,13 +239,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     validation_threshold = model.config["validation_threshold"]
     n_samples = database.get_rows()
     n_batches = n_samples // batch_size
-    max_epoch = max(model.config["max_epoch"], int(patience / n_batches))
-    if model.config["max_epoch"] < int(patience / n_batches):
-        log.warning(
-            f"max_epoch={model.config['max_epoch']} is smaller than expected value "
-            f"={int(patience / n_batches)}, setting default max_epoch={max_epoch}."
-        )
+    max_epoch = model.config["max_epoch"]
     max_iter = max_epoch * n_batches
+    if max_epoch < int(patience / n_batches):
+        patience = max_iter  # clamp patience to maximum iterations
     validation_frequency = min(n_batches, patience / 2)
 
     # flags
