@@ -207,6 +207,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
     # debug mode runs the training at the bare minimum,
     # i.e. without progress bars etc.
+    vb = model.config["verbosity"]
     debug = model.config["debug"]
     if debug is True:
         debug_log = log.get_debug_logger()
@@ -239,13 +240,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     validation_threshold = model.config["validation_threshold"]
     n_samples = database.get_rows()
     n_batches = n_samples // batch_size
-    max_epoch = max(model.config["max_epoch"], int(patience / n_batches))
-    if model.config["max_epoch"] < int(patience / n_batches):
-        log.warning(
-            f"max_epoch={model.config['max_epoch']} is smaller than expected value "
-            f"={int(patience / n_batches)}, setting default max_epoch={max_epoch}."
-        )
+    max_epoch = model.config["max_epoch"]
     max_iter = max_epoch * n_batches
+    if max_epoch < int(patience / n_batches):
+        patience = max_iter  # clamp patience to maximum iterations
     validation_frequency = min(n_batches, patience / 2)
 
     # flags
@@ -258,8 +256,16 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     model.best_ll = model.null_ll
     best_model = model
 
+    log.info(f"Training model...")
+    if debug is False:
+        print(
+            f"dataset: {database.name} (n={n_samples})\n"
+            + f"batch size: {batch_size}\n"
+            + f"iterations per epoch: {n_batches}"
+        )
+
     # disables tqdm if debug is True
-    if model.config["debug"] is False:
+    if debug is False:
         tqdm = tqdm_nb_check(model.config["notebook"])
         pbar0 = tqdm(
             bar_format=(
@@ -285,14 +291,6 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     tracker = IterationTracker(iterations=max_iter)
     rng = np.random.default_rng(model.config["seed"])
     start_time = timeit.default_timer()
-
-    log.info(f"Training model...")
-    if debug is False:
-        print(
-            f"dataset: {database.name} (n={n_samples})\n"
-            + f"batch size: {batch_size}\n"
-            + f"iterations per epoch: {n_batches}"
-        )
 
     # training run step
     while (epoch < max_epoch) and (not done_looping):
@@ -322,9 +320,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 # update the best model
                 if ll > model.best_ll:
                     if debug and (epoch > (last_logged + 10)):
-                        debug_log.debug(
-                            f"{epoch:4} log likelihood {ll:.2f} | score {ll_score:.2f} | learning rate {epoch_lr:.2e}"
-                        )
+                        if vb == "high":
+                            debug_log.debug(
+                                f"{epoch:4} log likelihood {ll:.2f} | score {ll_score:.2f} | learning rate {epoch_lr:.2e}"
+                            )
                         last_logged = epoch
                     if ll > (model.best_ll / validation_threshold):
                         patience = min(
@@ -336,7 +335,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                     model.best_ll_score = ll_score
 
                     # update tqdm if not in debug mode
-                    if model.config["debug"] is False:
+                    if debug is False:
                         pbar0.postfix[0]["ll"] = model.best_ll
                         pbar0.postfix[1]["sc"] = model.best_ll_score
                         pbar0.update()
@@ -344,7 +343,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                     best_model = model
 
             # update tqdm if debug is False
-            if model.config["debug"] is False:
+            if debug is False:
                 pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
                 pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
                 pbar.update()
@@ -369,12 +368,13 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
     if early_stopping:
         log.warning("Maximum patience reached. Early stopping...")
-    print(
-        (
-            "Optimization complete with accuracy of {0:6.3f}%."
-            " Max loglikelihood reached @ epoch {1}.\n"
-        ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
-    )
+    if vb == "high":
+        print(
+            (
+                "Optimization complete with accuracy of {0:6.3f}%."
+                " Max loglikelihood reached @ epoch {1}.\n"
+            ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
+        )
 
     # update tqdm if debug is False
     if best_model.config["debug"] is False:

@@ -30,7 +30,7 @@ jobs:
     
     - name: Install conda dependencies
       run: |
-        conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler  
+        conda install blas mkl-service conda-forge::libpython conda-forge::cxx-compiler conda-forge::m2w64-toolchain
     - name: Install package dependencies
       run: |
         pip install poetry
@@ -46,6 +46,10 @@ jobs:
     - name: Test with pytest
       run: |
         poetry run pytest
+    
+    - name: Run performance tests
+      run: |
+        poetry run pytest -s .\tests\test_performance.py
 
   build-install-linux:
     name: build-install-linux
