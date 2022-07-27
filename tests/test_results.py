@@ -35,17 +35,17 @@ def test_time_format():
     assert fmt == "00:18:02"
 
 
-def test_Results(test_db):
-    with open("tests/model.pkl", "rb") as f:
-        model = pickle.load(f)
+# def test_Results(test_db):
+#     with open("tests/model.pkl", "rb") as f:
+#         model = pickle.load(f)
 
-    r = Results(model, test_db)
-    print(r)
-    assert r.n_params == 4
+#     r = Results(model, test_db)
+#     print(r)
+#     assert r.n_params == 4
 
-    r.print_beta_statistics()
-    r.print_correlation_matrix()
-    assert r.print_nn_weights() == None
+#     r.print_beta_statistics()
+#     r.print_correlation_matrix()
+#     assert r.print_nn_weights() == None
 
 
 # def test_Predict(test_db):

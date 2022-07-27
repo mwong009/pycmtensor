@@ -15,7 +15,7 @@ from .logger import PyCMTensorError
 from .models import PyCMTensorModel
 from .scheduler import CyclicLR
 from .trackers import IterationTracker
-from .utils import save_to_pickle, tqdm_nb_check
+from .utils import save_to_pickle
 
 
 def build_functions(model, db, optimizer=None):
@@ -187,11 +187,12 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     """
 
     # [train-start]
-    # pre-run routine
+
+    # pre-run routine #
     inspect_model(model)
     build_functions(model, database, optimizer)
 
-    # load kwargs into model.config()
+    # load kwargs into model.config() #
     for key, val in kwargs.items():
         if key in model.config():
             if type(val) != type(model.config[key]):
@@ -205,15 +206,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 + "Valid options are: {model.config}"
             )
 
-    # debug mode runs the training at the bare minimum,
-    # i.e. without progress bars etc.
-    vb = model.config["verbosity"]
-    debug = model.config["debug"]
-    if debug is True:
-        debug_log = log.get_debug_logger()
-        log.info("Debug mode is on.")
-
-    # load learning rate scheduler
+    # load learning rate scheduler #
     if model.config["learning_scheduler"] in schlr.__dict__:
         Scheduler = getattr(schlr, model.config["learning_scheduler"])
     else:
@@ -221,7 +214,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
             f"Invalid option for learning_scheduler: {model.config['learning_scheduler']}"
         )
 
-    # create learning rate scheduler
+    # create learning rate scheduler #
     scheduler_kwargs = {"base_lr": model.config["base_lr"]}
     if Scheduler == CyclicLR:
         scheduler_kwargs.update(
@@ -233,7 +226,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
         )
     lr_scheduler = Scheduler(**scheduler_kwargs)
 
-    # training hyperparameters
+    # model training hyperparameters #
     batch_size = model.config["batch_size"]
     patience = model.config["patience"]
     patience_increase = model.config["patience_increase"]
@@ -246,44 +239,25 @@ def train(model, database, optimizer, save_model=False, **kwargs):
         patience = max_iter  # clamp patience to maximum iterations
     validation_frequency = min(n_batches, patience / 2)
 
-    # flags
-    done_looping = False
-    early_stopping = False
-
-    # set inital model solutions
+    # set inital model solutions #
     model.null_ll = model.loglikelihood()
     model.best_ll_score = 1 - model.output_errors()
     model.best_ll = model.null_ll
     best_model = model
 
+    # verbosity #
+    vb = model.config["verbosity"]
+    debug = model.config["debug"]
     log.info(f"Training model...")
-    if debug is False:
-        print(
-            f"dataset: {database.name} (n={n_samples})\n"
-            + f"batch size: {batch_size}\n"
-            + f"iterations per epoch: {n_batches}"
-        )
+    print(
+        f"dataset: {database.name} (n={n_samples})\n"
+        + f"batch size: {batch_size}\n"
+        + f"iterations per epoch: {n_batches}"
+    )
 
-    # disables tqdm if debug is True
-    if debug is False:
-        tqdm = tqdm_nb_check(model.config["notebook"])
-        pbar0 = tqdm(
-            bar_format=(
-                "Loglikelihood:  {postfix[0][ll]:.3f}  Score: {postfix[1][sc]:.3f}"
-            ),
-            postfix=[{"ll": model.null_ll}, {"sc": model.best_ll_score}],
-            position=0,
-            leave=True,
-        )
-        pbar = tqdm(
-            total=max_iter,
-            desc="Epoch {0:4d}/{1}".format(0, max_iter),
-            unit_scale=True,
-            position=1,
-            leave=True,
-        )
-
-    # training state and tracker
+    # training states and trackers #
+    done_looping = False
+    early_stopping = False
     epoch = 0
     iter = 0
     last_logged = 0
@@ -292,7 +266,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     rng = np.random.default_rng(model.config["seed"])
     start_time = timeit.default_timer()
 
-    # training run step
+    # training run loop #
     while (epoch < max_epoch) and (not done_looping):
 
         epoch = epoch + 1  # increment epoch
@@ -303,10 +277,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
             i = rng.integers(0, n_batches)  # select random index and shift slices
             shift = rng.integers(0, batch_size)
 
-            # train model
+            # train model step #
             model.loglikelihood_estimation(i, batch_size, shift, epoch_lr)
 
-            # validation step, validate every `validation_frequency`
+            # validation step, validate every `validation_frequency` #
             if iter % validation_frequency == 0:
                 ll = model.loglikelihood()  # record the loglikelihood
                 ll_score = 1 - model.output_errors()  # record the score
@@ -317,36 +291,24 @@ def train(model, database, optimizer, save_model=False, **kwargs):
                 tracker.add(track_index, "lr", epoch_lr)
                 track_index += 1
 
-                # update the best model
+                # update the best model #
                 if ll > model.best_ll:
                     if debug and (epoch > (last_logged + 10)):
-                        if vb == "high":
-                            debug_log.debug(
-                                f"{epoch:4} log likelihood {ll:.2f} | score {ll_score:.2f} | learning rate {epoch_lr:.2e}"
-                            )
+                        log.info(
+                            f"{epoch:4} log likelihood {ll:.2f} | score {ll_score:.2f} | learning rate {epoch_lr:.2e}"
+                        )
                         last_logged = epoch
                     if ll > (model.best_ll / validation_threshold):
                         patience = min(
                             max(patience, iter * patience_increase), max_iter
                         )
 
+                    # record training statistics #
                     model.best_epoch = epoch
                     model.best_ll = ll
                     model.best_ll_score = ll_score
 
-                    # update tqdm if not in debug mode
-                    if debug is False:
-                        pbar0.postfix[0]["ll"] = model.best_ll
-                        pbar0.postfix[1]["sc"] = model.best_ll_score
-                        pbar0.update()
-
                     best_model = model
-
-            # update tqdm if debug is False
-            if debug is False:
-                pbar.set_description("Epoch {0:4d}/{1}".format(epoch, max_epoch))
-                pbar.set_postfix({"Patience": f"{iter / patience * 100:.0f}%"})
-                pbar.update()
 
             if patience <= iter:
                 done_looping = True
@@ -355,7 +317,7 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
             iter += 1  # increment iteration
 
-    # end of training step
+    # end of training sequence #
     end_time = timeit.default_timer()
     best_model.train_time = end_time - start_time
     best_model.epochs_per_sec = round(epoch / model.train_time, 3)
@@ -368,22 +330,10 @@ def train(model, database, optimizer, save_model=False, **kwargs):
 
     if early_stopping:
         log.warning("Maximum patience reached. Early stopping...")
-    if vb == "high":
-        print(
-            (
-                "Optimization complete with accuracy of {0:6.3f}%."
-                " Max loglikelihood reached @ epoch {1}.\n"
-            ).format(best_model.best_ll_score * 100.0, best_model.best_epoch)
-        )
 
-    # update tqdm if debug is False
-    if best_model.config["debug"] is False:
-        pbar0.close()
-        pbar.close()
-
-    if debug:
-        for h in list(debug_log.handlers):
-            debug_log.removeHandler(h)
+    score = best_model.best_ll_score * 100.0
+    print(f"Optimization complete with accuracy of {score:.3f}%.")
+    print(f"Max log likelihood reached @ epoch {best_model.best_epoch}.")
 
     return best_model
     # [train-end]
