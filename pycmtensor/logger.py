@@ -2,7 +2,7 @@
 
 import logging
 
-VERBOSITY_DEFAULT = logging.WARNING
+VERBOSITY_DEFAULT = logging.INFO
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
@@ -42,20 +42,6 @@ def get_default_logger(name, level):
     logger.addHandler(get_console_handler())
     logger.setLevel(level)
     logger.propagate = False
-    return logger
-
-
-def get_debug_logger(name="debug", level=DEBUG):
-    logger = logging.getLogger(name)
-    handler = logging.StreamHandler()
-    handler.setFormatter(
-        logging.Formatter(
-            "{message:s}",
-            style="{",
-        )
-    )
-    logger.addHandler(handler)
-    logger.setLevel(level)
     return logger
 
 
