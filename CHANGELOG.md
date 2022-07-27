@@ -1,3 +1,10 @@
+## v1.0.5 (2022-07-27)
+
+### Fix
+
+- **tests**: removed depreciated tests
+- **routine**: remove depreciated tqdm module
+
 ## v1.0.4 (2022-07-27)
 
 ### Fix

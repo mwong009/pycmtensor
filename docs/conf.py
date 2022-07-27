@@ -36,9 +36,9 @@ author = "Melvin Wong"
 # the built documents.
 #
 # The short X.Y version.
-version = "1.0.4"
+version = "1.0.5"
 # The full version, including alpha/beta/rc tags.
-release = "1.0.4"
+release = "1.0.5"
 
 # -- General configuration ---------------------------------------------
 
