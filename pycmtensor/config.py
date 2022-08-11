@@ -115,8 +115,8 @@ def _config():
         "debug": False,
         "notebook": False,
         "learning_scheduler": "ConstantLR",
-        "cyclic_lr_mode": "triangular2",
-        "cyclic_lr_step_size": 8,
+        "cyclic_lr_mode": None,
+        "cyclic_lr_step_size": None,
     }
     return config
 
