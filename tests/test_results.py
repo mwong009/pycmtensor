@@ -3,7 +3,6 @@ from unittest import result
 import dill as pickle
 import pandas as pd
 import pytest
-from regex import P
 
 import pycmtensor as cmt
 from pycmtensor.expressions import Beta
