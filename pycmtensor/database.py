@@ -24,7 +24,7 @@ class Database:
         self.set_choice(choiceVar)
         self.choiceVar = self[choiceVar]
 
-        log.info(f"Choice variable set as '{self.choiceVar}'")
+        log.debug(f"Choice variable set as '{self.choiceVar}'")
 
     def __getstate__(self):
         return self.__dict__

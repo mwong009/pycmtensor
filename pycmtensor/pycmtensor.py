@@ -15,142 +15,7 @@ from .logger import PyCMTensorError
 from .models import PyCMTensorModel
 from .scheduler import CyclicLR
 from .trackers import IterationTracker
-from .utils import save_to_pickle
-
-
-def build_functions(model, db, optimizer=None):
-    """Build callable objects that will calculate ``outputs`` from ``inputs``.
-
-    Args:
-        model (PyCMTensorModel): must be of a :class:`PyCMTensorModel` model class object.
-        db (Database): the :class:`Database` object.
-        optimizer (Optimizer, optional): optimizer object class to use. If ``None`` is given, skips the build of loglikelihood_estimation function.
-
-    Returns:
-        PyCMTensorModel: the updated ``model`` instance.
-
-    Note:
-        :func:`build_functions` is called internally from :func:`train`. Generally you do not need to call this in your program.
-    """
-    log.info("Building model...")
-    start_time = timeit.default_timer()
-    if optimizer is not None:
-        lr = aet.scalar("learning_rate")
-        index = aet.lscalar("index")
-        batch_size = aet.lscalar("batch_size")
-        shift = aet.lscalar("shift")
-        db.compile_data()
-        opt = optimizer(model.params)
-        updates = opt.update(model.cost, model.params, lr)
-
-        model.loglikelihood_estimation = aesara.function(
-            inputs=[index, batch_size, shift, lr],
-            outputs=model.cost,
-            updates=updates,
-            on_unused_input="ignore",
-            givens={
-                t: data[index * batch_size + shift : (index + 1) * batch_size + shift]
-                for t, data in zip(model.inputs, db.input_shared_data())
-            },
-        )
-
-    model.loglikelihood = aesara.function(
-        inputs=[],
-        outputs=full_loglikelihood(model.p_y_given_x, model.y),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        name="loglikelihood",
-    )
-
-    model.output_probabilities = aesara.function(
-        inputs=model.inputs,
-        outputs=model.prob().T,  # returns (N x J) matrix
-        on_unused_input="ignore",
-        name="p_y_given_x",
-    )
-
-    model.output_predictions = aesara.function(
-        inputs=model.inputs,
-        outputs=model.pred.T,  # returns (N x 1) matrix
-        on_unused_input="ignore",
-        name="output_predictions",
-    )
-
-    model.output_estimated_betas = aesara.function(
-        inputs=[],
-        outputs=model.get_beta_values(),
-        on_unused_input="ignore",
-        name="output_betas",
-    )
-
-    model.output_estimated_weights = aesara.function(
-        inputs=[],
-        outputs=model.get_weight_values(),
-        on_unused_input="ignore",
-        name="output_weights",
-    )
-
-    model.output_errors = aesara.function(
-        inputs=[],
-        outputs=errors(model.p_y_given_x, model.y),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-        name="output_errors",
-    )
-    model.H = aesara.function(
-        inputs=[],
-        outputs=hessians(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-    )
-
-    model.BHHH = aesara.function(
-        inputs=[],
-        outputs=bhhh(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-    )
-
-    model.gnorm = aesara.function(
-        inputs=[],
-        outputs=gradient_norm(model.p_y_given_x, model.y, model.beta_params),
-        on_unused_input="ignore",
-        givens={t: data for t, data in zip(model.inputs, db.input_shared_data())},
-    )
-    end_time = timeit.default_timer()
-    model.build_time = round(end_time - start_time, 3)
-    # return model
-
-
-def inspect_model(model):
-    """Raises and error if `model` is not a valid ``PyCMTensorModel`` class.
-
-    Args:
-        model (PyCMTensorModel): the constructed model class.
-
-    Raises:
-        PyCMTensorError: logs an error if the model class is an invalid class.
-
-    Returns:
-        PyCMTensorModel: Returns the ``model`` object.
-
-    Example:
-        .. code-block :: python
-
-            import pycmtensor as cmt
-            from pycmtensor.models import MNLModel
-            db = cmt.Database(pandasDatabase=some_pandas_data)
-            ...
-
-            model = MNLogit(u=U, av=AV, database=db, name="mymodel")
-            inpect_model(model)
-
-    """
-    if not isinstance(model, PyCMTensorModel):
-        msg = f"{model} is not a valid PyCMTensorModel model."
-        log.error(msg)
-        raise PyCMTensorError(msg)
-    return model
+from .utils import inspect_model, save_to_pickle
 
 
 def train(model, database, optimizer, save_model=False, **kwargs):
@@ -187,10 +52,11 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     """
 
     # [train-start]
+    print("Python", model.config["python_version"])
 
     # pre-run routine #
     inspect_model(model)
-    build_functions(model, database, optimizer)
+    model.build_functions(database, optimizer)
 
     # load kwargs into model.config() #
     for key, val in kwargs.items():
@@ -248,12 +114,14 @@ def train(model, database, optimizer, save_model=False, **kwargs):
     # verbosity #
     vb = model.config["verbosity"]
     debug = model.config["debug"]
+
     log.info(f"Training model...")
-    print(
-        f"dataset: {database.name} (n={n_samples})\n"
-        + f"batch size: {batch_size}\n"
-        + f"iterations per epoch: {n_batches}"
-    )
+    # print(
+    #     f"\n"
+    #     + f"dataset: {database.name} (n={n_samples})\n"
+    #     + f"batch size: {batch_size}\n"
+    #     + f"iterations per epoch: {n_batches}\n"
+    # )
 
     # training states and trackers #
     done_looping = False
@@ -329,11 +197,11 @@ def train(model, database, optimizer, save_model=False, **kwargs):
         save_to_pickle(best_model)
 
     if early_stopping:
-        log.warning("Maximum patience reached. Early stopping...")
+        log.info("Maximum iterations reached. Terminating...")
 
     score = best_model.best_ll_score * 100.0
-    print(f"Optimization complete with accuracy of {score:.3f}%.")
-    print(f"Max log likelihood reached @ epoch {best_model.best_epoch}.")
+    log.info(f"Optimization complete with accuracy of {score:.3f}%.")
+    log.info(f"Max log likelihood reached @ epoch {best_model.best_epoch}.")
 
     return best_model
     # [train-end]

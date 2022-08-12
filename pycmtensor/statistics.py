@@ -55,7 +55,10 @@ def rob_stderror(h, bhhh, params):
 
 
 def correlation_matrix(model):
-    h = model.H()
+    if callable(hasattr(model, "H")):
+        h = model.H()
+    else:
+        h = model.H
 
     varCovar = variance_covariance(h)
     d = np.diag(varCovar)
@@ -75,7 +78,13 @@ def correlation_matrix(model):
 
 
 def rob_correlation_matrix(model):
-    robVarCovar = rob_variance_covariance(h=model.H(), bhhh=model.BH())
+    if callable(hasattr(model, "H")):
+        h = model.H()
+        bh = model.BHHH()
+    else:
+        h = model.H
+        bh = model.BHHH
+    robVarCovar = rob_variance_covariance(h=h, bhhh=bh)
     rd = np.diag(robVarCovar)
     if (rd > 0).all():
         diag = np.diag(np.sqrt(rd))

@@ -1,3 +1,4 @@
+import dill as pickle
 import pandas as pd
 
 import pycmtensor as cmt
@@ -13,13 +14,11 @@ globals().update(db.variables)
 db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
 db.data["CHOICE"] -= 1  # set the first choice index to 0
 db.choices = [0, 1, 2]
-print(f"line {10:3d}: db.choices={db.choices}")  # debug
 db.autoscale(
     variables=["TRAIN_CO", "TRAIN_TT", "CAR_CO", "CAR_TT", "SM_CO", "SM_TT"],
     default=100.0,
     verbose=False,
 )
-print(db.variables["CHOICE"].__dict__)
 
 b_cost = Beta("b_cost", 0.0, None, None, 0)
 b_time = Beta("b_time", 0.0, None, None, 0)
@@ -35,15 +34,17 @@ U_3 = b_cost * db["CAR_CO"] + b_time * db["CAR_TT"] + asc_car
 U = [U_1, U_2, U_3]
 AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]
 
-mymodel = MNLogit(u=U, av=AV, database=db, name="mymodel")
+mymodel = MNLogit(u=U, av=AV, database=db, name="Multinomial Logit")
 mymodel.add_params(locals())
-
-print(mymodel.config)
 
 model = cmt.train(
     model=mymodel,
     database=db,
     optimizer=Adam,
 )
+
+with open("model.pkl", "wb") as f:
+    model.export_to_pickle(f)
+
 
 result = Results(model, db)

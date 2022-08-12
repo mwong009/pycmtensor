@@ -1,13 +1,23 @@
 # models.py
+import timeit
 
 import aesara.tensor as aet
+import dill as pickle
 from aesara import function, pprint
 
 from pycmtensor import config
 from pycmtensor import logger as log
 
 from .expressions import Beta, Weights
-from .functions import logit, neg_loglikelihood
+from .functions import (
+    bhhh,
+    errors,
+    full_loglikelihood,
+    gradient_norm,
+    hessians,
+    logit,
+    neg_loglikelihood,
+)
 
 
 class PyCMTensorModel:
@@ -154,6 +164,135 @@ class PyCMTensorModel:
 
     def get_beta_values(self):
         return [p() for p in self.beta_params]
+
+    def build_functions(self, db, optimizer=None):
+        """Build callable objects that will calculate ``outputs`` from ``inputs``.
+
+        Args:
+            self (PyCMTensorModel): must be of a :class:`PyCMTensorModel` model
+                class object.
+            db (Database): the :class:`Database` object.
+            optimizer (Optimizer, optional): optimizer object class to use. If ``None``
+                is given, skips the build of loglikelihood_estimation function.
+
+        Returns:
+            self: the updated ``model`` instance.
+
+        Note:
+            :func:`build_functions` is called internally. Generally,
+            you do not need to call this function in your program.
+        """
+        log.info("Building model...")
+        start_time = timeit.default_timer()
+        if optimizer is not None:
+            lr = aet.scalar("learning_rate")
+            index = aet.lscalar("index")
+            batch_size = aet.lscalar("batch_size")
+            shift = aet.lscalar("shift")
+            db.compile_data()
+            opt = optimizer(self.params)
+            updates = opt.update(self.cost, self.params, lr)
+
+            self.loglikelihood_estimation = function(
+                inputs=[index, batch_size, shift, lr],
+                outputs=self.cost,
+                updates=updates,
+                on_unused_input="ignore",
+                givens={
+                    t: data[
+                        index * batch_size + shift : (index + 1) * batch_size + shift
+                    ]
+                    for t, data in zip(self.inputs, db.input_shared_data())
+                },
+            )
+
+        self.loglikelihood = function(
+            inputs=[],
+            outputs=full_loglikelihood(self.p_y_given_x, self.y),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(self.inputs, db.input_shared_data())},
+            name="loglikelihood",
+        )
+        self.loglikelihood.trust_input = True
+
+        self.output_probabilities = function(
+            inputs=self.inputs,
+            outputs=self.prob().T,  # returns (N x J) matrix
+            on_unused_input="ignore",
+            name="p_y_given_x",
+        )
+        self.output_probabilities.trust_input = True
+
+        self.output_predictions = function(
+            inputs=self.inputs,
+            outputs=self.pred.T,  # returns (N x 1) matrix
+            on_unused_input="ignore",
+            name="output_predictions",
+        )
+        self.output_predictions.trust_input = True
+
+        self.output_estimated_betas = function(
+            inputs=[],
+            outputs=self.get_beta_values(),
+            on_unused_input="ignore",
+            name="output_betas",
+        )
+        self.output_estimated_betas.trust_input = True
+
+        self.output_estimated_weights = function(
+            inputs=[],
+            outputs=self.get_weight_values(),
+            on_unused_input="ignore",
+            name="output_weights",
+        )
+        self.output_estimated_weights.trust_input = True
+
+        self.output_errors = function(
+            inputs=[],
+            outputs=errors(self.p_y_given_x, self.y),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(self.inputs, db.input_shared_data())},
+            name="output_errors",
+        )
+        self.output_errors.trust_input = True
+
+        self.H = function(
+            inputs=[],
+            outputs=hessians(self.p_y_given_x, self.y, self.beta_params),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(self.inputs, db.input_shared_data())},
+        )
+        self.H.trust_input = True
+
+        self.BHHH = function(
+            inputs=[],
+            outputs=bhhh(self.p_y_given_x, self.y, self.beta_params),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(self.inputs, db.input_shared_data())},
+        )
+        self.BHHH.trust_input = True
+
+        self.gnorm = function(
+            inputs=[],
+            outputs=gradient_norm(self.p_y_given_x, self.y, self.beta_params),
+            on_unused_input="ignore",
+            givens={t: data for t, data in zip(self.inputs, db.input_shared_data())},
+        )
+        self.gnorm.trust_input = True
+
+        end_time = timeit.default_timer()
+        self.build_time = round(end_time - start_time, 3)
+
+    def export_to_pickle(self, f):
+        model = self
+        model.gnorm = model.gnorm()
+        model.H = model.H()
+        model.BHHH = model.BHHH()
+        del model.loglikelihood_estimation
+        del model.loglikelihood
+        del model.output_errors
+
+        pickle.dump(model, f)
 
     def __repr__(self):
         return f"{self.name}"

@@ -42,8 +42,8 @@ def generate_blas_flags():
         )
 
 
-def generate_cxx_flags():
-    """Finds and generates the gcc__cxxflags config option
+def generate_cxx_flags_macos():
+    """Finds and generates the gcc__cxxflags config option in macos
 
     Returns:
         list: a list of cxx flags to pass to .aesararc
@@ -57,10 +57,10 @@ def generate_ld_path_flags():
     """Finds and generates the blas__ldflags config option for .aesararc
 
     Raises:
-            NameError: Raises an error if Conda is not installed.
+        NameError: Raises an error if Conda is not installed.
 
     Returns:
-            list: a list of ld_path flags prefixed with "-L"
+        list: a list of ld_path flags prefixed with "-L"
     """
     if "CONDA_PREFIX" in os.environ:
         if sys.platform == "win32":
@@ -73,7 +73,7 @@ def generate_ld_path_flags():
         raise NameError("Conda not installed.")
 
 
-def init_aesararc():
+def init_aesara_rc():
     """This method gets called on initialization of the Config class.
 
     Generates the .aesararc config file into the user's home directory if it does not
@@ -82,19 +82,36 @@ def init_aesararc():
     HOMEPATH = os.path.expanduser("~")
     aesararc_config_file = os.path.join(HOMEPATH, ".aesararc")
     aesararc_config = configparser.ConfigParser()
+
+    # global
     aesararc_config.add_section("global")
     aesararc_config["global"] = {"device": "cpu", "floatX": "float64"}
+    aesararc_config["global"]["allow_gc"] = "False"  # disables garbage collector
+    # aesararc_config["global"]["openmp"] = "True"
+    aesararc_config["global"]["optimizer"] = "fast_compile"
+    aesararc_config["global"]["optimizer_including"] = "local_remove_all_assert"
+    aesararc_config["global"]["optimizer_excluding"] = "inplace"
+
+    # blas
     aesararc_config.add_section("blas")
     ldflags = "".join(f"{ld_path} " for ld_path in generate_ld_path_flags())
     ldflags += "".join(f"{blas} " for blas in generate_blas_flags())
     aesararc_config["blas"]["ldflags"] = ldflags
+
+    # gcc
+    aesararc_config.add_section("gcc")
     if sys.platform == "darwin":
-        aesararc_config.add_section("gcc")
         aesararc_config["gcc"]["cxxflags"] = "".join(
-            f"{cxxflag} " for cxxflag in generate_cxx_flags()
+            f"{cxxflag} " for cxxflag in generate_cxx_flags_macos()
+        )
+    else:
+        aesararc_config["gcc"]["cxxflags"] = "".join(
+            f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer"
         )
     with open(aesararc_config_file, "w") as f:
         aesararc_config.write(f)
+
+    return aesararc_config
 
 
 def _config():
@@ -121,7 +138,7 @@ def _config():
     return config
 
 
-def init_env_vars():
+def init_environment_variables():
     """Sets misc. options in the environment variables"""
     num_cores = multiprocessing.cpu_count()
     os.environ["MKL_NUM_THREADS"] = str(num_cores)
@@ -133,8 +150,8 @@ class Config:
 
     def __init__(self):
         self.config = _config()
-        init_aesararc()
-        init_env_vars()
+        self.aesara_rc = init_aesara_rc()
+        init_environment_variables()
 
     def __repr__(self):
         rval = f"config ={{\n"
@@ -155,3 +172,11 @@ class Config:
 
     def __call__(self):
         return self.config
+
+    def set_aesararc(self, section, var, value):
+        if self.aesara_rc.has_section(section):
+            self.aesara_rc[section][var] = value
+
+    def append_aesararc(self, section, var, value):
+        if self.aesara_rc.has_section(section):
+            self.aesara_rc[section][var] += f"{value} "
