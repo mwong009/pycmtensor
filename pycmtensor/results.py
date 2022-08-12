@@ -3,6 +3,7 @@
 import dill as pickle
 import numpy as np
 import pandas as pd
+from attr import has
 from numpy import nan_to_num as nan2num
 
 from pycmtensor import logger as log
@@ -19,7 +20,7 @@ def time_format(seconds):
 
 
 class Results:
-    def __init__(self, model, database):
+    def __init__(self, model, database, prnt=True):
         """Generate the output results to stdout
 
         Args:
@@ -55,7 +56,10 @@ class Results:
 
         self.akaike = 2.0 * (k - max_loglike)
         self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
-        self.g_norm = model.gnorm()
+        if not callable(hasattr(model, "gnorm")):
+            self.g_norm = model.gnorm
+        else:
+            self.g_norm = model.gnorm()
         self.model = model
         self.n_params = n_params
         self.n_weights = n_weights
@@ -69,7 +73,7 @@ class Results:
         self.beta_statistics = self.generate_beta_statistics()
 
         self.print_results = (
-            f"Results for model: {self.name}\n"
+            f"Model: {self.name}\n"
             + f"Build time: {self.build_time}\n"
             + f"Estimation time: {self.train_time}\n"
             + f"Estimation rate: {self.iter_per_sec} iter/s\n"
@@ -89,13 +93,14 @@ class Results:
             + f"Bayesian Information Criterion: {self.bayesian:.2f}\n"
             + f"Final gradient norm: {self.g_norm:.3f}\n"
         )
-        print(self.print_results)
+        if prnt:
+            print(self.__str__())
 
     def generate_beta_statistics(self):
         return get_beta_statistics(self.model)
 
     def print_beta_statistics(self):
-        print("Statistical Analysis:")
+        print("Model statistics:")
         print(self.generate_beta_statistics().to_string() + f"\n")
 
     def print_nn_weights(self):
@@ -116,7 +121,7 @@ class Results:
         print(self.correlationMatrix.to_string() + f"\n")
 
     def __str__(self):
-        rval = self.print_results
+        rval = f"\nResults\n------\n" + self.print_results
         if hasattr(self, "beta_results"):
             rval += self.generate_beta_statistics().to_string()
         return rval
@@ -152,8 +157,12 @@ class Predict:
 
 
 def get_beta_statistics(model):
-    h = model.H()
-    bh = model.BHHH()
+    if not callable(hasattr(model, "H")):
+        h = model.H
+        bh = model.BHHH
+    else:
+        h = model.H()
+        bh = model.BHHH()
 
     pandas_stats = pd.DataFrame(
         columns=[
