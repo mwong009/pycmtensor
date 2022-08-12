@@ -1,3 +1,13 @@
+## v1.0.7 (2022-08-12)
+
+### Refactor
+
+- **models**: refactored build_functions() into models.py
+
+### Fix
+
+- **config**: added optimizing speedups to config
+
 ## v1.0.6 (2022-08-12)
 
 ### Refactor
