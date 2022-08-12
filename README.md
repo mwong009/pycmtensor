@@ -39,8 +39,7 @@ PyCMTensor also include the ability to estimate models using 1st order stochasti
 To install PyCMTensor, you need [Conda](https://docs.conda.io/en/latest/miniconda.html) (Full Anaconda works fine, but **miniconda** is recommmended for a minimal installation). 
 Ensure that Conda is using at least `Python 3.9`.
 
-Once Conda is installed, install the required dependencies from conda by running the following 
-command in your terminal:
+Once Conda is installed, install the required dependencies from conda by running the following command in your terminal:
 
 **Windows**
 

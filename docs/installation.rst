@@ -9,7 +9,7 @@ Requirements
 
 .. note ::
     
-    We only support installation of requirements through `Conda`_ and `pip`_.
+    We only support installation of requirements through `Conda`_.
 
 .. margin ::
 
@@ -23,20 +23,17 @@ Requirements
       - Version
       - 
     * - Python_
-      - == 3.9.7
-      - Other versions of python (>3.6) might be supported. Python version 3.10 and above are not yet supported.
+      - >= 3.9
+      - Other versions of python (>3.6) might be supported. Python version 3.10 and above are now supported.
     * - Numpy_
       - >= 1.21.0
       - Older versions of numpy may be compatible.
     * - Scipy_
-      - >= 1.7.1, <1.8.0
-      - Scipy 1.8.0 and above may have bugs.
+      - >= 1.8.0
+      - 
     * - `Intel MKL`_
-      - >= 2022.0.2
+      - >= 2022.0.1 
       - Intel® Math Kernel Library (installed with `mkl-service`) provides the BLAS libraries. It is recommended that `mkl-service` is installed through conda
-    * - Biogeme_
-      - >= 3.2.8
-      - Latest version of biogeme can be downloaded from `<https://github.com/michelbierlaire/biogeme>`_
     * - Aesara_
       - >= 2.4.0
       - Latest version of Aesara can be downloaded from `<https://github.com/aesara-devs/aesara>`_
@@ -45,7 +42,6 @@ Requirements
 .. _Numpy: https://numpy.org/
 .. _Scipy: https://scipy.org/
 .. _Intel MKL: https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-mkl-for-dpcpp/top.html
-.. _Biogeme: https://biogeme.epfl.ch/
 .. _Aesara: https://aesara.readthedocs.io/en/latest/index.html
 
 Installing through Conda (miniconda)
@@ -55,53 +51,79 @@ Download and install `Miniconda <https://docs.conda.io/en/latest/miniconda.html>
 
 Run the following command to install the required packages:
 
+To install PyCMTensor, you need `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_ (Full Anaconda works fine, but **miniconda** is recommmended for a minimal installation). Ensure that Conda is using at least `Python 3.9`.
+
+Once Conda is installed, install the required dependencies from conda by running the following command in your terminal:
+
+Windows:
+
 .. code-block:: console
 
-    $ conda install -c conda-forge git cxx-compiler m2w64-toolchain libblas libpython
+    conda install mkl-service conda-forge::cxx-compiler conda-forge::m2w64-toolchain -y
+
+Mac OS X:
+
+.. code-block:: console
+
+    conda install mkl-service Clang
+
+Linux:
+
+.. code-block:: console
+
+    conda install mkl-service conda-forge::cxx-compiler
+
 
 Stable release
 --------------
 
-To install `PyCMTensor`, run this command in your terminal:
+Run this command in your terminal to download and install the latest branch of `PyCMTensor` from `PyPI <https://pypi.org/project/pycmtensor/>`_:
 
 .. code-block:: console
 
-    $ pip install pycmtensor
+    pip install pycmtensor -U
 
 This is the preferred method to install `PyCMTensor`, as it will always install the most recent stable release.
 
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
+*Optional*: If you want the development version from the Github repository:
+
+.. code-block:: console
+
+    pip install git+https://github.com/mwong009/pycmtensor.git@develop -U
 
 We recommend using `Conda`_ as the dependency and package manager. 
 
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 .. _Conda: https://https://docs.conda.io/en/latest/miniconda.html.pypa.io
 
-From sources
-------------
+
+Development
+-----------
 
 The sources for PyCMTensor can be downloaded from the `Github repo`_.
 
-You can either clone the public repository:
+.. code-block:: console
+
+    git clone git://github.com/mwong009/pycmtensor
+
+To set up `PyCMTensor` in a local development environment, you need to set up a virtual environment and install the project requirements. Follow the instructions to install Conda (miniconda), then start a new virtual environment with the provided `environment_<your OS>.yml` file.
+
+For example in windows:
 
 .. code-block:: console
 
-    $ git clone git://github.com/mwong009/pycmtensor
+    conda env create -f environment_windows.yml
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl -OJL https://github.com/mwong009/pycmtensor/tarball/master
-
-Once you have a copy of the source, `cd` to the repo directory and install with:
+Next, activate the virtual environment and install poetry via `pip`.
 
 .. code-block:: console
 
-    $ cd pycmtensor
-    $ make install
+    conda activate pycmtensor-dev
+    pip install poetry
+
+Lastly, install the project and development dependencies
+
+.. code-block:: console
+
+    poetry install -E dev
 
 .. _Github repo: https://github.com/mwong009/pycmtensor
-.. _tarball: https://github.com/mwong009/pycmtensor/tarball/master
