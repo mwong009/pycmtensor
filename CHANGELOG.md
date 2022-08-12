@@ -1,3 +1,14 @@
+## v1.0.6 (2022-08-12)
+
+### Refactor
+
+- **database**: refactor set_choice(choiceVar)
+
+### Fix
+
+- **config**: set default `cyclic_lr_mode` and `cyclic_lr_step_size` to `None`
+- **pre-commit-config**: update black to `22.6.0` in pre-commit check
+
 ## v1.0.5 (2022-07-27)
 
 ### Fix
