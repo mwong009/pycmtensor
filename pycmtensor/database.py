@@ -13,6 +13,7 @@ floatX = aesara.config.floatX
 class Variable:
     def __init__(self, name):
         self.name = name
+        self.x = aet.vector(name)
 
 
 class Database:
@@ -20,15 +21,9 @@ class Database:
         self.name = name
         self.data = pandasDatabase
         self.variables = {col: Variable(col) for col in self.data.columns}
-
-        assert choiceVar in self.data.columns
-        for name, variable in self.variables.items():
-            if name in self.data.columns:
-                if name == choiceVar:
-                    variable.y = aet.ivector(name)
-                else:
-                    variable.x = aet.vector(name)
+        self.set_choice(choiceVar)
         self.choiceVar = self[choiceVar]
+
         log.info(f"Choice variable set as '{self.choiceVar}'")
 
     def __getstate__(self):
@@ -53,6 +48,15 @@ class Database:
             msg = f"Variable {item} not found"
             log.error(msg)
             raise PyCMTensorError(msg)
+
+    def set_choice(self, label):
+        assert label in self.data.columns
+        for name, variable in self.variables.items():
+            if name in self.data.columns:
+                if name == label:
+                    variable.y = aet.ivector(name)
+                    if hasattr(variable, "x"):
+                        del variable.__dict__["x"]
 
     def compile_data(self):
         self.sharedData = {}

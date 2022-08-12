@@ -1,0 +1,11 @@
+name: pycmtensor-dev
+dependencies:
+    - python==3.10
+    - mkl-service
+    - Clang
+
+# macos
+# conda install mkl-service Clang
+# conda activate pycmtensor-dev
+# pip install poetry
+# poetry install
