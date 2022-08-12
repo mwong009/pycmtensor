@@ -37,14 +37,14 @@ AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]
 mymodel = MNLogit(u=U, av=AV, database=db, name="Multinomial Logit")
 mymodel.add_params(locals())
 
-model = cmt.train(
-    model=mymodel,
-    database=db,
-    optimizer=Adam,
-)
+model = cmt.train(model=mymodel, database=db, optimizer=Adam)
 
 with open("model.pkl", "wb") as f:
     model.export_to_pickle(f)
 
 
-result = Results(model, db)
+results = Results(model, db, prnt=False)
+print(results)
+results.generate_beta_statistics()
+results.print_beta_statistics()
+results.print_correlation_matrix()
