@@ -9,10 +9,4 @@ dependencies:
 # conda install mkl-service conda-forge::cxx-compiler conda-forge::m2w64-toolchain -y
 # conda activate pycmtensor-dev
 # pip install poetry
-# poetry install
-
-# linux / macos
-# conda install mkl-service conda-forge::cxx-compiler
-# conda activate pycmtensor-dev
-# pip install poetry
-# poetry install
+# poetry install -E dev
