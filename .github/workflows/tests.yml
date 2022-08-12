@@ -128,15 +128,9 @@ jobs:
         echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
       shell: bash
 
-    - name: Xcode (macos)
-      if: matrix.os == 'macos-latest'
-      run: |
-        clang --version
-        xcrun --show-sdk-path
-
     - name: Install conda dependencies 
       run: |
-        conda install mkl-service conda-forge::cxx-compiler
+        conda install mkl-service Clang
     
     - name: Install package dependencies
       run: |
@@ -144,6 +138,12 @@ jobs:
         poetry install
         poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
     
+    - name: Xcode check (macos)
+      if: matrix.os == 'macos-latest'
+      run: |
+        clang --version
+        xcrun --show-sdk-path
+
     - name: Show contents of .aesararc
       run: |
         python -c "import sys; print(sys.platform)"
