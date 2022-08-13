@@ -7,34 +7,46 @@ Users of [Biogeme](https://biogeme.epfl.ch) will be familiar with the syntax of 
 
 This package allows one to incorporate neural networks into discrete choice models that boosts accuracy of model estimates which still being able to produce all the same statistical analysis found in traditional choice modelling software.
 
-PyCMTensor aims to provide developers and researchers with deep learning tools for econometric and travel behaviour modelling with **reproducible** and **interpretable** results.
+# Download
 
-# Contents
+PyCMTensor is available on PyPi https://pypi.org/project/pycmtensor/. It can be install via
 
-```{toctree}
-:caption: User guide
-:maxdepth: 2
-
-installation
-usage
-contributing
-authors
+```console
+$ pip install -U pycmtensor
 ```
 
-```{toctree}
-:maxdepth: 1
+The latest development version is available via [Github](https://github.com/mwon009/pycmtensor). It can be install via 
 
+```console
+$ pip install git+https://github.com/mwong009/pycmtensor.git
+```
+
+For more information about installing, see [Installation](installation).
+
+# Documentation
+
+- [Introduction](introduction)
+- [Installation](installation)
+- [Usage](usage)
+- [Development Guide](development)
+- [Changelog](changelog)
+- [API Reference](autoapi/index)
+
+```{toctree} 
+:caption: User guide
+:maxdepth: 3
+:hidden:
+
+introduction
+installation
+usage
+development
+authors
 changelog
 autoapi/index
 ```
 
-```{toctree}
-:caption: Tutorials
-:maxdepth: 1
-
-```
-
-# Indices and tables
+---
 
 - {ref}`genindex`
 - {ref}`modindex`
