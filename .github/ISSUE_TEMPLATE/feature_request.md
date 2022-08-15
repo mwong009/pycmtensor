@@ -1,20 +1,21 @@
----
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+## Description of your problem or feature request
 
----
+**Please provide a minimal, self-contained, and reproducible example.**
+```python
+[Your code here]
+```
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Please provide the full traceback of any errors.**
+```python
+[The error output here]
+```
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Please provide any additional information below.**
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+## Versions and main components
+
+* PyCMTensor version:
+* Python version:
+* Operating system:
+* How did you install PyCMTensor: (conda/pip)

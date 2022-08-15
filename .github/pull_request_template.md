@@ -1,48 +1,14 @@
-# Description
 
-Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
+**Pull Request**
 
-<!-- Fixes (issue) -->
+Here are a few important guidelines and requirements to check before your PR can be merged:
++ [ ] There is an informative high-level description of the changes.
++ [ ] The description and/or commit message(s) references the relevant GitHub issue(s).
++ [ ] [`pre-commit`](https://pre-commit.com/#installation) is installed and [set up](https://pre-commit.com/#3-install-the-git-hook-scripts).
++ [ ] The commit messages follow [these guidelines](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
++ [ ] The commits correspond to [_relevant logical changes_](https://wiki.openstack.org/wiki/GitCommitMessages#Structural_split_of_changes), and there are **no commits that fix changes introduced by other commits in the same branch/BR**.
++ [ ] There are tests covering the changes introduced in the PR.
 
-## Type of change
+Don't worry, your PR doesn't need to be in perfect order to submit it.  As development progresses and/or reviewers request changes, you can always [rewrite the history](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_rewriting_history) of your feature/PR branches.
 
-Please delete options that are not relevant.
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
-
-### New Feature Submissions:
-
-1. [ ] Does your submission pass tests?
-2. [ ] Have you lint your code locally before submission?
-
-### Changes to Core Features:
-
-* [ ] Have you added an explanation of what your changes do and why you'd like us to include them?
-* [ ] Have you written new tests for your core changes, as applicable?
-* [ ] Have you successfully run tests with your changes locally?
-
-## How Has This Been Tested?
-
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
-
-**Test Configuration**:
-* Firmware version:
-* Hardware:
-* Toolchain:
-* SDK:
-
-## Checklist:
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
-
-## Screenshots (if appropriate):
+If your PR is an ongoing effort and you would like to involve us in the process, simply make it a [draft PR](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests#draft-pull-requests).
