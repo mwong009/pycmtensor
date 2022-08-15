@@ -49,8 +49,8 @@ def generate_cxx_flags_macos():
         list: a list of cxx flags to pass to .aesararc
     """
     sdk_path = subprocess.getoutput("xcrun --show-sdk-path")
-    cxxflag = os.path.join(sdk_path, "usr", "include")
-    return [f"-I{cxxflag}"]
+    cxxflags = os.path.join(sdk_path, "usr", "include")
+    return [f"-I{cxxflags} "]
 
 
 def generate_ld_path_flags():
@@ -87,7 +87,7 @@ def init_aesara_rc():
     aesararc_config.add_section("global")
     aesararc_config["global"] = {"device": "cpu", "floatX": "float64"}
     aesararc_config["global"]["allow_gc"] = "False"  # disables garbage collector
-    # aesararc_config["global"]["openmp"] = "True"
+    aesararc_config["global"]["openmp"] = "False"
     aesararc_config["global"]["optimizer"] = "fast_compile"
     aesararc_config["global"]["optimizer_including"] = "local_remove_all_assert"
     aesararc_config["global"]["optimizer_excluding"] = "inplace"
@@ -100,14 +100,14 @@ def init_aesara_rc():
 
     # gcc
     aesararc_config.add_section("gcc")
+    aesararc_config["gcc"]["cxxflags"] = "".join(
+        f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer "
+    )
     if sys.platform == "darwin":
-        aesararc_config["gcc"]["cxxflags"] = "".join(
-            f"{cxxflag} " for cxxflag in generate_cxx_flags_macos()
+        aesararc_config["gcc"]["cxxflags"] += "".join(
+            f"{cxxflags} " for cxxflags in generate_cxx_flags_macos()
         )
-    else:
-        aesararc_config["gcc"]["cxxflags"] = "".join(
-            f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer"
-        )
+
     with open(aesararc_config_file, "w") as f:
         aesararc_config.write(f)
 

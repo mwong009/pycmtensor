@@ -162,7 +162,7 @@ class Beta(Expressions):
         self.ub = upperbound
         self.status = status
         self.sharedVar = aesara.shared(
-            value=np.array(value, dtype=floatX), borrow=True, name=name
+            value=np.array(value, dtype=floatX), borrow=False, name=name
         )
         self.sharedVar.__dict__.update({"status": status, "lb": self.lb, "ub": self.ub})
 
