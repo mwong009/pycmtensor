@@ -89,8 +89,8 @@ def init_aesara_rc():
     aesararc_config["global"]["allow_gc"] = "False"  # disables garbage collector
     aesararc_config["global"]["openmp"] = "False"
     aesararc_config["global"]["optimizer"] = "fast_compile"
+    # aesararc_config["global"]["optimizer_excluding"] = "inplace"
     aesararc_config["global"]["optimizer_including"] = "local_remove_all_assert"
-    aesararc_config["global"]["optimizer_excluding"] = "inplace"
 
     # blas
     aesararc_config.add_section("blas")
@@ -100,12 +100,15 @@ def init_aesara_rc():
 
     # gcc
     aesararc_config.add_section("gcc")
-    aesararc_config["gcc"]["cxxflags"] = "".join(
-        f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer "
-    )
+
     if sys.platform == "darwin":
-        aesararc_config["gcc"]["cxxflags"] += "".join(
+        aesararc_config["gcc"]["cxxflags"] = "".join(
             f"{cxxflags} " for cxxflags in generate_cxx_flags_macos()
+        )
+    else:
+        aesararc_config["gcc"]["cxxflags"] = "".join(
+            # f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer "
+            f" "
         )
 
     with open(aesararc_config_file, "w") as f:
