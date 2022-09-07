@@ -53,8 +53,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "autoapi.extension",
     "sphinx.ext.napoleon",
-    "sphinx.ext.inheritance_diagram",
-    "myst_nb",
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -76,8 +75,7 @@ todo_include_todos = False
 #
 source_suffix = {
     ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".md": "myst-nb",
+    ".md": "markdown",
 }
 
 # The master toctree document.
