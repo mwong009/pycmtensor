@@ -1,23 +1,62 @@
-import aesara.tensor as aet
-import numpy as np
+# test_optimizers.py
 import pytest
-from aesara import function, shared
 
-from pycmtensor.expressions import Beta
-from pycmtensor.optimizers import SGD
+import pycmtensor.optimizers as opt
 
 
-def test_SGD():
-    x = aet.scalar("x")
-    y = aet.scalar("y")
-    beta = Beta("beta", 2.0, None, None, 0)
-    opt = SGD()
-    y = beta.sharedVar * x + 3
-    updates = opt.update(y, [beta], lr=1.0)
-    f = function([x], updates[0][1], updates=updates)
-    b = function([x], y)
-    # dy/dbeta = x
-    # beta = beta - x = 2 - 4 = -2
-    # y = -2 * 4 + 3 = -5
-    assert f(4) == -2
-    assert b(4) == -5
+def test_sgd(mnl_model):
+    sgd = opt.SGD(mnl_model.params)
+    assert repr(sgd) == "SGD"
+
+    updates = sgd.update(mnl_model.cost, mnl_model.params)
+    assert isinstance(updates, list)
+    assert len(updates) == 4
+
+
+def test_adagrad(mnl_model):
+    adagrad = opt.AdaGrad(mnl_model.params)
+    assert repr(adagrad) == "AdaGrad"
+
+    updates = adagrad.update(mnl_model.cost, mnl_model.params)
+    assert isinstance(updates, list)
+    assert len(updates) == 8
+
+
+def test_momentum(mnl_model):
+    nesterov = opt.Momentum(mnl_model.params)
+    assert repr(nesterov) == "NAG"
+    updates = nesterov.update(mnl_model.cost, mnl_model.params)
+
+    momentum = opt.Momentum(mnl_model.params, nesterov=False)
+    assert repr(momentum) == "Momentum"
+    updates = momentum.update(mnl_model.cost, mnl_model.params)
+    assert isinstance(updates, list)
+    assert len(updates) == 8
+
+
+def test_rmsprop(mnl_model):
+    rmsprop = opt.RMSProp(mnl_model.params)
+    assert repr(rmsprop) == "RMSProp"
+    updates = rmsprop.update(mnl_model.cost, mnl_model.params)
+    assert len(updates) == 8
+
+
+def test_adadelta(mnl_model):
+    adadelta = opt.Adadelta(mnl_model.params)
+    assert repr(adadelta) == "Adadelta"
+    updates = adadelta.update(mnl_model.cost, mnl_model.params)
+    assert len(updates) == 12
+
+
+def test_adam(mnl_model):
+    adam = opt.Adam(mnl_model.params)
+    assert repr(adam) == "Adam"
+    updates = adam.update(mnl_model.cost, mnl_model.params)
+    assert len(updates) == 13
+
+
+def test_adamax(mnl_model):
+    adamax = opt.Adamax(mnl_model.params)
+    assert repr(adamax) == "Adamax"
+    updates = adamax.update(mnl_model.cost, mnl_model.params)
+    assert len(updates) == 13

@@ -9,136 +9,73 @@ import sys
 
 import numpy as np
 
+from pycmtensor import log
+
 
 def generate_blas_flags():
-    """Finds and generates the blas__ldflags config option for .aesararc
+    """Finds and generates the blas_flags config option for .aesararc"""
+    if "CONDA_PREFIX" not in os.environ:
+        raise NameError("CONDA_PREFIX not found in environment variables")
 
-    Raises:
-            NameError: Raises an error if Conda is not installed.
-
-    Returns:
-            list: a list of blas flags prefixed with "-l"
-    """
-    if "CONDA_PREFIX" in os.environ:
-
-        if sys.platform == "win32":
-            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
-        else:
-            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
-
-        mkt_rt_bins = glob.glob(os.path.join(ld_dir, "*mkl_rt*"))
-        blas_flags = []
-        for b in mkt_rt_bins:
-            if sys.platform != "win32":
-                b = "mkl_rt"
-            else:
-                if b.endswith(".dll"):
-                    b = b[:-4]
-            blas_flags = [f"-l{os.path.basename(b)}"]
-        return blas_flags
+    if sys.platform == "win32":
+        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
     else:
-        raise NameError(
-            "CONDA_PREFIX not found, please add CONDA_PREFIX to environment variables"
-        )
+        ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
+
+    flags = [f"-L{ld_dir}"]
+    mkt_rt_bins = glob.glob(os.path.join(ld_dir, "*mkl_rt*"))
+    for b in mkt_rt_bins:
+        if sys.platform != "win32":
+            b = "mkl_rt"
+        if b.endswith(".dll"):
+            b = b[:-4]
+        mkl_flags = [f"-l{os.path.basename(b)}"]
+    flags.extend(mkl_flags)
+    return flags
 
 
 def generate_cxx_flags_macos():
-    """Finds and generates the gcc__cxxflags config option in macos
-
-    Returns:
-        list: a list of cxx flags to pass to .aesararc
-    """
+    """Finds and generates the gcc__cxxflags config option in macos"""
     sdk_path = subprocess.getoutput("xcrun --show-sdk-path")
     cxxflags = os.path.join(sdk_path, "usr", "include")
-    return [f"-I{cxxflags} "]
-
-
-def generate_ld_path_flags():
-    """Finds and generates the blas__ldflags config option for .aesararc
-
-    Raises:
-        NameError: Raises an error if Conda is not installed.
-
-    Returns:
-        list: a list of ld_path flags prefixed with "-L"
-    """
-    if "CONDA_PREFIX" in os.environ:
-        if sys.platform == "win32":
-            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "Library", "bin")
-        else:
-            ld_dir = os.path.join(os.getenv("CONDA_PREFIX"), "lib")
-        ld_path_flags = [f"-L{ld_dir}"]
-        return ld_path_flags
-    else:
-        raise NameError("Conda not installed.")
+    return [f"-I{cxxflags}"]
 
 
 def init_aesara_rc():
-    """This method gets called on initialization of the Config class.
-
-    Generates the .aesararc config file into the user's home directory if it does not
-    exist
-    """
+    """Generates the .aesararc config file in the user's home directory"""
     HOMEPATH = os.path.expanduser("~")
-    aesararc_config_file = os.path.join(HOMEPATH, ".aesararc")
-    aesararc_config = configparser.ConfigParser()
+    conf_file = os.path.join(HOMEPATH, ".aesararc")
+    aesara_rc = configparser.ConfigParser()
 
-    # global
-    aesararc_config.add_section("global")
-    aesararc_config["global"] = {"device": "cpu", "floatX": "float64"}
-    aesararc_config["global"]["allow_gc"] = "False"  # disables garbage collector
-    aesararc_config["global"]["openmp"] = "False"
-    aesararc_config["global"]["optimizer"] = "fast_compile"
-    # aesararc_config["global"]["optimizer_excluding"] = "inplace"
-    aesararc_config["global"]["optimizer_including"] = "local_remove_all_assert"
+    # section global
+    aesara_rc.add_section("global")
+    aesara_rc["global"] = {"device": "cpu", "floatX": "float64"}
+    aesara_rc["global"]["allow_gc"] = "False"
+    aesara_rc["global"]["on_unused_input"] = "ignore"
+    aesara_rc["global"]["openmp"] = "True"
+    aesara_rc["global"]["optimizer"] = "fast_compile"
+    aesara_rc["global"]["cycle_detection"] = "fast"
+    aesara_rc["global"]["optimizer_including"] = "local_remove_all_assert"
 
-    # blas
-    aesararc_config.add_section("blas")
-    ldflags = "".join(f"{ld_path} " for ld_path in generate_ld_path_flags())
-    ldflags += "".join(f"{blas} " for blas in generate_blas_flags())
-    aesararc_config["blas"]["ldflags"] = ldflags
+    # section blas
+    aesara_rc.add_section("blas")
+    ldflags = " ".join(f"{flag}" for flag in generate_blas_flags())
+    aesara_rc["blas"]["ldflags"] = ldflags
 
-    # gcc
-    aesararc_config.add_section("gcc")
+    # section gcc
+    aesara_rc.add_section("gcc")
 
     if sys.platform == "darwin":
-        aesararc_config["gcc"]["cxxflags"] = "".join(
-            f"{cxxflags} " for cxxflags in generate_cxx_flags_macos()
-        )
+        flags = " ".join(f"{flag}" for flag in generate_cxx_flags_macos())
+        aesara_rc["gcc"]["cxxflags"] = flags
     else:
-        aesararc_config["gcc"]["cxxflags"] = "".join(
-            # f"-O3 -ffast-math -ftree-loop-distribution -funroll-loops -ftracer "
-            f" "
-        )
+        aesara_rc["gcc"]["cxxflags"] = " ".join([""])
+        # ["-03", "-ffast-math", "-funroll-loops", "-ftracer"]
 
-    with open(aesararc_config_file, "w") as f:
-        aesararc_config.write(f)
+    with open(conf_file, "w") as f:
+        aesara_rc.write(f)
 
-    return aesararc_config
-
-
-def _config():
-    """Defines the default model hyperparameters and config options"""
-    rng = np.random.default_rng()
-    config = {
-        "python_version": sys.version,
-        "cwd": os.getcwd(),
-        "patience": 9000,
-        "patience_increase": 2,
-        "validation_threshold": 1.003,
-        "seed": rng.integers(1, 9000),
-        "base_lr": 0.0001,
-        "max_lr": 0.01,
-        "batch_size": 64,
-        "max_epoch": 2000,
-        "verbosity": "high",
-        "debug": False,
-        "notebook": False,
-        "learning_scheduler": "ConstantLR",
-        "cyclic_lr_mode": None,
-        "cyclic_lr_step_size": None,
-    }
-    return config
+    return aesara_rc
 
 
 def init_environment_variables():
@@ -149,37 +86,49 @@ def init_environment_variables():
 
 
 class Config:
-    """Default config class"""
+    """Class object to store config and hyperparameters"""
 
     def __init__(self):
-        self.config = _config()
+        self.rng = np.random.default_rng()
+        self.info = {
+            "python_version": sys.version,
+            "directory": os.getcwd(),
+        }
+        self.hyperparameters = {
+            "seed": self.rng.integers(1, 9000),
+            "patience": 4000,
+            "patience_increase": 2,
+            "validation_threshold": 1.005,
+            "base_learning_rate": 0.01,
+            "max_learning_rate": 0.01,
+            "batch_size": 250,
+            "max_steps": 1000,
+            "learning_scheduler": "ConstantLR",
+            "cyclic_lr_mode": None,
+            "cyclic_lr_step_size": None,
+        }
         self.aesara_rc = init_aesara_rc()
         init_environment_variables()
 
-    def __repr__(self):
-        rval = f"config ={{\n"
-        for key, val in self.config.items():
-            rval += f"    {key}: {val},\n"
-        rval += f"}}"
+    def __print__(self):
+        rval = f"\nhyperparameters\n---------------\n"
+        for key, val in self.hyperparameters.items():
+            rval += f"{key:<24}: {val}\n"
         return rval
 
-    def __getitem__(self, name):
-        if name in self.config:
-            return self.config[name]
+    def __getitem__(self, name: str):
+        if name in self.hyperparameters:
+            return self.hyperparameters[name]
 
-    def __setitem__(self, name, val):
-        if name in self.config:
-            self.config[name] = val
+    def __setitem__(self, name: str, val):
+        if name in self.hyperparameters:
+            self.hyperparameters[name] = val
         else:
-            raise NameError(f"{name} not found in config file.")
+            raise NameError(f"hyperparameter {name} is not a valid option")
 
     def __call__(self):
-        return self.config
+        return self.hyperparameters
 
-    def set_aesararc(self, section, var, value):
-        if self.aesara_rc.has_section(section):
-            self.aesara_rc[section][var] = value
-
-    def append_aesararc(self, section, var, value):
-        if self.aesara_rc.has_section(section):
-            self.aesara_rc[section][var] += f"{value} "
+    def set_hyperparameter(self, key: str, value):
+        self.hyperparameters[key] = value
+        log(10, f"set {key}={value}")

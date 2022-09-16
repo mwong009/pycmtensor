@@ -1,5 +1,5 @@
-# logger
-
+# logger.py
+"""PyCMTensor logger module"""
 import logging
 
 VERBOSITY_DEFAULT = logging.INFO
@@ -9,12 +9,6 @@ INFO = logging.INFO
 WARNING = logging.WARNING
 ERROR = logging.ERROR
 CRITICAL = logging.CRITICAL
-
-
-class PyCMTensorError(Exception):
-    """Default exception handler"""
-
-    pass
 
 
 def set_level(level):
@@ -52,11 +46,3 @@ default_formatter = logging.Formatter(
 )
 
 main_logger = get_default_logger("pycmtensor", VERBOSITY_DEFAULT)
-
-debug = main_logger.debug
-info = main_logger.info
-warning = main_logger.warning
-error = main_logger.error
-critical = main_logger.critical
-exception = main_logger.exception
-log = main_logger.log

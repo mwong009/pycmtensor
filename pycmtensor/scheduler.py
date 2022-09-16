@@ -1,7 +1,11 @@
+# scheduler.py
+"""PyCMTensor scheduler module"""
 import numpy as np
 
 
 class ConstantLR:
+    """Base class for learning rate scheduler"""
+
     def __init__(self, base_lr=0.01, **kwargs):
         self.base_lr = base_lr
         for _, _ in kwargs:

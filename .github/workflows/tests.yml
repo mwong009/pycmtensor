@@ -47,10 +47,6 @@ jobs:
     - name: Test with pytest
       run: |
         poetry run pytest
-    
-    - name: Run performance tests
-      run: |
-        poetry run pytest -s .\tests\test_performance.py
 
   build-install-linux:
     name: build-install-linux

@@ -1,44 +1,64 @@
-from unittest import result
-
-import dill as pickle
-import pandas as pd
+# test_results.py
 import pytest
 
-import pycmtensor as cmt
-from pycmtensor.expressions import Beta
-from pycmtensor.models import MNLogit
-from pycmtensor.optimizers import Adam
-from pycmtensor.results import Results, time_format
+from pycmtensor.statistics import elasticities
 
 
-@pytest.fixture
-def test_db():
-    swissmetro = pd.read_csv("data/swissmetro.dat", sep="\t")
-    db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
-    globals().update(db.variables)
-    # Removing some observations
-    db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
-    db.data["CHOICE"] -= 1  # set the first choice index to 0
-    db.choices = [0, 1, 2]
-    db.autoscale(
-        variables=["TRAIN_CO", "TRAIN_TT", "CAR_CO", "CAR_TT", "SM_CO", "SM_TT"],
-        default=100.0,
-        verbose=False,
-    )
-    return db
+@pytest.fixture(scope="module")
+def trained_model(swissmetro_db, mnl_model):
+    model = mnl_model
+    db = swissmetro_db
+    model.config.set_hyperparameter("max_steps", 10)
+    model.train(db)
+    return model
 
 
-def test_time_format():
-    s = 1082
-    fmt = time_format(s)
-    assert fmt == "00:18:02"
+def test_model(mnl_model):
+    m = mnl_model
+    m.reset_values()
+    assert isinstance(m.get_betas(), dict)
+    assert len(m.get_weights()) == 0
+    assert str(m) == "MNL"
 
 
-def test_results(test_db):
-    with open("tests/model.pkl", "rb") as f:
-        model = pickle.load(f)
+def test_beta_statistics(trained_model):
+    model = trained_model
+    assert len(model.results.beta_statistics()) == 5
 
-    results = Results(model, test_db, prnt=False)
-    results.generate_beta_statistics()
-    results.print_beta_statistics()
-    results.print_correlation_matrix()
+
+def test_model_statistics(trained_model):
+    model = trained_model
+    assert len(model.results.model_statistics()) == 11
+
+
+def test_benchmark(trained_model):
+    model = trained_model
+    assert len(model.results.benchmark()) == 4
+
+
+def test_model_correlation_matrix(trained_model):
+    model = trained_model
+    assert len(model.results.model_correlation_matrix()) == 4
+    assert len(model.results.model_correlation_matrix().columns) == 4
+
+
+def test_model_robust_correlation_matrix(trained_model):
+    model = trained_model
+    assert len(model.results.model_robust_correlation_matrix()) == 4
+    assert len(model.results.model_robust_correlation_matrix().columns) == 4
+
+
+def test_prediction(trained_model, swissmetro_db):
+    model = trained_model
+    db = swissmetro_db
+    prediction = model.predict(db, return_choices=False)
+    assert prediction.shape == (10719, 3)
+    choices = model.predict(db, return_choices=True)
+    assert choices.shape == (10719,)
+
+
+def test_elasticities(trained_model, swissmetro_db):
+    model = trained_model
+    db = swissmetro_db
+    e = elasticities(model, db, 0, "TRAIN_TT")
+    assert len(e) == 8575
