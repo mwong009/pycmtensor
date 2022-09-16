@@ -1,24 +1,19 @@
-import dill as pickle
+import numpy as np
 import pandas as pd
 
 import pycmtensor as cmt
 from pycmtensor.expressions import Beta
-from pycmtensor.models import MNLogit
-from pycmtensor.optimizers import Adam
-from pycmtensor.results import Results
+from pycmtensor.models import MNL
+from pycmtensor.statistics import elasticities
 
-swissmetro = pd.read_csv("data/swissmetro.dat", sep="\t")
-db = cmt.Database(name="swissmetro", pandasDatabase=swissmetro, choiceVar="CHOICE")
-globals().update(db.variables)
-# Removing some observations
-db.data.drop(db.data[db.data["CHOICE"] == 0].index, inplace=True)
-db.data["CHOICE"] -= 1  # set the first choice index to 0
-db.choices = [0, 1, 2]
-db.autoscale(
-    variables=["TRAIN_CO", "TRAIN_TT", "CAR_CO", "CAR_TT", "SM_CO", "SM_TT"],
-    default=100.0,
-    verbose=False,
-)
+cmt.logger.set_level(cmt.logger.INFO)
+
+swissmetro = pd.read_csv("../data/swissmetro.dat", sep="\t")
+swissmetro.drop(swissmetro[swissmetro["CHOICE"] == 0].index, inplace=True)
+swissmetro["CHOICE"] -= 1  # set the first choice index to 0
+db = cmt.Data(df=swissmetro, choice="CHOICE")
+db.autoscale_data(except_for=["ID", "ORIGIN", "DEST"])  # scales dataset
+db.split_db(split_frac=0.8)  # split dataset
 
 b_cost = Beta("b_cost", 0.0, None, None, 0)
 b_time = Beta("b_time", 0.0, None, None, 0)
@@ -31,20 +26,19 @@ U_2 = b_cost * db["SM_CO"] + b_time * db["SM_TT"] + asc_sm
 U_3 = b_cost * db["CAR_CO"] + b_time * db["CAR_TT"] + asc_car
 
 # specify the utility function and the availability conditions
-U = [U_1, U_2, U_3]
-AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]
+U = [U_1, U_2, U_3]  # utility
+AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]  # availability
 
-mymodel = MNLogit(u=U, av=AV, database=db, name="Multinomial Logit")
-mymodel.add_params(locals())
+mymodel = MNL(U, AV, locals(), db, name="MNL")
+mymodel.config.set_hyperparameter("max_steps", 200)
+mymodel.train(db)
 
-model = cmt.train(model=mymodel, database=db, optimizer=Adam)
+print(elasticities(mymodel, db, 0, "TRAIN_TT"))
+print(mymodel.results.beta_statistics())
+print(mymodel.results.model_statistics())
+print(mymodel.results.model_correlation_matrix())
+print(mymodel.results.benchmark())
 
-with open("model.pkl", "wb") as f:
-    model.export_to_pickle(f)
-
-
-results = Results(model, db, prnt=False)
-print(results)
-results.generate_beta_statistics()
-results.print_beta_statistics()
-results.print_correlation_matrix()
+# predictions
+print(mymodel.predict(db, return_choices=False))
+print(np.unique(mymodel.predict(db), return_counts=True))

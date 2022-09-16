@@ -1,193 +1,144 @@
 # results.py
-
-import dill as pickle
+"""PyCMTensor results module"""
 import numpy as np
 import pandas as pd
-from attr import has
 from numpy import nan_to_num as nan2num
 
-from pycmtensor import logger as log
-from pycmtensor.statistics import *
-
-
-def time_format(seconds):
-    minutes, seconds = divmod(round(seconds), 60)
-    if minutes >= 60:
-        hours, minutes = divmod(minutes, 60)
-    else:
-        hours = 0
-    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+from .statistics import (
+    correlation_matrix,
+    p_value,
+    rob_correlation_matrix,
+    rob_stderror,
+    stderror,
+    t_test,
+)
 
 
 class Results:
-    def __init__(self, model, database, prnt=True):
-        """Generate the output results to stdout
+    """Class object to hold model results"""
 
-        Args:
-            model (Class): The model class object or pickle file
-            db (Class): The database class object
-        """
-        if isinstance(model, str):
-            self.name = model
-            with open(self.name, "rb") as f:
-                model = pickle.load(f)
-        else:
-            self.name = model.name
+    def __init__(self):
+        self.build_time = None
+        self.train_time = None
+        self.iterations_per_sec = None
+        self.n_params = None
+        self.n_train_samples = None
+        self.n_valid_samples = None
+        self.seed = None
 
-        self.model = model
-        self.database = database
-        n_samples = database.get_rows()
-        n_params = len(model.get_betas())
-        n_weights = model.get_weight_size()
-        k = n_params + n_weights
+        self.null_loglikelihood = -np.inf
+        self.init_loglikelihood = -np.inf
+        self.best_loglikelihood = -np.inf
+        self.best_valid_error = 1.0
+        self.best_step = 0
 
-        null_loglike = model.null_ll
-        max_loglike = model.best_ll
+        self.gnorm = None
+        self.hessian_matrix = None
+        self.bhhh_matrix = None
+        self.betas = None
+        self.weights = None
 
-        self.build_time = time_format(model.build_time)
-        self.train_time = time_format(model.train_time)
-        self.epochs_per_sec = model.epochs_per_sec
-        self.iter_per_sec = model.iter_per_sec
-        self.seed = model.config["seed"]
+        self.performance_graph = None
 
-        self.rho_square = nan2num(1.0 - max_loglike / null_loglike)
-        self.rho_square_bar = nan2num(1.0 - (max_loglike - k) / null_loglike)
-        self.ll_ratio_test = -2.0 * (null_loglike - max_loglike)
+    def rho_square(self):
+        """Returns the rho square statistics"""
+        return nan2num(1.0 - self.best_loglikelihood / self.null_loglikelihood)
 
-        self.akaike = 2.0 * (k - max_loglike)
-        self.bayesian = -2.0 * max_loglike + k * np.log(n_samples)
-        if not callable(hasattr(model, "gnorm")):
-            self.g_norm = model.gnorm
-        else:
-            self.g_norm = model.gnorm()
-        self.model = model
-        self.n_params = n_params
-        self.n_weights = n_weights
-        self.sample_size = n_samples
-        self.excluded_data = database.excludedData
-        self.best_epoch = model.best_epoch
-        self.best_ll_score = model.best_ll_score
-        self.null_loglike = null_loglike
-        self.max_loglike = max_loglike
+    def rho_square_bar(self):
+        """Returns the rho square bar statistics"""
+        k = self.n_params
+        return nan2num(1.0 - (self.best_loglikelihood - k) / self.null_loglikelihood)
 
-        self.beta_statistics = self.generate_beta_statistics()
+    def loglikelihood_ratio_test(self):
+        """Returns the log likelihood ratio test statistics"""
+        return -2.0 * (self.null_loglikelihood - self.best_loglikelihood)
 
-        self.print_results = (
-            f"Model: {self.name}\n"
-            + f"Build time: {self.build_time}\n"
-            + f"Estimation time: {self.train_time}\n"
-            + f"Estimation rate: {self.iter_per_sec} iter/s\n"
-            + f"Seed value: {self.seed}\n"
-            + f"Number of Beta parameters: {self.n_params}\n"
-            + (f"Tensor size: {self.n_weights}\n" if n_weights > 0 else "")
-            + f"Sample size: {self.sample_size}\n"
-            + f"Excluded data: {self.excluded_data}\n"
-            + f"Init loglikelihood: {self.null_loglike:.3f}\n"
-            + f"Final loglikelihood: {self.max_loglike:.3f}\n"
-            + f"Final loglikelihood reached at: epoch {self.best_epoch}\n"
-            + f"Likelihood ratio test: {self.ll_ratio_test:.3f}\n"
-            + f"Accuracy: {(100 * self.best_ll_score):.3f}%\n"
-            + f"Rho square: {self.rho_square:.3f}\n"
-            + f"Rho bar square: {self.rho_square_bar:.3f}\n"
-            + f"Akaike Information Criterion: {self.akaike:.2f}\n"
-            + f"Bayesian Information Criterion: {self.bayesian:.2f}\n"
-            + f"Final gradient norm: {self.g_norm:.3f}\n"
+    def AIC(self):
+        """Returns the Akaike Information Criterion"""
+        k = self.n_params
+        return 2.0 * (k - self.best_loglikelihood)
+
+    def BIC(self):
+        """Returns the Bayesian Information Criterion"""
+        k = self.n_params
+        n = self.n_train_samples
+        return -2.0 * self.best_loglikelihood + k * np.log(n)
+
+    def benchmark(self):
+        """Returns a pandas DataFrame of a summary of the model benchmark"""
+        stats = pd.DataFrame(columns=["value"])
+        stats.loc["Seed"] = self.seed
+        stats.loc["Model build time"] = self.build_time
+        stats.loc["Model train time"] = self.train_time
+        stats.loc["iterations per sec"] = f"{self.iterations_per_sec}/s"
+        return stats
+
+    def model_statistics(self):
+        """Returns a pandas DataFrame of a summary of the model training"""
+        stats = pd.DataFrame(columns=["value"]).astype("object")
+        stats.loc["Number of training samples used"] = int(self.n_train_samples)
+        stats.loc["Number of validation samples used"] = int(self.n_valid_samples)
+        stats.loc["Init. log likelihood"] = self.init_loglikelihood
+        stats.loc["Final log likelihood"] = self.best_loglikelihood
+        stats.loc["Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
+        stats.loc["Likelihood ratio test"] = self.loglikelihood_ratio_test()
+        stats.loc["Rho square"] = self.rho_square()
+        stats.loc["Rho square bar"] = self.rho_square_bar()
+        stats.loc["Akaike Information Criterion"] = self.AIC()
+        stats.loc["Bayesian Information Criterion"] = self.BIC()
+        stats.loc["Final gradient norm"] = self.gnorm
+        return stats
+
+    def beta_statistics(self):
+        """Returns a pandas DataFrame of the model beta statistics"""
+        betas = self.betas
+        h = self.hessian_matrix
+        bhhh = self.bhhh_matrix
+
+        stats = pd.DataFrame(
+            index=[b.name for b in betas if (b.status != 1)], columns=["value"]
         )
-        if prnt:
-            print(self.__str__())
+        stats["std err"] = stderror(h, betas)
+        stats["t-test"] = t_test(stats["std err"], betas)
+        stats["p-value"] = p_value(stats["std err"], betas)
 
-    def generate_beta_statistics(self):
-        return get_beta_statistics(self.model)
+        stats["rob. std err"] = rob_stderror(h, bhhh, betas)
+        stats["rob. t-test"] = t_test(stats["rob. std err"], betas)
+        stats["rob. p-value"] = p_value(stats["rob. std err"], betas)
+        stats.drop("value", axis=1, inplace=True)
 
-    def print_beta_statistics(self):
-        print("Model statistics:")
-        print(self.generate_beta_statistics().to_string() + f"\n")
+        df = pd.DataFrame(
+            data=[b().eval() for b in betas],
+            index=[b.name for b in betas],
+            columns=["value"],
+        )
+        stats = pd.concat([df, stats], axis=1).sort_index().fillna("-").astype("O")
 
-    def print_nn_weights(self):
-        if self.model.get_weight_size() == 0:
-            log.warning("No weights to show")
-            return 0
-        else:
-            self.weights = self.model.output_estimated_weights()
-            for w, value in zip(self.model.get_weights(), self.weights):
-                random = "zeros"
-                if w.random_init:
-                    random = "random"
-                print(f"{w.name} {w.size} init: {random}\n" + f"{value}\n")
+        return stats
 
-    def print_correlation_matrix(self):
-        self.correlationMatrix = correlation_matrix(self.model)
-        print("Correlation matrix:")
-        print(self.correlationMatrix.to_string() + f"\n")
+    def model_correlation_matrix(self):
+        """Returns a pandas DataFrame of the model correlation matrix"""
+        betas = self.betas
+        h = self.hessian_matrix
 
-    def __str__(self):
-        rval = f"\nResults\n------\n" + self.print_results
-        if hasattr(self, "beta_results"):
-            rval += self.generate_beta_statistics().to_string()
-        return rval
+        mat = pd.DataFrame(
+            columns=[b.name for b in betas if (b.status != 1)],
+            index=[b.name for b in betas if (b.status != 1)],
+            data=correlation_matrix(h),
+        )
 
+        return mat
 
-class Predict:
-    def __init__(self, model, database):
-        """Class to output estimated model predictions
+    def model_robust_correlation_matrix(self):
+        """Returns a pandas DataFrame of the model (robust) correlation matrix"""
+        betas = self.betas
+        h = self.hessian_matrix
+        bhhh = self.bhhh_matrix
 
-        Usage:
-            Call Predict(model, database).probs() or .choices() for probabilities or
-            discrete choices (argmax) respectively
+        mat = pd.DataFrame(
+            columns=[b.name for b in betas if (b.status != 1)],
+            index=[b.name for b in betas if (b.status != 1)],
+            data=rob_correlation_matrix(h, bhhh),
+        )
 
-        Args:
-            model (PyCMTensor): the estimated model class object
-            database (pycmtensor.Database): the given database object
-        """
-        self.model = model
-        self.database = database
-        self.columns = None
-        if hasattr(database, "choices"):
-            self.columns = database.choices
-
-    def probs(self):
-        db = self.database
-        data_obj = self.model.output_probabilities(*db.input_data(self.model.inputs))
-        return pd.DataFrame(data_obj, columns=self.columns)
-
-    def choices(self):
-        db = self.database
-        data_obj = self.model.output_predictions(*db.input_data(self.model.inputs))
-        return pd.DataFrame(data_obj, columns=[db.choiceVar])
-
-
-def get_beta_statistics(model):
-    if not callable(hasattr(model, "H")):
-        h = model.H
-        bh = model.BHHH
-    else:
-        h = model.H()
-        bh = model.BHHH()
-
-    pandas_stats = pd.DataFrame(
-        columns=[
-            "Value",
-            "Std err",
-            "t-test",
-            "p-value",
-            "Rob. Std err",
-            "Rob. t-test",
-            "Rob. p-value",
-        ],
-        index=[p.name for p in model.beta_params if (p.status != 1)],
-    )
-    stderr = stderror(h, model.beta_params)
-    robstderr = rob_stderror(h, bh, model.beta_params)
-    pandas_stats["Std err"] = stderr
-    pandas_stats["t-test"] = t_test(stderr, model.beta_params)
-    pandas_stats["p-value"] = p_value(stderr, model.beta_params)
-    pandas_stats["Rob. Std err"] = robstderr
-    pandas_stats["Rob. t-test"] = t_test(robstderr, model.beta_params)
-    pandas_stats["Rob. p-value"] = p_value(robstderr, model.beta_params)
-    pandas_stats = pd.DataFrame(index=[p.name for p in model.beta_params]).join(
-        pandas_stats
-    )
-
-    pandas_stats["Value"] = np.asarray(model.output_estimated_betas())
-
-    return np.round(pandas_stats, 6).sort_index().fillna("-").astype("O")
+        return mat

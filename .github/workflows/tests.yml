@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.9']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -47,10 +47,6 @@ jobs:
     - name: Test with pytest
       run: |
         poetry run pytest
-    
-    - name: Run performance tests
-      run: |
-        poetry run pytest -s .\tests\test_performance.py
 
   build-install-linux:
     name: build-install-linux
@@ -58,7 +54,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.9', '3.10']
+        python-version: ['3.9']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -110,7 +106,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest]
-        python-version: ['3.9', '3.10']
+        python-version: ['3.9']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python

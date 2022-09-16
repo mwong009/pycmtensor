@@ -1,13 +1,11 @@
-default_language_version:
-  python: python3.9
 repos:
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.21.2
+    rev: v2.33.1
     hooks:
       - id: commitizen
-        stages: [commit-msg]
+        stages: [push]
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.8.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
