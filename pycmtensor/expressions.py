@@ -240,15 +240,7 @@ class Expressions:
 
 
 class Beta(Expressions):
-    """Class object for Beta parameters
-
-    Attributes:
-        name (str): Name of the Beta
-        init_value (float): The inital value of the Beta when created
-        status (int): The status of the Beta. Not modifiable
-        shared_var (:class:`aet.TensorSharedVariable`): The shared variable object
-            of the Beta parameter to be updated on. Can be accessed with a call function
-    """
+    """Class object for Beta parameters"""
 
     def __init__(self, name, value=0.0, lowerbound=None, upperbound=None, status=0):
         """Constructor for Beta class object

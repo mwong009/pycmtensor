@@ -46,6 +46,7 @@ rstcheck = { version = "^3.3.1", optional = true }
 # Documentation
 Sphinx = { version = "^4.4.0", optional = true } 
 sphinx-book-theme = { version = "^0.2.0", optional = true } 
+sphinx-design = {version = "^0.3.0", optional = true}
 sphinx-autoapi = { version = "^1.8.4", optional = true } 
 myst-parser = {version = "^0.18.0", optional = true}
 
@@ -61,8 +62,8 @@ pytest-cov = "^3.0.0"
 [tool.poetry.extras]
 lint = ["black", "isort", "pydocstyle", "rstcheck"]
 commit = ["commitizen", "pre-commit"]
-docs = ["Sphinx", "sphinx-book-theme", "sphinx-autoapi", "myst-parser"]
-dev = ["black", "isort", "pydocstyle", "rstcheck", "Sphinx", "sphinx-book-theme", "sphinx-autoapi", "myst-parser", "commitizen", "pre-commit"]
+docs = ["Sphinx", "sphinx-book-theme", "sphinx-autoapi", "myst-parser", "sphinx-design"]
+dev = ["black", "isort", "pydocstyle", "rstcheck", "Sphinx", "sphinx-book-theme", "sphinx-design", "sphinx-autoapi", "myst-parser", "commitizen", "pre-commit"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
