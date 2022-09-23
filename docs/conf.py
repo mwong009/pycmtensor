@@ -54,6 +54,7 @@ extensions = [
     "autoapi.extension",
     "sphinx.ext.napoleon",
     "myst_parser",
+    "sphinx_design",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -86,6 +87,10 @@ suppress_warnings = ["autoapi"]
 # -- Options for myst-nb -----------------------------------------------------
 
 jupyter_execute_notebooks = "off"
+
+# -- Options for myst-parser -------------------------------------------------
+
+myst_enable_extensions = ["colon_fence"]
 
 # -- Options for autoapi -----------------------------------------------------
 
