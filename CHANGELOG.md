@@ -1,3 +1,19 @@
+## v1.1.0 (2022-09-23)
+
+### Feat
+
+- **scheduler**: added learning rate scheduling to train()
+- **code**: overhaul and cleanup
+
+### Fix
+
+- **environment**: update project deps and pre-commit routine
+- **config**: remove unnecessary cxx flags from macos builds
+
+### Perf
+
+- **config**: misc optimization changes
+
 ## v1.0.7 (2022-08-12)
 
 ### Refactor

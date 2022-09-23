@@ -1,7 +1,7 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "1.0.7"
+__version__ = "1.1.0"
 
 from .logger import main_logger
 
