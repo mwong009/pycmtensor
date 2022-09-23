@@ -11,6 +11,8 @@ import numpy as np
 
 from pycmtensor import log
 
+from .scheduler import *
+
 
 def generate_blas_flags():
     """Finds and generates the blas_flags config option for .aesararc"""
@@ -100,13 +102,13 @@ class Config:
             "patience_increase": 2,
             "validation_threshold": 1.005,
             "base_learning_rate": 0.01,
-            "max_learning_rate": 0.01,
+            "max_learning_rate": None,
             "batch_size": 250,
             "max_steps": 1000,
-            "learning_scheduler": "ConstantLR",
-            "cyclic_lr_mode": None,
-            "cyclic_lr_step_size": None,
+            "clr_cycle_steps": 16,
+            "clr_gamma": None,
         }
+        self.hyperparameters["lr_scheduler"] = ConstantLR(self["base_learning_rate"])
         self.aesara_rc = init_aesara_rc()
         init_environment_variables()
 
@@ -132,3 +134,26 @@ class Config:
     def set_hyperparameter(self, key: str, value):
         self.hyperparameters[key] = value
         log(10, f"set {key}={value}")
+
+    def set_lr_scheduler(self, scheduler):
+        if not isinstance(scheduler, Scheduler):
+            raise TypeError(
+                f"{type(scheduler)} is not a {Scheduler} instance, perhaps missing arguments?"
+            )
+        if not hasattr(scheduler, "lr"):
+            raise TypeError(f"{scheduler} is not a valid learning rate scheduler")
+        self["lr_scheduler"] = scheduler
+        self["base_learning_rate"] = scheduler.lr
+
+        if hasattr(scheduler, "max_lr"):
+            self["max_learning_rate"] = scheduler.max_lr
+        else:
+            self["max_learning_rate"] = None
+        if hasattr(scheduler, "cycle_steps"):
+            self["clr_cycle_steps"] = scheduler.cycle_steps
+        else:
+            self["clr_cycle_steps"] = None
+        if hasattr(scheduler, "gamma"):
+            self["clr_gamma"] = scheduler.gamma
+        else:
+            self["clr_gamma"] = None

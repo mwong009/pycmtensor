@@ -39,4 +39,4 @@ def test_setitem_magic(config_class):
 
 def test_getitem_magic(config_class):
     assert config_class["patience_increase"] == 2
-    assert config_class["learning_scheduler"] == "ConstantLR"
+    assert config_class["batch_size"] == 250

@@ -4,6 +4,7 @@ import pandas as pd
 import pycmtensor as cmt
 from pycmtensor.expressions import Beta
 from pycmtensor.models import MNL
+from pycmtensor.scheduler import StepLR
 from pycmtensor.statistics import elasticities
 
 cmt.logger.set_level(cmt.logger.INFO)
@@ -31,6 +32,7 @@ AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]  # availability
 
 mymodel = MNL(U, AV, locals(), db, name="MNL")
 mymodel.config.set_hyperparameter("max_steps", 200)
+mymodel.config.set_lr_scheduler(StepLR())
 mymodel.train(db)
 
 print(elasticities(mymodel, db, 0, "TRAIN_TT"))
