@@ -1,6 +1,7 @@
 # pycmtensor.py
 """PyCMTensor main module"""
 import timeit
+from collections import OrderedDict
 
 import dill as pickle
 import numpy as np
@@ -116,6 +117,7 @@ class PyCMTensorModel:
         """Function to train the model"""
 
         # [train-start]
+        lr_scheduler = self.config["lr_scheduler"]
         batch_size = self.config["batch_size"]
         max_steps = min(self.config["max_steps"], steps)
         patience = self.config["patience"]
@@ -135,11 +137,7 @@ class PyCMTensorModel:
         log(10, msg)
 
         # initalize results array
-        self.results.performance_graph = pd.DataFrame(
-            index=np.arange(1, max_steps),
-            columns=["train_loglikelihood", "valid_error"],
-        )
-        self.results.performance_graph.index.name = "step"
+        self.results.performance_graph = OrderedDict()
 
         # set training and validation datasets
         train_data = db.pandas.inputs(self.inputs, split_type="train")
@@ -150,23 +148,22 @@ class PyCMTensorModel:
         self.results.best_loglikelihood = self.results.init_loglikelihood
         self.results.best_valid_error = self.prediction_error(*valid_data)
 
-        # set learning rate
-        learning_rate = self.config["base_learning_rate"]
-
         # loop parameters
         done_looping = False
         step = 0
         iteration = 0
+
+        # set learning rate
+        learning_rate = lr_scheduler(step)
 
         # main loop
         start_time = timeit.default_timer()
         log(20, f"Start (n={n_train_samples})")
 
         while (step < max_steps) and (not done_looping):
-            # increment step
-            step += 1
 
             # loop over batch
+            learning_rate = lr_scheduler(step)
             for _ in range(n_train_batches):
                 if patience <= iteration:
                     done_looping = True
@@ -194,11 +191,9 @@ class PyCMTensorModel:
 
                 train_ll = self.loglikelihood(*train_data)
                 valid_error = self.prediction_error(*valid_data)
-                self.results.performance_graph.at[
-                    step, "train_loglikelihood"
-                ] = np.round(train_ll, 2)
-                self.results.performance_graph.at[step, "valid_error"] = np.round(
-                    valid_error, 4
+                self.results.performance_graph[step] = (
+                    np.round(train_ll, 2),
+                    np.round(valid_error, 4),
                 )
 
                 if valid_error >= self.results.best_valid_error:
@@ -223,6 +218,9 @@ class PyCMTensorModel:
                     max(patience, iteration * patience_increase), max_iterations
                 )
 
+            # increment step
+            step += 1
+
         train_time = round(timeit.default_timer() - start_time, 3)
         self.results.train_time = time_format(train_time)
         self.results.iterations_per_sec = round(iteration / train_time, 2)
@@ -235,6 +233,7 @@ class PyCMTensorModel:
         self.results.n_valid_samples = n_valid_samples
         self.results.n_params = self.n_params
         self.results.seed = self.config["seed"]
+        self.results.lr_history_graph = self.config["lr_scheduler"].history
 
         # statistical analysis step
         self.results.gnorm = self.gradient_norm(*train_data)

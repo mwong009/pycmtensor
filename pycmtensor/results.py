@@ -39,6 +39,7 @@ class Results:
         self.weights = None
 
         self.performance_graph = None
+        self.lr_history_graph = None
 
     def rho_square(self):
         """Returns the rho square statistics"""
