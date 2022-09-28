@@ -41,12 +41,32 @@ def log_likelihood(prob, y):
 
     Args:
         prob (TensorVariable): Matrix describing the choice probabilites.
-        y (TensorVariable): The ``TensorVariable`` referencing the choice column.
+        y (TensorVariable): `TensorVariable`` referencing the choice column.
 
     Returns:
         TensorVariable: a symbolic representation of the log likelihood with ndim=0.
     """
     return aet.sum(aet.log(prob)[y, aet.arange(y.shape[0])])
+
+
+def kl_divergence(p, q):
+    """Computes the KL divergence loss between ``p`` and ``q``.
+
+    Args:
+        p (TensorVariable): Matrix of the output probabilities
+        q (TensorVariable): Matrix of the reference probabilities
+
+    Returns:
+        TensorVariable: a symbolic representation of the KL loss with ndim=0.
+
+    Notes:
+        loss = \sum [y_prob * log(y_prob/prob) where y_prob>0, else 0]
+    """
+    if p.ndim != q.ndim:
+        msg = f"p should have the same shape as q. p.ndim: {p.ndim}, q.ndim: {q.ndim}"
+        log(40, msg)
+        raise ValueError(msg)
+    return aet.sum(aet.switch(aet.neq(p, 0), p * aet.log(p / q), 0))
 
 
 def errors(prob, y):
