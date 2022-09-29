@@ -3,7 +3,7 @@
 ![Licence](https://img.shields.io/badge/Licence-MIT-blue)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor)
 [![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
-[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=develop)](https://pycmtensor.readthedocs.io/en/develop/?badge=develop)
+[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor)
 
 [![Tests](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml)
