@@ -1,122 +1,215 @@
 # About PyCMTensor
 
+![Licence](https://img.shields.io/badge/Licence-MIT-blue)
+![](https://img.shields.io/pypi/pyversions/pycmtensor)
+[![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
+[![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=develop)](https://pycmtensor.readthedocs.io/en/develop/?badge=develop)
+[![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor)
+
+[![Tests](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml)
+[![Publish](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml)
+
+
 PyCMTensor is a discrete choice modelling development tool on deep learning libraries, enabling development of complex models using deep neural networks.
-PyCMTensor is build on [Aesara](https://github.com/aesara-devs/aesara), a tensor library which uses features commonly found in deep learning packages such as Tensorflow and Keras.
+PyCMTensor is build on [Aesara](https://github.com/aesara-devs/aesara), a tensor library which uses features commonly found in deep learning packages such as ``Tensorflow`` and ``Keras``.
 ``Aesara`` was chosen as the back end mathematical library because of its hackable, open-source nature.
 Users of [Biogeme](https://biogeme.epfl.ch) would be familiar with the syntax of PyCMTensor.
 
-# Download
+PyCMTensor improves on [Biogeme](https://biogeme.epfl.ch) in situations where much more complex models are necessary, for example, integrating neural networks into discrete choice models.
+PyCMTensor also include the ability to estimate models using 1st order stochastic gradient descent methods by default, such as Nesterov Accelerated Gradient (NAG), Adaptive momentum (ADAM), or RMSProp.
 
-PyCMTensor is available on PyPi https://pypi.org/project/pycmtensor/. It can be install through
+# Quick start
 
-```console
-$ pip install -U pycmtensor
+## Installation
+
+1. Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+	Full Anaconda works fine, but Miniconda is recommmended for a minimal installation. Ensure that Conda is using at least **Python 3.9**
+
+	Next, install the required dependencies:
+
+	::::{tab-set}
+
+    :::{tab-item} Windows
+    ```console
+    conda install mkl-service conda-forge::cxx-compiler conda-forge::m2w64-toolchain -y
+    ```
+    :::
+
+    :::{tab-item} OSX
+    ```console
+    conda install mkl-service Clang -y
+    ```
+    :::
+
+    :::{tab-item} Linux/Ubuntu
+    ```console
+    conda install mkl-service conda-forge::cxx-compiler -y
+    ```
+    :::
+
+    ::::
+
+2. Install the ``PyCMTensor`` package
+
+	PyCMTensor is available on [PyPI](https://pypi.org/project/pycmtensor). It can be installed with ``pip``
+
+	```console
+	pip install -U pycmtensor
+	```
+
+	Alternatively, the latest development version is available via [Github](https://github.com/mwong009/pycmtensor). It can be installed via 
+
+	```
+	pip install -U git+https://github.com/mwong009/pycmtensor.git
+	```
+
+# Usage
+
+PyCMTensor uses syntax very similar to ``Biogeme``. Users of ``Biogeme`` should be familiar with the syntax.
+Make sure you are using the correct Conda environment and/or the required packages are installed.
+
+## Simple example: Swissmetro dataset
+
+1. Start an interactive session (e.g. ``IPython`` or Jupyter Notebook) and import the ``PyCMTensor`` package:
+
+	```python
+	import pycmtensor as cmt
+	import pandas as pd
+	```
+
+	Several submodules to include:
+	```python
+	from pycmtensor.expressions import Beta # Beta class for model parameters
+	from pycmtensor.models import MNL  # MNL model
+	from pycmtensor.statistics import elasticities  # For calculating elasticities
+	```
+
+	For a full list of submodules and description, refer to [API Reference](https://pycmtensor.readthedocs.io/en/latest/autoapi/index.html).
+	Using the [swissmetro dataset](https://biogeme.epfl.ch/data.html), we define a simple MNL model. 
+
+```{note} 
+The following is a replication of the results from Biogeme using the ``Adam`` optimization method with constant learning rate.
 ```
 
-The latest development version is available via [Github](https://github.com/mwon009/pycmtensor). It can be install via 
+1. Import the dataset and perform some data cleaning
+	```python
+	swissmetro = pd.read_csv("swissmetro.dat", sep="\t")
+	swissmetro.drop(swissmetro[swissmetro["CHOICE"] == 0].index, inplace=True)
+	swissmetro["CHOICE"] -= 1  # set the first choice index to 0
+	db = cmt.Data(df=swissmetro, choice="CHOICE")
+	db.autoscale_data(except_for=["ID", "ORIGIN", "DEST"])  # scales dataset
+	db.split_db(split_frac=0.8)  # split dataset into train/valid sets
+	```
 
-```console
-$ pip install git+https://github.com/mwong009/pycmtensor.git
-```
+2. Initialize the model parameters and specify the utility functions and availability conditions
+	```python
+	b_cost = Beta("b_cost", 0.0, None, None, 0)
+	b_time = Beta("b_time", 0.0, None, None, 0)
+	asc_train = Beta("asc_train", 0.0, None, None, 0)
+	asc_car = Beta("asc_car", 0.0, None, None, 0)
+	asc_sm = Beta("asc_sm", 0.0, None, None, 1)
 
-For more information about installing, see [Installation](installation).
+	U_1 = b_cost * db["TRAIN_CO"] + b_time * db["TRAIN_TT"] + asc_train
+	U_2 = b_cost * db["SM_CO"] + b_time * db["SM_TT"] + asc_sm
+	U_3 = b_cost * db["CAR_CO"] + b_time * db["CAR_TT"] + asc_car
 
-# Overview
+	# specify the utility function and the availability conditions
+	U = [U_1, U_2, U_3]  # utility
+	AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]  # availability
+	``` 
 
-PyCMTensor is written similar to [Biogeme](https://biogeme.epfl.ch). 
+3. Define the Multinomial Logit model
+	```python
+	mymodel = MNL(U, AV, locals(), db, name="MNL")
+	```
 
-To import a dataset, for example the ``swissmetro.dat`` dataset:
+4. Train the model and generate model statistics (Optionally, you can also set the training hyperparameters)
+	```python
+	mymodel.config.set_hyperparameter("max_steps", 200)  # set the max number of train steps
+	mymodel.config.set_hyperparameter("batch_size", 128)  # set the training batch size
+	mymodel.train(db)  # run the model training on the dataset `db`
+	```
 
-```python
-import pycmtensor as cmt
-swissmetro = pd.read_csv("swissmetro.dat", sep="\t")
-db = cmt.Data(df=swissmetro, choice="CHOICE")
-db.split_db(split_frac=0.8)  # split dataset into train and valid datasets
-```
+## Results
+The following model functions outputs the statistics, results of the model, and model training
 
-Define the choice model coefficients and utility equations:
+1. **Model estimates**
+	```Python
+	print(mymodel.results.beta_statistics())
+	```
 
-```python
-b_cost = Beta("b_cost", 0.0, None, None, 0)
-b_time = Beta("b_time", 0.0, None, None, 0)
-asc_train = Beta("asc_train", 0.0, None, None, 0)
-asc_car = Beta("asc_car", 0.0, None, None, 0)
-asc_sm = Beta("asc_sm", 0.0, None, None, 1)
+	Output:
+	```
+	              value   std err     t-test   p-value rob. std err rob. t-test rob. p-value
+	asc_car   -0.665638  0.044783 -14.863615       0.0     0.176178    -3.77821     0.000158
+	asc_sm          0.0         -          -         -            -           -            -
+	asc_train -1.646826  0.048099 -34.238218       0.0     0.198978   -8.276443          0.0
+	b_cost     0.024912   0.01943   1.282135  0.199795     0.016413    1.517851     0.129052
+	b_time    -0.313186  0.049708  -6.300485       0.0     0.208239   -1.503979     0.132587
+	```
 
-U_1 = b_cost * db["TRAIN_CO"] + b_time * db["TRAIN_TT"] + asc_train
-U_2 = b_cost * db["SM_CO"] + b_time * db["SM_TT"] + asc_sm
-U_3 = b_cost * db["CAR_CO"] + b_time * db["CAR_TT"] + asc_car
+2. **Training results**
+	```Python
+	print(mymodel.results.model_statistics())
+	```
 
-# specify the utility function and the availability conditions
-U = [U_1, U_2, U_3]  # utility
-AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]  # availability
+	Output:
+	```
+	                                          value
+	Number of training samples used          8575.0
+	Number of validation samples used        2143.0
+	Init. log likelihood               -8874.438875
+	Final log likelihood                -7513.22967
+	Accuracy                                 59.26%
+	Likelihood ratio test                2722.41841
+	Rho square                             0.153385
+	Rho square bar                         0.152822
+	Akaike Information Criterion       15036.459339
+	Bayesian Information Criterion      15071.74237
+	Final gradient norm                    0.007164
+	```
 
-mymodel = MNL(U, AV, locals(), db, name="MNL")
-```
+3. **Correlation matrix**
+	```Python
+	print(mymodel.results.model_correlation_matrix())
+	```
 
-Train or execute model estimation
+	Output:
+	```
+	             b_cost    b_time  asc_train   asc_car
+	b_cost     1.000000  0.209979   0.226737 -0.028335
+	b_time     0.209979  1.000000   0.731378  0.796144
+	asc_train  0.226737  0.731378   1.000000  0.664478
+	asc_car   -0.028335  0.796144   0.664478  1.000000
+	```
 
-```python
-mymodel.train(db)
-```
+4. **Elasticities**
+	```Python
+	print(elasticities(mymodel, db, 0, "TRAIN_TT"))  # CHOICE:TRAIN (0) wrt TRAIN_TT
+	```
 
-**Generate results and statistics**
-```python
-print(mymodel.results.model_statistics())
-```
-```
-                                          value
-Number of training samples used          8575.0
-Number of validation samples used        2143.0
-Init. log likelihood               -8869.978759
-Final log likelihood               -7532.283616
-Accuracy                                 60.15%
-Likelihood ratio test               2675.390285
-Rho square                             0.150812
-Rho square bar                         0.150248
-Akaike Information Criterion       15074.567232
-Bayesian Information Criterion     15109.850263
-Final gradient norm                    0.005921
-```
+	Output:
+	```
+	[-0.06813523 -0.01457346 -0.0555597  ... -0.03453162 -0.02809382 -0.02343637]
+	```
 
-**Beta statistics**
-```python
-print(mymodel.results.beta_statistics())
-```
-```
-              value   std err     t-test   p-value rob. std err rob. t-test rob. p-value
-asc_car   -0.681302   0.04447 -15.320491       0.0     0.136012   -5.009141     0.000001
-asc_sm          0.0         -          -         -            -           -            -
-asc_train -1.615423  0.047496 -34.011958       0.0     0.147135  -10.979158          0.0
-b_cost     0.030627  0.019547   1.566831  0.117154     0.010567    2.898396     0.003751
-b_time    -0.303005  0.048987   -6.18539       0.0     0.160293    -1.89032     0.058715
-```
+5. **Choice probability predictions**
+	```Python
+	print(mymodel.predict(db, return_choices=False))
+	```
 
-**Correlation matrix**
-```python
-print(mymodel.results.model_correlation_matrix())
-```
-```
-             b_cost    b_time  asc_train   asc_car
-b_cost     1.000000  0.209228   0.226905 -0.034368
-b_time     0.209228  1.000000   0.730218  0.790017
-asc_train  0.226905  0.730218   1.000000  0.660197
-asc_car   -0.034368  0.790017   0.660197  1.000000
-```
-
-**Choice probability predictions**
-```python
-print(mymodel.predict(db, return_choices=False))
-```
-```
-[[0.12677006 0.5450971  0.32813285]
- [0.12620901 0.54609865 0.32769234]
- [0.12715643 0.54322562 0.32961795]
- ...
- [0.13161936 0.5223758  0.34600483]
- [0.1307124  0.51879211 0.35049549]
- [0.13236051 0.52069128 0.34694821]]
- ```
+	Output:
+	```
+	[[0.12319342 0.54372904 0.33307754]
+	[0.12267997 0.54499504 0.33232499]
+	[0.12354587 0.54162143 0.3348327 ]
+	...
+	[0.12801816 0.5201341  0.35184774]
+	[0.1271984  0.51681635 0.35598525]
+	[0.12881032 0.51856181 0.35262787]]
+	```
 
 # Documentation
 
