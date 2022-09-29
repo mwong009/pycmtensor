@@ -1,4 +1,5 @@
 # test_functions.py
+import aesara
 import aesara.tensor as aet
 import pytest
 from aesara.tensor.var import TensorVariable
@@ -39,6 +40,16 @@ class TestFunctions:
 
     def test_log_likelihood(self, loglikelihood):
         assert loglikelihood.ndim == 0
+
+    def test_kl_divergence(self):
+        p = aet.vector("p")
+        q = aet.vector("q")
+
+        loss = aesara.function([p, q], functions.kl_divergence(p, q))
+        assert (
+            round(float(loss([0.2, 0.1, 0.4, 0.3], [0.3, 0.1, 0.1, 0.5])), 4) == 0.3202
+        )
+        assert float(loss([0.2, 0.1, 0.4, 0.3], [0.2, 0.1, 0.4, 0.3])) == float(0.0)
 
     def test_errors(self, logit, swissmetro_db):
         prob = logit
