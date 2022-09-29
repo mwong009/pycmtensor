@@ -107,6 +107,7 @@ class Config:
             "max_steps": 1000,
             "clr_cycle_steps": 16,
             "clr_gamma": None,
+            "batch_shuffle": False,
         }
         self.hyperparameters["lr_scheduler"] = ConstantLR(self["base_learning_rate"])
         self.aesara_rc = init_aesara_rc()
