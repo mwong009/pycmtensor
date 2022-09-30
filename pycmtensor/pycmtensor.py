@@ -115,6 +115,7 @@ class PyCMTensorModel:
 
     def train(self, db, steps=np.inf, k=0):
         """Function to train the model"""
+        self.config.check_values()  # assert config.hyperparameters
 
         # [train-start]
         lr_scheduler = self.config["lr_scheduler"]

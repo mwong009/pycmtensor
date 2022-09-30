@@ -97,7 +97,7 @@ class Config:
             "directory": os.getcwd(),
         }
         self.hyperparameters = {
-            "seed": self.rng.integers(1, 9000),
+            "seed": int(self.rng.integers(1, 9000)),
             "patience": 4000,
             "patience_increase": 2,
             "validation_threshold": 1.005,
@@ -158,3 +158,9 @@ class Config:
             self["clr_gamma"] = scheduler.gamma
         else:
             self["clr_gamma"] = None
+
+    def check_values(self):
+        """Checks validity of hyperparameter values"""
+        assert isinstance(self["seed"], (int, np.int64))
+        assert isinstance(self["batch_shuffle"], bool)
+        assert (self["clr_gamma"] is None) or (isinstance(self["clr_gamma"], float))
