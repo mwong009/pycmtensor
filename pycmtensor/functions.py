@@ -50,11 +50,11 @@ def log_likelihood(prob, y):
 
 
 def kl_divergence(p, q):
-    """Computes the KL divergence loss between ``p`` and ``q``.
+    """Computes the KL divergence loss between discrete distributions ``p`` and ``q``.
 
     Args:
-        p (TensorVariable): Matrix of the output probabilities
-        q (TensorVariable): Matrix of the reference probabilities
+        p (TensorVariable): Output probabilities
+        q (TensorVariable): Reference probabilities
 
     Returns:
         TensorVariable: a symbolic representation of the KL loss with ndim=0.
@@ -67,6 +67,31 @@ def kl_divergence(p, q):
         log(40, msg)
         raise ValueError(msg)
     return aet.sum(aet.switch(aet.neq(p, 0), p * aet.log(p / q), 0))
+
+
+def kl_univar_norm(m0: float, v0: float, m1: float, v1: float):
+    """Computes the KL divergence loss between two univariate normal distributions.
+
+    Args:
+        m0 (scalar): mean of the first Normal distribution $N_0$
+        v0 (scalar): variance of the first Normal distribution $N_0$
+        m1 (scalar): mean of the second Normal distribution $N_1$
+        v1 (scalar): variance of the second Normal distribution $N_1$
+
+    Notes:
+        Formula: $$
+        D_{KL}(N_0||N_1) = -log(sqrt(v_0/v_1)) + (v_0 + (m_0-m_1)^2)/(2 * v_1) - 0.5
+        $$
+
+        If m1=0 and v1=1, then $$
+        D_{KL}(N_0||N_1) = -log(sqrt(v_0)) + (v_0 + m_0^2)/2 - 0.5
+        $$
+    """
+    if (v0 < 0) or (v1 < 0):
+        msg = f"Invalid input value for variance v1 ({v1}) in kl_univar_norm()"
+        log(40, msg)
+        raise ValueError(msg)
+    return 0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1)
 
 
 def errors(prob, y):
