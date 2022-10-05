@@ -80,11 +80,11 @@ def kl_univar_norm(m0: float, v0: float, m1: float, v1: float):
 
     Notes:
         Formula: $$
-        D_{KL}(N_0||N_1) = -log(sqrt(v_0/v_1)) + (v_0 + (m_0-m_1)^2)/(2 * v_1) - 0.5
+        D_{KL}(N_0||N_1) = -ln(sqrt(v_0/v_1)) + (v_0 + (m_0-m_1)^2)/(2 * v_1) - 0.5
         $$
 
         If m1=0 and v1=1, then $$
-        D_{KL}(N_0||N_1) = -log(sqrt(v_0)) + (v_0 + m_0^2)/2 - 0.5
+        D_{KL}(N_0||N_1) = -ln(sqrt(v_0)) + (v_0 + m_0^2)/2 - 0.5
         $$
     """
     if (v0 < 0) or (v1 < 0):
@@ -92,6 +92,37 @@ def kl_univar_norm(m0: float, v0: float, m1: float, v1: float):
         log(40, msg)
         raise ValueError(msg)
     return 0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1)
+
+
+def kl_multivar_norm(m0, v0, m1, v1):
+    """Computes the KL divergence loss between two multivariate normal distributions.
+
+    Args:
+        m0 (vector): mean vector of the first Normal m.v. distribution $N_0$
+        v0 (matrix): (co-)variance matrix of the first Normal m.v. distribution $N_0$
+        m1 (vector): mean vector of the second Normal m.v. distribution $N_1$
+        v1 (matrix): (co-)variance of the second Normal m.v. distribution $N_1$
+
+    Notes:
+        If m1 and v1 is 0 and 1 respectively, computes a simplified version using the
+        univariate norm formula.
+
+        k = dimension of the distribution.
+
+        Formula: $$
+        D_{KL}(N_0||N_1) = 0.5 * (ln(|v_1|/|v_0|) + trace(v_1^{-1} * v_0) +
+            (m_1-m_0)^T * v_1^{-1} * (m_1-m_0) - k)
+        $$
+
+    """
+    if (m1 == 0) and (v1 == 1):
+        return aet.sum(0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1))
+
+    k = m0.shape[0]
+    v1_inv = nlinalg.inv(v1)
+    det_term = aet.log(nlinalg.det(v1) / nlinalg.det(v0))
+    trace_term = nlinalg.trace(v1_inv * v0)
+    return det_term + trace_term + (m1 - m0).T * v1_inv * (m1 - m0) - k
 
 
 def errors(prob, y):
