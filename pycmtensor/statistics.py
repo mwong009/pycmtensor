@@ -1,15 +1,16 @@
 # statistics.py
 """PyCMTensor statistics module"""
 import aesara.tensor as aet
+import aesara.tensor.nlinalg as nlinalg
 import numpy as np
 from aesara import function
 from numpy import nan_to_num as nan2num
-from scipy import linalg, stats
+from scipy import stats
 
 
 def variance_covariance(h):
     """Returns the var-covar matrix given the Hessian (``h``)"""
-    return -linalg.pinv(nan2num(h))
+    return -nlinalg.pinv(nan2num(h)).eval()
 
 
 def rob_variance_covariance(h, bhhh):
@@ -69,7 +70,7 @@ def correlation_matrix(h):
     d = np.diag(var_covar)
     if (d > 0).all():
         diag = np.diag(np.sqrt(d))
-        diag_inv = linalg.inv(diag)
+        diag_inv = nlinalg.inv(diag).eval()
         mat = diag_inv.dot(var_covar.dot(diag_inv))
     else:
         mat = np.full_like(var_covar, np.finfo(float).max)
@@ -83,7 +84,7 @@ def rob_correlation_matrix(h, bhhh):
     rd = np.diag(rob_var_covar)
     if (rd > 0).all():
         diag = np.diag(np.sqrt(rd))
-        diag_inv = linalg.inv(diag)
+        diag_inv = nlinalg.inv(diag).eval()
         mat = diag_inv.dot(rob_var_covar.dot(diag_inv))
     else:
         mat = np.full_like(rob_var_covar, np.finfo(float).max)

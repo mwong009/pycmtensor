@@ -1,8 +1,8 @@
 # functions.py
 """PyCMTensor functions module"""
 import aesara.tensor as aet
+import aesara.tensor.nlinalg as nlinalg
 import numpy as np
-from scipy import linalg
 
 from pycmtensor import log
 
@@ -200,4 +200,4 @@ def gnorm(cost, params):
         params = list(params.values())
     params = [p() for p in params if (p.status != 1)]
     grads = aet.grad(cost, params, disconnected_inputs="ignore")
-    return linalg.norm(grads)
+    return nlinalg.norm(grads, ord=None)
