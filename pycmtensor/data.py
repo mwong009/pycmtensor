@@ -23,6 +23,7 @@ class Data:
 
         self.tensor = Variables(choice)
         self.pandas = PandasDataFrame(df, choice)
+        self.shared = SharedVariables()
 
         for column in self.pandas.columns:
             if column == choice:
@@ -204,3 +205,19 @@ class Variables:
     def all(self) -> list[aet.TensorVariable]:
         """Returns all ``TensorVariable``"""
         return self.x + [self.y]
+
+
+class SharedVariables:
+    """Class object to store TensorSharedVariables"""
+
+    def __init__(self):
+        pass
+
+    def __getitem__(self):
+        pass
+
+    def __setitem__(self):
+        pass
+
+    def add_item(self):
+        pass
