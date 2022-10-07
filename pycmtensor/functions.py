@@ -69,43 +69,18 @@ def kl_divergence(p, q):
     return aet.sum(aet.switch(aet.neq(p, 0), p * aet.log(p / q), 0))
 
 
-def kl_univar_norm(m0: float, v0: float, m1: float, v1: float):
-    """Computes the KL divergence loss between two univariate normal distributions.
-
-    Args:
-        m0 (scalar): mean of the first Normal distribution $N_0$
-        v0 (scalar): variance of the first Normal distribution $N_0$
-        m1 (scalar): mean of the second Normal distribution $N_1$
-        v1 (scalar): variance of the second Normal distribution $N_1$
-
-    Notes:
-        Formula: $$
-        D_{KL}(N_0||N_1) = -ln(sqrt(v_0/v_1)) + (v_0 + (m_0-m_1)^2)/(2 * v_1) - 0.5
-        $$
-
-        If m1=0 and v1=1, then $$
-        D_{KL}(N_0||N_1) = -ln(sqrt(v_0)) + (v_0 + m_0^2)/2 - 0.5
-        $$
-    """
-    if (v0 < 0) or (v1 < 0):
-        msg = f"Invalid input value for variance v1 ({v1}) in kl_univar_norm()"
-        log(40, msg)
-        raise ValueError(msg)
-    return 0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1)
-
-
 def kl_multivar_norm(m0, v0, m1, v1):
     """Computes the KL divergence loss between two multivariate normal distributions.
 
     Args:
-        m0 (vector): mean vector of the first Normal m.v. distribution $N_0$
-        v0 (matrix): (co-)variance matrix of the first Normal m.v. distribution $N_0$
-        m1 (vector): mean vector of the second Normal m.v. distribution $N_1$
-        v1 (matrix): (co-)variance of the second Normal m.v. distribution $N_1$
+        m0: mean vector of the first Normal m.v. distribution $N_0$
+        v0: (co-)variance matrix of the first Normal m.v. distribution $N_0$
+        m1: mean vector of the second Normal m.v. distribution $N_1$
+        v1: (co-)variance of the second Normal m.v. distribution $N_1$
 
     Notes:
-        If m1 and v1 is 0 and 1 respectively, computes a simplified version using the
-        univariate norm formula.
+        If m0 and v0 are 0 and 1 respectively, returns a univariate norm solution.
+        If m1 and v1 are 0 and 1 respectively, computes a simplified version of the multivariate norm.
 
         k = dimension of the distribution.
 
@@ -115,14 +90,29 @@ def kl_multivar_norm(m0, v0, m1, v1):
         $$
 
     """
-    if (m1 == 0) and (v1 == 1):
+    if not (
+        (m0.ndim >= m1.ndim)
+        and (v0.ndim >= v1.ndim)
+        and (m0.ndim <= 1)
+        and (v0.ndim <= 2)
+    ):
+        msg = f"Incorrect dimensions inputs: m0.ndim={m0.ndim}, v0.ndim={v0.ndim}, m1.ndim={m1.ndim}, v1.ndim={v1.ndim}"
+        log(40, msg)
+        raise ValueError(msg)
+
+    if (m0.ndim == v0.ndim == 0) or (m1.ndim == v1.ndim == 0):
+        # computes univariate norm or multivariate norm with N(m1, v1)=N(0, 1)
+        if v0.ndim == 2:
+            v0 = aet.diag(v0)
         return aet.sum(0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1))
 
     k = m0.shape[0]
     v1_inv = nlinalg.inv(v1)
     det_term = aet.log(nlinalg.det(v1) / nlinalg.det(v0))
-    trace_term = nlinalg.trace(v1_inv * v0)
-    return det_term + trace_term + (m1 - m0).T * v1_inv * (m1 - m0) - k
+    trace_term = nlinalg.trace(aet.dot(v1_inv, v0))
+    return aet.sum(
+        det_term + trace_term + aet.dot((m1 - m0).T, aet.dot(v1_inv, (m1 - m0))) - k
+    )
 
 
 def errors(prob, y):
