@@ -1,8 +1,8 @@
 # functions.py
 """PyCMTensor functions module"""
 import aesara.tensor as aet
+import aesara.tensor.nlinalg as nlinalg
 import numpy as np
-from scipy import linalg
 
 from pycmtensor import log
 
@@ -50,11 +50,11 @@ def log_likelihood(prob, y):
 
 
 def kl_divergence(p, q):
-    """Computes the KL divergence loss between ``p`` and ``q``.
+    """Computes the KL divergence loss between discrete distributions ``p`` and ``q``.
 
     Args:
-        p (TensorVariable): Matrix of the output probabilities
-        q (TensorVariable): Matrix of the reference probabilities
+        p (TensorVariable): Output probabilities
+        q (TensorVariable): Reference probabilities
 
     Returns:
         TensorVariable: a symbolic representation of the KL loss with ndim=0.
@@ -67,6 +67,52 @@ def kl_divergence(p, q):
         log(40, msg)
         raise ValueError(msg)
     return aet.sum(aet.switch(aet.neq(p, 0), p * aet.log(p / q), 0))
+
+
+def kl_multivar_norm(m0, v0, m1, v1):
+    """Computes the KL divergence loss between two multivariate normal distributions.
+
+    Args:
+        m0: mean vector of the first Normal m.v. distribution $N_0$
+        v0: (co-)variance matrix of the first Normal m.v. distribution $N_0$
+        m1: mean vector of the second Normal m.v. distribution $N_1$
+        v1: (co-)variance of the second Normal m.v. distribution $N_1$
+
+    Notes:
+        If m0 and v0 are 0 and 1 respectively, returns a univariate norm solution.
+        If m1 and v1 are 0 and 1 respectively, computes a simplified version of the multivariate norm.
+
+        k = dimension of the distribution.
+
+        Formula: $$
+        D_{KL}(N_0||N_1) = 0.5 * (ln(|v_1|/|v_0|) + trace(v_1^{-1} * v_0) +
+            (m_1-m_0)^T * v_1^{-1} * (m_1-m_0) - k)
+        $$
+
+    """
+    if not (
+        (m0.ndim >= m1.ndim)
+        and (v0.ndim >= v1.ndim)
+        and (m0.ndim <= 1)
+        and (v0.ndim <= 2)
+    ):
+        msg = f"Incorrect dimensions inputs: m0.ndim={m0.ndim}, v0.ndim={v0.ndim}, m1.ndim={m1.ndim}, v1.ndim={v1.ndim}"
+        log(40, msg)
+        raise ValueError(msg)
+
+    if (m0.ndim == v0.ndim == 0) or (m1.ndim == v1.ndim == 0):
+        # computes univariate norm or multivariate norm with N(m1, v1)=N(0, 1)
+        if v0.ndim == 2:
+            v0 = aet.diag(v0)
+        return aet.sum(0.5 * ((v0 + aet.sqr(m0 - m1)) / v1 - aet.log(v0 / v1) - 1))
+
+    k = m0.shape[0]
+    v1_inv = nlinalg.inv(v1)
+    det_term = aet.log(nlinalg.det(v1) / nlinalg.det(v0))
+    trace_term = nlinalg.trace(aet.dot(v1_inv, v0))
+    return aet.sum(
+        det_term + trace_term + aet.dot((m1 - m0).T, aet.dot(v1_inv, (m1 - m0))) - k
+    )
 
 
 def errors(prob, y):
@@ -175,4 +221,4 @@ def gnorm(cost, params):
         params = list(params.values())
     params = [p() for p in params if (p.status != 1)]
     grads = aet.grad(cost, params, disconnected_inputs="ignore")
-    return linalg.norm(grads)
+    return nlinalg.norm(grads, ord=None)
