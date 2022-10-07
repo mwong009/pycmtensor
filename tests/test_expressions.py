@@ -1,4 +1,9 @@
 # test_expressions.py
+from copy import copy
+
+import aesara
+import aesara.tensor as aet
+import numpy as np
 import pytest
 from aesara import function
 from aesara.tensor.sharedvar import TensorSharedVariable
@@ -14,6 +19,16 @@ def exp_parser():
 @pytest.fixture
 def beta_class():
     return expressions.Beta("b_cost", 1.0, -10.0, 10, 0)
+
+
+@pytest.fixture
+def weight_class(rng):
+    return expressions.Weights("w_f1", size=(128, 128), rng=rng)
+
+
+@pytest.fixture
+def rng():
+    return np.random.default_rng(42069)
 
 
 def test_parser(exp_parser):
@@ -40,6 +55,8 @@ def test_beta_reset(beta_class):
 
 def test_beta_update(beta_class):
     b_cost = beta_class
+    assert b_cost.Beta.get_value() == 1.0
+    assert b_cost().get_value() == 1.0
     assert b_cost.get_value() == 1.0
     f = function(
         inputs=[],
@@ -49,3 +66,43 @@ def test_beta_update(beta_class):
     for _ in range(2):
         value = f()
     assert value == 2.0
+
+
+def test_weight_constructor(weight_class):
+    w = weight_class
+    assert w.shape == (128, 128)
+    assert isinstance(w.W, TensorSharedVariable)
+
+    with pytest.raises(ValueError):
+        new_weight = expressions.Weights("nw", (2,))
+
+    with pytest.raises(ValueError):
+        new_weight = expressions.Weights("nw", (5, 5), np.eye(3))
+
+
+def test_weight_init(rng):
+    w = expressions.Weights("w_none", (5, 5), rng=rng, init_type=None)
+    gl = expressions.Weights("w_glorot", (5, 5), rng=rng, init_type="glorot")
+
+
+def test_weight_he(weight_class, rng):
+
+    a = aesara.shared(rng.normal(size=(128,)))
+
+    for _ in range(22):
+        w = copy(weight_class)
+        a = aet.nnet.relu(aet.dot(w(), a))
+
+    assert round(float(aet.mean(a).eval()), 3) == 2.082
+    assert round(float(aet.std(a).eval()), 3) == 2.942
+
+
+def test_weight_glorot(rng):
+    glorot = expressions.Weights("w_glorot", (128, 128), rng=rng, init_type="glorot")
+    a = aesara.shared(rng.normal(size=(128,)))
+
+    for _ in range(22):
+        w = copy(glorot)
+        a = aet.tanh(aet.dot(w(), a))
+    assert round(float(aet.mean(a).eval()), 3) == 0.008
+    assert round(float(aet.std(a).eval()), 3) == 0.194
