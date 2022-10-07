@@ -13,7 +13,7 @@ documentation = ""
 keywords = ["pycmtensor"]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -86,6 +86,7 @@ version_files = [
     "pyproject.toml:version",
     "pycmtensor/__init__.py",
     "docs/conf.py",
+    "README.md"
 ]
 
 [tool.pytest]
