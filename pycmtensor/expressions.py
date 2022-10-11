@@ -243,7 +243,7 @@ class Expressions:
 
 class ModelParam:
     def __init__(self, name, rng=None):
-        """Constructor for model param object"""
+        """Class object for model parameters"""
         self._name = name
 
         if rng is None:
@@ -254,6 +254,7 @@ class ModelParam:
 
     @property
     def name(self):
+        """Returns the name of the model parameter"""
         return self._name
 
     def __call__(self):
@@ -273,10 +274,8 @@ class ModelParam:
 
 
 class Beta(Expressions, ModelParam):
-    """Class object for Beta parameters"""
-
     def __init__(self, name, value=0.0, lowerbound=None, upperbound=None, status=0):
-        """Constructor for Beta class object
+        """Class object for Beta parameters
 
         Args:
             name (str): name of the Beta class object
@@ -311,10 +310,8 @@ class Beta(Expressions, ModelParam):
 
 
 class Weights(Expressions, ModelParam):
-    """Class object for Neural Network weights"""
-
     def __init__(self, name, size, init_value=None, rng=None, init_type="he"):
-        """Constructor for neural network weights
+        """Class object for Neural Network weights
 
         Args:
             name (str): name of the weight
@@ -325,14 +322,15 @@ class Weights(Expressions, ModelParam):
 
         Note:
             Initialization types are one of the following:
-            - "he": initialization method for neural networks that takes into account
-              the non-linearity of activation functions, e.g. ReLU or Softplus [1]
-            - "glorot": initialization method that maintains the variance for
-              symmetric activation functions, e.g. sigm, tanh [2]
 
-        Refs:
-            [1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
-            [2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
+            * "he": initialization method for neural networks that takes into account
+              the non-linearity of activation functions, e.g. ReLU or Softplus [#]_
+
+            * "glorot": initialization method that maintains the variance for
+              symmetric activation functions, e.g. sigm, tanh [#]_
+
+            .. [#] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
+            .. [#] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
         """
         ModelParam.__init__(self, name, rng)
         if not ((len(size) == 2) and isinstance(size, (list, tuple))):
