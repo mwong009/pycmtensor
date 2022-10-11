@@ -13,7 +13,7 @@ def logit(utility: list, avail: list = None):
     Args:
         utility (list): List of M utility equations.
         avail (list): List of M availability conditions. If no availabilities are
-        provided, defaults to 1 for all availabilities.
+            provided, defaults to 1 for all availabilities.
 
     Returns:
         TensorVariable: A NxM matrix of probabilities.
@@ -23,14 +23,14 @@ def logit(utility: list, avail: list = None):
         if (avail != None) and (len(utility) != len(avail)):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
-        U = aet.stack(utility).flatten(2)
+        U = aet.stack(utility)
     else:
         U = utility
 
     prob = aet.nnet.softmax(U, axis=0)
     if avail != None:
         AV = aet.stack(avail)
-        assert U.ndim == AV.ndim
+        assert prob.ndim == AV.ndim
         prob *= AV
         prob = prob / aet.sum(prob, axis=0, keepdims=1)
     return prob
@@ -41,7 +41,7 @@ def log_likelihood(prob, y):
 
     Args:
         prob (TensorVariable): Matrix describing the choice probabilites.
-        y (TensorVariable): `TensorVariable`` referencing the choice column.
+        y (TensorVariable): ``TensorVariable`` referencing the choice column.
 
     Returns:
         TensorVariable: a symbolic representation of the log likelihood with ndim=0.
@@ -60,7 +60,7 @@ def kl_divergence(p, q):
         TensorVariable: a symbolic representation of the KL loss with ndim=0.
 
     Notes:
-        loss = \sum [y_prob * log(y_prob/prob) where y_prob>0, else 0]
+        L = $\sum$ [y_prob * log(y_prob/prob) where y_prob>0, else 0]
     """
     if p.ndim != q.ndim:
         msg = f"p should have the same shape as q. p.ndim: {p.ndim}, q.ndim: {q.ndim}"
