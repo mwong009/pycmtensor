@@ -55,7 +55,7 @@ def test_beta_reset(beta_class):
 
 def test_beta_update(beta_class):
     b_cost = beta_class
-    assert b_cost.Beta.get_value() == 1.0
+    assert b_cost.beta.get_value() == 1.0
     assert b_cost().get_value() == 1.0
     assert b_cost.get_value() == 1.0
     f = function(

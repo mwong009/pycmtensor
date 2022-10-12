@@ -4,6 +4,7 @@ import aesara
 import aesara.tensor as aet
 import numpy as np
 from aesara import pprint
+from aesara.tensor.random.utils import RandomStream
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
@@ -306,7 +307,22 @@ class Beta(Expressions, ModelParam):
         return self._status
 
     @property
-    def Beta(self):
+    def beta(self):
+        return self.shared_var
+
+
+class Sigma(Beta):
+    def __init__(self, name, value=1.0, upperbound=None, status=0, dist="NORMAL"):
+        super().__init__(name, value, 0, upperbound, status)
+        self._dist = dist
+        self.srng = RandomStream(seed=42069)
+
+    @property
+    def dist(self):
+        return self._dist
+
+    @property
+    def sigma(self):
         return self.shared_var
 
 
