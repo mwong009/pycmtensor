@@ -4,7 +4,7 @@ import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
 
-from pycmtensor import log
+from .logger import log
 
 
 def logit(utility: list, avail: list = None):

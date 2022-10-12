@@ -5,11 +5,11 @@ from collections import OrderedDict
 
 import dill as pickle
 import numpy as np
-import pandas as pd
 
-from pycmtensor import config, log, rng
+from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weights
+from .logger import log
 from .results import Results
 from .utils import time_format
 

@@ -4,9 +4,8 @@ import timeit
 import aesara.tensor as aet
 from aesara import function, pprint
 
-from pycmtensor import log
-
 from ..functions import bhhh, errors, gnorm, hessians, log_likelihood, logit
+from ..logger import log
 from ..optimizers import Adam
 from ..pycmtensor import PyCMTensorModel
 from ..utils import time_format

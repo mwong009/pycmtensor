@@ -7,6 +7,16 @@ from aesara import function
 from numpy import nan_to_num as nan2num
 from scipy import stats
 
+__all__ = [
+    "correlation_matrix",
+    "p_value",
+    "rob_correlation_matrix",
+    "rob_stderror",
+    "stderror",
+    "t_test",
+    "elasticities",
+]
+
 
 def variance_covariance(h):
     """Returns the var-covar matrix given the Hessian (``h``)"""
