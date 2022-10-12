@@ -23,7 +23,7 @@ def beta_class():
 
 @pytest.fixture
 def weight_class(rng):
-    return expressions.Weights("w_f1", size=(128, 128), rng=rng)
+    return expressions.Weights("w_f1", size=(128, 128), init_type="he", rng=rng)
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def test_beta_reset(beta_class):
 
 def test_beta_update(beta_class):
     b_cost = beta_class
-    assert b_cost.Beta.get_value() == 1.0
+    assert b_cost.beta.get_value() == 1.0
     assert b_cost().get_value() == 1.0
     assert b_cost.get_value() == 1.0
     f = function(
@@ -77,7 +77,7 @@ def test_weight_constructor(weight_class):
         new_weight = expressions.Weights("nw", (2,))
 
     with pytest.raises(ValueError):
-        new_weight = expressions.Weights("nw", (5, 5), np.eye(3))
+        new_weight = expressions.Weights("nw", (5, 5), init_value=np.eye(3))
 
 
 def test_weight_init(rng):

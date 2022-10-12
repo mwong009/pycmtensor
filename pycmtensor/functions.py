@@ -4,7 +4,7 @@ import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
 
-from pycmtensor import log
+from .logger import log
 
 
 def logit(utility: list, avail: list = None):
@@ -16,7 +16,10 @@ def logit(utility: list, avail: list = None):
             are provided, defaults to 1 for all availabilities.
 
     Returns:
-        TensorVariable: A :math:`NxM` matrix of probabilities.
+        TensorVariable: A NxM matrix of probabilities.
+
+    Note:
+        The 0-th dimension is the numbering of alternatives.
     """
 
     if isinstance(utility, (list, tuple)):
@@ -30,8 +33,9 @@ def logit(utility: list, avail: list = None):
     prob = aet.nnet.softmax(U, axis=0)
     if avail != None:
         AV = aet.stack(avail)
-        assert prob.ndim == AV.ndim
-        prob *= AV
+        while AV.ndim < prob.ndim:
+            AV = aet.expand_dims(AV, 1)
+        prob = prob * AV
         prob = prob / aet.sum(prob, axis=0, keepdims=1)
     return prob
 
@@ -41,12 +45,15 @@ def log_likelihood(prob, y):
 
     Args:
         prob (TensorVariable): matrix describing the choice probabilites
-        y (TensorVariable): ground truth referencing the choice column
+        y (TensorVariable): ``TensorVariable`` referencing the choice column
 
     Returns:
-        TensorVariable: symbolic scalar representation of the log likelihood
+        TensorVariable: a symbolic representation of the log likelihood with ndim=0.
+
+    Note:
+        The 0-th dimension is the numbering of alternatives.
     """
-    return aet.sum(aet.log(prob)[y, aet.arange(y.shape[0])])
+    return aet.sum(aet.log(prob)[y, ..., aet.arange(y.shape[0])])
 
 
 def rmse(y_est, y):
@@ -187,29 +194,18 @@ def errors(prob, y):
     """Symbolic representation of the prediction as a percentage error.
 
     Args:
-        prob (TensorVariable): Matrix describing the choice probabilites.
-        y (TensorVariable): The ``TensorVariable`` referencing the choice column.
-
-    Raises:
-        TypeError: ``y`` should have the same shape as ``pred``.
-        NotImplementedError: ``y`` should be an ``int`` Type.
+        prob (TensorVariable): matrix describing the choice probabilites
+        y (TensorVariable): The ``TensorVariable`` referencing the choice column
 
     Returns:
-        TensorVariable: a symbolic representation of the prediction error with ndim=0.
+        TensorVariable: the mean prediction error over the input ``y``
     """
-    if prob.ndim > 2:
-        prob = aet.reshape(prob, [prob.shape[0], y.shape[0], -1])
-        prob = aet.mean(prob, axis=-1)
     pred = aet.argmax(prob, axis=0)
 
-    if y.ndim != pred.ndim:
-        msg = f"y should have the same shape as pred. y.ndim: {y.ndim}, pred.ndim: {pred.ndim}"
-        log(40, msg)
-        raise ValueError(msg)
     if y.dtype.startswith("int"):
         return aet.mean(aet.neq(pred, y))
     else:
-        raise NotImplementedError(f"y should be an int Type", ("y.dtype:", y.dtype))
+        raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
 def hessians(ll, params):
