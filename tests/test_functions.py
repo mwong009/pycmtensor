@@ -130,10 +130,6 @@ class TestFunctions:
             y_test = aet.vector("y")
             functions.errors(prob, y_test)
 
-        with pytest.raises(ValueError):
-            y_test = aet.imatrix("y")
-            functions.errors(prob, y_test)
-
     def test_hessians(self, mnl_model):
         h = functions.hessians(mnl_model.ll, mnl_model.betas)
         assert h.ndim == 2

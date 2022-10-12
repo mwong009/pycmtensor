@@ -326,7 +326,7 @@ class Sigma(Beta):
 
 
 class Weights(Expressions, ModelParam):
-    def __init__(self, name, size, init_type="he", init_value=None, rng=None):
+    def __init__(self, name, size, init_type=None, init_value=None, rng=None):
         """Class object for Neural Network weights
 
         Args:
@@ -356,15 +356,20 @@ class Weights(Expressions, ModelParam):
         n_in, n_out = size
 
         if init_value is None:
-            if init_type == "he":
+            if init_type is None:
+                log(10, f"using default initialization for {name}")
+                init_value = self.rng.uniform(-1.0, 1.0, size=size)
+            elif init_type == "he":
                 init_value = self.rng.normal(size=size) * np.sqrt(2 / n_in)
             elif init_type == "glorot":
                 init_value = self.rng.uniform(-1.0, 1.0, size) * np.sqrt(
                     6 / (n_in + n_out)
                 )
             else:
-                log(10, f"using default initialization for {name}")
-                init_value = self.rng.uniform(-1.0, 1.0, size=size)
+                log(
+                    10,
+                    f'init_type {name} not implemented yet. Options: "he" or "glorot"',
+                )
 
         if not init_value.shape == size:
             raise ValueError(f"init_value argument is not a valid array of size {size}")
