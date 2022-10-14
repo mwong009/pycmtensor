@@ -4,34 +4,38 @@ import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
 
-from pycmtensor import log
+from .logger import log
 
 
 def logit(utility: list, avail: list = None):
     """Computes the Logit function, with availability conditions.
 
     Args:
-        utility (list): List of M utility equations.
-        avail (list): List of M availability conditions. If no availabilities are
-        provided, defaults to 1 for all availabilities.
+        utility (list): list of :math:`M` utility equations
+        avail (list): list of :math:`M` availability conditions, if no availabilities
+            are provided, defaults to 1 for all availabilities.
 
     Returns:
         TensorVariable: A NxM matrix of probabilities.
+
+    Note:
+        The 0-th dimension is the numbering of alternatives.
     """
 
     if isinstance(utility, (list, tuple)):
         if (avail != None) and (len(utility) != len(avail)):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
-        U = aet.stack(utility).flatten(2)
+        U = aet.stack(utility)
     else:
         U = utility
 
     prob = aet.nnet.softmax(U, axis=0)
     if avail != None:
         AV = aet.stack(avail)
-        assert U.ndim == AV.ndim
-        prob *= AV
+        while AV.ndim < prob.ndim:
+            AV = aet.expand_dims(AV, 1)
+        prob = prob * AV
         prob = prob / aet.sum(prob, axis=0, keepdims=1)
     return prob
 
@@ -40,27 +44,98 @@ def log_likelihood(prob, y):
     """Symbolic representation of the log likelihood cost function.
 
     Args:
-        prob (TensorVariable): Matrix describing the choice probabilites.
-        y (TensorVariable): `TensorVariable`` referencing the choice column.
+        prob (TensorVariable): matrix describing the choice probabilites
+        y (TensorVariable): ``TensorVariable`` referencing the choice column
 
     Returns:
         TensorVariable: a symbolic representation of the log likelihood with ndim=0.
+
+    Note:
+        The 0-th dimension is the numbering of alternatives.
     """
-    return aet.sum(aet.log(prob)[y, aet.arange(y.shape[0])])
+    return aet.sum(aet.log(prob)[y, ..., aet.arange(y.shape[0])])
+
+
+def rmse(y_est, y):
+    """Computes the root mean squared error between pairs of observations
+
+    Args:
+        y_est (TensorVariable): model estimated values, vector
+        y (TensorVariable): ground truth values, vector
+
+    Returns:
+        TensorVariable: symbolic scalar representation of the rmse
+
+    Note:
+        Tensor is flattened to an N-vector if the input args are :math:`Nx1` matrices.
+
+        Formula:
+
+        .. math::
+
+            RMSE = \\sqrt{\\frac{1}{N}\\sum_{i=1}^N(\\hat{y}_i-y_i)^2}
+
+    """
+    if y_est.ndim != y.ndim:
+        msg = f"y_est should have the same dimensions as y. y_est.ndim: {y_est.ndim}, q.ndim: {y.ndim}"
+        log(40, msg)
+        raise ValueError(msg)
+    if y_est.ndim < 1:
+        y_est = aet.flatten(y_est)
+        y = aet.flatten(y)
+
+    return aet.sqrt(aet.mean(aet.sqr(y_est - y)))
+
+
+def mae(y_est, y):
+    """Computes the mean absolute error between pairs of observations
+
+    Args:
+        y_est (TensorVariable): model estimated values, vector
+        y (TensorVariable): ground truth values, vector
+
+    Returns:
+        TensorVariable: symbolic scalar representation of the mae
+
+    Note:
+        Tensor is flattened to an N-vector if the input args are :math:`Nx1` matrices.
+
+        Formula:
+
+        .. math::
+
+            MAE = \frac{\sum_{i=1}^N|\\hat{y}_i-y_i|}{N}
+    """
+    if y_est.ndim != y.ndim:
+        msg = f"y_est should have the same dimensions as y. y_est.ndim: {y_est.ndim}, q.ndim: {y.ndim}"
+        log(40, msg)
+        raise ValueError(msg)
+    if y_est.ndim < 1:
+        y_est = aet.flatten(y_est)
+        y = aet.flatten(y)
+
+    return aet.mean(aet.abs(y_est - y))
 
 
 def kl_divergence(p, q):
     """Computes the KL divergence loss between discrete distributions ``p`` and ``q``.
 
     Args:
-        p (TensorVariable): Output probabilities
-        q (TensorVariable): Reference probabilities
+        p (TensorVariable): model output probabilities
+        q (TensorVariable): ground truth probabilities
 
     Returns:
-        TensorVariable: a symbolic representation of the KL loss with ndim=0.
+        TensorVariable: a symbolic representation of the KL loss with
 
-    Notes:
-        loss = \sum [y_prob * log(y_prob/prob) where y_prob>0, else 0]
+    Note:
+        Formula:
+
+        .. math::
+
+            L = \\begin{cases}
+                \\sum_{i=1}^N (p_i * log(p_i/q_i)) & p>0\\\\
+                0 & p<=0
+            \\end{cases}
     """
     if p.ndim != q.ndim:
         msg = f"p should have the same shape as q. p.ndim: {p.ndim}, q.ndim: {q.ndim}"
@@ -73,22 +148,22 @@ def kl_multivar_norm(m0, v0, m1, v1):
     """Computes the KL divergence loss between two multivariate normal distributions.
 
     Args:
-        m0: mean vector of the first Normal m.v. distribution $N_0$
-        v0: (co-)variance matrix of the first Normal m.v. distribution $N_0$
-        m1: mean vector of the second Normal m.v. distribution $N_1$
-        v1: (co-)variance of the second Normal m.v. distribution $N_1$
+        m0: mean vector of the first Normal m.v. distribution :math:`N_0`
+        v0: (co-)variance matrix of the first Normal m.v. distribution :math:`N_0`
+        m1: mean vector of the second Normal m.v. distribution :math:`N_1`
+        v1: (co-)variance of the second Normal m.v. distribution :math:`N_1`
 
-    Notes:
+    Note:
         If m0 and v0 are 0 and 1 respectively, returns a univariate norm solution.
         If m1 and v1 are 0 and 1 respectively, computes a simplified version of the multivariate norm.
 
         k = dimension of the distribution.
 
-        Formula: $$
-        D_{KL}(N_0||N_1) = 0.5 * (ln(|v_1|/|v_0|) + trace(v_1^{-1} * v_0) +
-            (m_1-m_0)^T * v_1^{-1} * (m_1-m_0) - k)
-        $$
+        Formula:
 
+        .. math::
+
+            D_{KL}(N_0||N_1) = 0.5 * \Big(\\ln\big(\\frac{|v_1|}{|v_0|}\big) + trace(v_1^{-1} v_0) + (m_1-m_0)^T v_1^{-1} (m_1-m_0) - k\Big)
     """
     if not (
         (m0.ndim >= m1.ndim)
@@ -119,29 +194,18 @@ def errors(prob, y):
     """Symbolic representation of the prediction as a percentage error.
 
     Args:
-        prob (TensorVariable): Matrix describing the choice probabilites.
-        y (TensorVariable): The ``TensorVariable`` referencing the choice column.
-
-    Raises:
-        TypeError: ``y`` should have the same shape as ``pred``.
-        NotImplementedError: ``y`` should be an ``int`` Type.
+        prob (TensorVariable): matrix describing the choice probabilites
+        y (TensorVariable): The ``TensorVariable`` referencing the choice column
 
     Returns:
-        TensorVariable: a symbolic representation of the prediction error with ndim=0.
+        TensorVariable: the mean prediction error over the input ``y``
     """
-    if prob.ndim > 2:
-        prob = aet.reshape(prob, [prob.shape[0], y.shape[0], -1])
-        prob = aet.mean(prob, axis=-1)
     pred = aet.argmax(prob, axis=0)
 
-    if y.ndim != pred.ndim:
-        msg = f"y should have the same shape as pred. y.ndim: {y.ndim}, pred.ndim: {pred.ndim}"
-        log(40, msg)
-        raise ValueError(msg)
     if y.dtype.startswith("int"):
         return aet.mean(aet.neq(pred, y))
     else:
-        raise NotImplementedError(f"y should be an int Type", ("y.dtype:", y.dtype))
+        raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
 def hessians(ll, params):

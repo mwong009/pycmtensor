@@ -4,16 +4,18 @@ import aesara
 import aesara.tensor as aet
 import numpy as np
 from aesara import pprint
+from aesara.tensor.random.utils import RandomStream
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor import log
+
+from .logger import log
 
 FLOATX = aesara.config.floatX
 
 
 class ExpressionParser:
-    """Base class for the Expression Parser object"""
+    """Base class for the ExpressionParser object"""
 
     def __init__(self):
         pass
@@ -22,7 +24,7 @@ class ExpressionParser:
         """Returns a list of str words found in expression
 
         Args:
-            expression: The symbolic Tensor object to parse
+            expression (TensorVariable): the symbolic Tensor object to parse
         """
         if isinstance(expression, str):
             stdout = expression
@@ -242,7 +244,8 @@ class Expressions:
 
 
 class ModelParam:
-    def __init__(self, name, rng=None):
+
+    def __init__(self, name: str, rng=None):
         """Constructor for model param object"""
         self._name = name
 
@@ -254,10 +257,11 @@ class ModelParam:
 
     @property
     def name(self):
+        """Returns the name of the object"""
         return self._name
 
     def __call__(self):
-        """Returns the shared value of the Model parameter object"""
+        """Returns the shared value"""
         return self.shared_var
 
     def __repr__(self):
@@ -273,22 +277,20 @@ class ModelParam:
 
 
 class Beta(Expressions, ModelParam):
-    """Class object for Beta parameters"""
-
-    def __init__(self, name, value=0.0, lowerbound=None, upperbound=None, status=0):
-        """Constructor for Beta class object
+    def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
+        """Class object for Beta parameters
 
         Args:
             name (str): name of the Beta class object
             value (float): initial starting value. Defaults to ``0``
-            lowerbound (float): lowerbound value. Defaults to ``None``
-            upperbound (float): upperbound value. Defaults to ``None``
+            lb (float): lowerbound value. Defaults to ``None``
+            ub (float): upperbound value. Defaults to ``None``
             status (int): whether to estimate (0) this Beta expression or not (1).
         """
         ModelParam.__init__(self, name)
         self._status = status
-        self.lb = lowerbound
-        self.ub = upperbound
+        self.lb = lb
+        self.ub = ub
         self._init_value = np.asarray(value, dtype=FLOATX)
         self.reset_value()
 
@@ -306,33 +308,47 @@ class Beta(Expressions, ModelParam):
         return self._status
 
     @property
-    def Beta(self):
+    def beta(self):
+        return self.shared_var
+
+
+class Sigma(Beta):
+    def __init__(self, name, value=1.0, ub=None, status=0, dist="NORMAL"):
+        super().__init__(name, value, 0, ub, status)
+        self._dist = dist
+        self.srng = RandomStream(seed=42069)
+
+    @property
+    def dist(self):
+        return self._dist
+
+    @property
+    def sigma(self):
         return self.shared_var
 
 
 class Weights(Expressions, ModelParam):
-    """Class object for Neural Network weights"""
-
-    def __init__(self, name, size, init_value=None, rng=None, init_type="he"):
-        """Constructor for neural network weights
+    def __init__(self, name, size, init_type=None, init_value=None, rng=None):
+        """Class object for Neural Network weights
 
         Args:
             name (str): name of the weight
             size (tuple, list): array size of the weight, ndim=2
+            init_type (str): initialization type, see notes
             init_value (numpy.ndarray, optional): initial value of the weights
-            rng (numpy.random.Genrator): random generator
-            type (str): initialization type, see notes
+            rng (numpy.random.Generator, optional): random generator
 
         Note:
             Initialization types are one of the following:
-            - "he": initialization method for neural networks that takes into account
-              the non-linearity of activation functions, e.g. ReLU or Softplus [1]
-            - "glorot": initialization method that maintains the variance for
-              symmetric activation functions, e.g. sigm, tanh [2]
 
-        Refs:
-            [1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
-            [2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
+            * "he": initialization method for neural networks that takes into account
+              the non-linearity of activation functions, e.g. ReLU or Softplus [#]_
+
+            * "glorot": initialization method that maintains the variance for
+              symmetric activation functions, e.g. sigm, tanh [#]_
+
+            .. [#] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
+            .. [#] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
         """
         ModelParam.__init__(self, name, rng)
         if not ((len(size) == 2) and isinstance(size, (list, tuple))):
@@ -343,15 +359,20 @@ class Weights(Expressions, ModelParam):
         n_in, n_out = size
 
         if init_value is None:
-            if init_type == "he":
+            if init_type is None:
+                log(10, f"using default initialization for {name}")
+                init_value = self.rng.uniform(-1.0, 1.0, size=size)
+            elif init_type == "he":
                 init_value = self.rng.normal(size=size) * np.sqrt(2 / n_in)
             elif init_type == "glorot":
                 init_value = self.rng.uniform(-1.0, 1.0, size) * np.sqrt(
                     6 / (n_in + n_out)
                 )
             else:
-                log(10, f"using default initialization for {name}")
-                init_value = self.rng.uniform(-1.0, 1.0, size=size)
+                log(
+                    10,
+                    f'init_type {name} not implemented yet. Options: "he" or "glorot"',
+                )
 
         if not init_value.shape == size:
             raise ValueError(f"init_value argument is not a valid array of size {size}")

@@ -90,7 +90,7 @@ jupyter_execute_notebooks = "off"
 
 # -- Options for myst-parser -------------------------------------------------
 
-myst_enable_extensions = ["colon_fence"]
+myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath"]
 
 # -- Options for autoapi -----------------------------------------------------
 

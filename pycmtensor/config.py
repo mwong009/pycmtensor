@@ -9,9 +9,10 @@ import sys
 
 import numpy as np
 
-from pycmtensor import log
-
+from .logger import log
 from .scheduler import *
+
+__all__ = ["Config"]
 
 
 def generate_blas_flags():
@@ -88,9 +89,8 @@ def init_environment_variables():
 
 
 class Config:
-    """Class object to store config and hyperparameters"""
-
     def __init__(self):
+        """Class object to store config and hyperparameters"""
         self.rng = np.random.default_rng()
         self.info = {
             "python_version": sys.version,
@@ -133,10 +133,12 @@ class Config:
         return self.hyperparameters
 
     def set_hyperparameter(self, key: str, value):
+        """Helper command to set hyperparameters to ``key: value``"""
         self.hyperparameters[key] = value
         log(10, f"set {key}={value}")
 
     def set_lr_scheduler(self, scheduler):
+        """Sets the config option ``lr_scheduler`` and ``base_learning rate``"""
         if not isinstance(scheduler, Scheduler):
             raise TypeError(
                 f"{type(scheduler)} is not a {Scheduler} instance, perhaps missing arguments?"
