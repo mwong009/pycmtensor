@@ -338,14 +338,15 @@ class Weights(Expressions, ModelParam):
 
         Note:
             Initialization types are one of the following:
-            - "he": initialization method for neural networks that takes into account
-              the non-linearity of activation functions, e.g. ReLU or Softplus [1]
-            - "glorot": initialization method that maintains the variance for
-              symmetric activation functions, e.g. sigm, tanh [2]
 
-        Refs:
-            [1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
-            [2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
+            * "he": initialization method for neural networks that takes into account
+              the non-linearity of activation functions, e.g. ReLU or Softplus [#]_
+
+            * "glorot": initialization method that maintains the variance for
+              symmetric activation functions, e.g. sigm, tanh [#]_
+
+            .. [#] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
+            .. [#] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
         """
         ModelParam.__init__(self, name, rng)
         if not ((len(size) == 2) and isinstance(size, (list, tuple))):
