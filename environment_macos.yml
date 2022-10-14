@@ -1,6 +1,6 @@
 name: pycmtensor-dev
 dependencies:
-    - python==3.9.12
+    - python=3.9
     - mkl-service
     - Clang
 
