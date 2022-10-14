@@ -8,6 +8,7 @@ from aesara.tensor.random.utils import RandomStream
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
+
 from .logger import log
 
 FLOATX = aesara.config.floatX
@@ -243,6 +244,7 @@ class Expressions:
 
 
 class ModelParam:
+
     def __init__(self, name: str, rng=None):
         """Constructor for model param object"""
         self._name = name
