@@ -1,3 +1,18 @@
+## v1.2.0 (2022-10-14)
+
+### Feat
+
+- **expressions**: added Weights class object (#59)
+- **functions**: added rmse and mae objective functions (#58)
+- batch shuffle for training
+- **function**: added KL divergence loss function (#50)
+
+### Fix
+
+- added expand_dims into logit function
+- replace class function Beta.Beta with Beta.beta
+- removed flatten() from logit function
+
 ## v1.1.0 (2022-09-23)
 
 ### Feat
@@ -16,41 +31,45 @@
 
 ## v1.0.7 (2022-08-12)
 
-### Refactor
-
-- **models**: refactored build_functions() into models.py
-
 ### Fix
 
 - **config**: added optimizing speedups to config
 
-## v1.0.6 (2022-08-12)
-
 ### Refactor
 
-- **database**: refactor set_choice(choiceVar)
+- **models**: refactored build_functions() into models.py
+
+## v1.0.6 (2022-08-12)
 
 ### Fix
 
 - **config**: set default `cyclic_lr_mode` and `cyclic_lr_step_size` to `None`
 - **pre-commit-config**: update black to `22.6.0` in pre-commit check
 
+### Refactor
+
+- **database**: refactor set_choice(choiceVar)
+
 ## v1.0.5 (2022-07-27)
 
 ### Fix
 
 - **tests**: removed depreciated tests
-- **routine**: remove depreciated tqdm module
 
 ## v1.0.4 (2022-07-27)
 
 ### Fix
 
+- **routine**: remove depreciated tqdm module
 - **pycmtensor.py**: update training method
 - **config.py**: new config option verbosity: "high", "low"
 - **pycmtensor.py**: remove warnings for max_iter<patience
 
 ## v1.0.3 (2022-05-12)
+
+## v1.0.2 (2022-05-12)
+
+## v1.0.1 (2022-05-12)
 
 ### Fix
 
@@ -89,6 +108,10 @@
 
 ## v0.7.0 (2022-03-17)
 
+### Feat
+
+- **models**: add functionality to compute elasticities of choice vs attribute in models.py
+
 ### Fix
 
 - **results**: remove unnessary `show_weights` option in Results
@@ -97,10 +120,6 @@
 - **scheduler**: modified cyclic_lr config loading sequence to fix unboundError
 - **train**: turn saving model off for now
 - **config**: generate os dependent ld_flags
-
-### Feat
-
-- **models**: add functionality to compute elasticities of choice vs attribute in models.py
 
 ### Refactor
 
@@ -123,15 +142,15 @@
 
 ## v0.6.4 (2022-03-13)
 
+### Feat
+
+- **scheduler.py**: add new scheduler (CyclicLR) for adaptive LR
+
 ### Fix
 
 - **project**: fix project metadata and ci
 - **config**: loadout config from train() to configparser
 - **utils**: fix TypeError check
-
-### Feat
-
-- **scheduler.py**: add new scheduler (CyclicLR) for adaptive LR
 
 ## v0.5.0 (2022-03-02)
 
