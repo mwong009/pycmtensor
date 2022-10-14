@@ -9,9 +9,10 @@ import sys
 
 import numpy as np
 
-from pycmtensor import log
-
+from .logger import log
 from .scheduler import *
+
+__all__ = ["Config"]
 
 
 def generate_blas_flags():
@@ -88,16 +89,15 @@ def init_environment_variables():
 
 
 class Config:
-    """Class object to store config and hyperparameters"""
-
     def __init__(self):
+        """Class object to store config and hyperparameters"""
         self.rng = np.random.default_rng()
         self.info = {
             "python_version": sys.version,
             "directory": os.getcwd(),
         }
         self.hyperparameters = {
-            "seed": self.rng.integers(1, 9000),
+            "seed": int(self.rng.integers(1, 9000)),
             "patience": 4000,
             "patience_increase": 2,
             "validation_threshold": 1.005,
@@ -107,6 +107,7 @@ class Config:
             "max_steps": 1000,
             "clr_cycle_steps": 16,
             "clr_gamma": None,
+            "batch_shuffle": False,
         }
         self.hyperparameters["lr_scheduler"] = ConstantLR(self["base_learning_rate"])
         self.aesara_rc = init_aesara_rc()
@@ -132,10 +133,12 @@ class Config:
         return self.hyperparameters
 
     def set_hyperparameter(self, key: str, value):
+        """Helper command to set hyperparameters to ``key: value``"""
         self.hyperparameters[key] = value
         log(10, f"set {key}={value}")
 
     def set_lr_scheduler(self, scheduler):
+        """Sets the config option ``lr_scheduler`` and ``base_learning rate``"""
         if not isinstance(scheduler, Scheduler):
             raise TypeError(
                 f"{type(scheduler)} is not a {Scheduler} instance, perhaps missing arguments?"
@@ -157,3 +160,9 @@ class Config:
             self["clr_gamma"] = scheduler.gamma
         else:
             self["clr_gamma"] = None
+
+    def check_values(self):
+        """Checks validity of hyperparameter values"""
+        assert isinstance(self["seed"], (int, np.int64))
+        assert isinstance(self["batch_shuffle"], bool)
+        assert (self["clr_gamma"] is None) or (isinstance(self["clr_gamma"], float))

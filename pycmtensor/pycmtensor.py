@@ -5,11 +5,11 @@ from collections import OrderedDict
 
 import dill as pickle
 import numpy as np
-import pandas as pd
 
-from pycmtensor import config, log, rng
+from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weights
+from .logger import log
 from .results import Results
 from .utils import time_format
 
@@ -115,6 +115,7 @@ class PyCMTensorModel:
 
     def train(self, db, steps=np.inf, k=0):
         """Function to train the model"""
+        self.config.check_values()  # assert config.hyperparameters
 
         # [train-start]
         lr_scheduler = self.config["lr_scheduler"]
@@ -152,6 +153,7 @@ class PyCMTensorModel:
         done_looping = False
         step = 0
         iteration = 0
+        shift = 0
 
         # set learning rate
         learning_rate = lr_scheduler(step)
@@ -164,7 +166,7 @@ class PyCMTensorModel:
 
             # loop over batch
             learning_rate = lr_scheduler(step)
-            for _ in range(n_train_batches):
+            for index in range(n_train_batches):
                 if patience <= iteration:
                     done_looping = True
                     log(10, f"Early stopping... (s={step})")
@@ -174,8 +176,9 @@ class PyCMTensorModel:
                 iteration += 1
 
                 # set index and shift slices
-                index = rng.integers(0, n_train_batches)
-                shift = rng.integers(0, batch_size)
+                if self.config["batch_shuffle"]:
+                    index = rng.integers(0, n_train_batches)
+                    shift = rng.integers(0, batch_size)
 
                 # get data slice from dataset
                 batch_data = db.pandas.inputs(

@@ -4,16 +4,26 @@ import aesara
 import aesara.tensor as aet
 import numpy as np
 import pandas as pd
+from aesara.tensor.var import TensorVariable
 
-from pycmtensor import config, log
+from pycmtensor import config
+
+from .logger import log
+
+__all__ = ["Data", "FLOATX"]
+
 
 FLOATX = aesara.config.floatX
 
 
 class Data:
-    """Base Data class object"""
-
     def __init__(self, df: pd.DataFrame, choice: str):
+        """Base Data class object
+
+        Args:
+            df (pandas.DataFrame): the input Pandas dataframe
+            choice (str): column string name of the choice dependent variable
+        """
         self.seed = config["seed"]
         self.split_frac = None
         self.k_fold = None
@@ -23,6 +33,7 @@ class Data:
 
         self.tensor = Variables(choice)
         self.pandas = PandasDataFrame(df, choice)
+        self.shared = SharedVariables()
 
         for column in self.pandas.columns:
             if column == choice:
@@ -44,7 +55,7 @@ class Data:
     def all(self):
         return self.tensor.all
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, item: str) -> TensorVariable:
         if item in [x.name for x in self.all]:
             return self.tensor[item]
 
@@ -57,6 +68,14 @@ class Data:
         """Returns the lenth of the DataFrame object"""
         return len(self.pandas())
 
+    def get_train_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
+        """Alias to get train data slice from self.pandas.inputs()"""
+        return self.pandas.inputs(tensors, index, batch_size, shift, "train", k)
+
+    def get_valid_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
+        """Alias to get valid data slice from self.pandas.inputs()"""
+        return self.pandas.inputs(tensors, index, batch_size, shift, "valid", k)
+
     def scale_data(self, **kwargs):
         """Scales data values by data/scale from ``kwargs:{column=scale}``"""
         for key, scale in kwargs.items():
@@ -68,7 +87,7 @@ class Data:
         """Autoscale variable values to within -10.0 < x < 10.0
 
         Args:
-                        except_for (list): list of str to skip autoscaling
+            except_for (list[str]): list of column labels to skip autoscaling step
         """
         x_columns = [x.name for x in self.x]
         if type(except_for) != type([]):
@@ -102,9 +121,13 @@ class Data:
 
 
 class PandasDataFrame:
-    """Class object to store Pandas DataFrames"""
-
     def __init__(self, df: pd.DataFrame, choice: str):
+        """Class object to store Pandas DataFrame.
+
+        Args:
+            df (pandas.DataFrame): the input Pandas dataframe
+            choice (str): column string name of the choice dependent variable
+        """
         self.pandas = df
         if choice not in self.pandas.columns:
             raise ValueError(f"{choice} is not found in dataframe.")
@@ -157,6 +180,7 @@ class PandasDataFrame:
         return datalist
 
     def split_pandas(self, seed, split_frac):
+        """Function to split the pandas dataset into train and valid splits"""
         df = self.pandas
         df = df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
         n_train_samples = round(len(df) * split_frac)
@@ -167,9 +191,12 @@ class PandasDataFrame:
 
 
 class Variables:
-    """Class object to store TensorVariables"""
-
     def __init__(self, choice: str):
+        """Class object to store TensorVariable.
+
+        Args:
+            choice (str): column string name of the choice dependent variable
+        """
         self.variables = {}
         self.choice = choice
 
@@ -202,5 +229,20 @@ class Variables:
 
     @property
     def all(self) -> list[aet.TensorVariable]:
-        """Returns all ``TensorVariable``"""
+        """Returns all ``TensorVariable`` objects"""
         return self.x + [self.y]
+
+
+class SharedVariables:
+    def __init__(self):
+        """Class object to store TensorSharedVariables"""
+        pass
+
+    def __getitem__(self):
+        pass
+
+    def __setitem__(self):
+        pass
+
+    def add_item(self):
+        pass

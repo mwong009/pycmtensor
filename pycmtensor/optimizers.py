@@ -3,7 +3,7 @@
 import aesara
 import aesara.tensor as aet
 
-floatX = aesara.config.floatX
+from .data import FLOATX
 
 
 class Optimizer:
