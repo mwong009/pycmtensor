@@ -7,13 +7,38 @@ import numpy as np
 from .logger import log
 
 
+def exp_mov_average(batch_mean, moving_mean, alpha=0.1):
+    """Calculates the exponential moving average (EMA) of a new minibatch
+
+    args:
+        batch_mean (TensorVariable): the new batch value of the mean
+        moving_mean (TensorVariable): the moving value of the accumulated mean
+        alpha (float): the moving average factor of the batch mean
+
+    returns:
+        TensorVariable: the new moving average
+
+    note:
+        The moving average will decay by the difference between the existing value
+        and the new value multiplied by the moving average factor. A higher ``alpha``
+        value results in faster changing moving average.
+
+        Formula:
+
+        .. math::
+
+            x_{EMA} = \\alpha * x_t + x_{EMA} * (1-\\alpha)
+    """
+    return batch_mean * alpha + moving_mean * (1 - alpha)
+
+
 def logit(utility: list, avail: list = None):
     """Computes the Logit function, with availability conditions.
 
     Args:
         utility (list): list of :math:`M` utility equations
-        avail (list): list of :math:`M` availability conditions, if no availabilities
-            are provided, defaults to 1 for all availabilities.
+        avail (list): list of :math:`M` availability conditions, if no availability
+            conditions are provided, defaults to 1 for all availabilities.
 
     Returns:
         TensorVariable: A NxM matrix of probabilities.
