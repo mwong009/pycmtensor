@@ -4,7 +4,7 @@ import timeit
 import aesara.tensor as aet
 from aesara import function, pprint
 
-from ..functions import bhhh, errors, gnorm, hessians, log_likelihood, logit
+from ..functions import log_likelihood, logit
 from ..logger import log
 from ..optimizers import Adam
 from ..pycmtensor import PyCMTensorModel
@@ -43,72 +43,29 @@ class MNL(PyCMTensorModel):
 
         # define the optimizer for the model
         self.opt = optimizer(self.params)
-        updates = self.opt.update(self.cost, self.params, self.learning_rate)
+        self.updates += self.opt.update(self.cost, self.params, self.learning_rate)
 
         # define the update function to update the parameters wrt to the cost
         self.update_wrt_cost = function(
+            name="update_wrt_cost",
             inputs=self.inputs + [self.learning_rate],
             outputs=self.cost,
-            updates=updates,
-            on_unused_input="ignore",
-            name="update_wrt_cost",
+            updates=self.updates,
         )
 
         # define the function to output the log likelihood of the model
         self.loglikelihood = function(
+            name="loglikelihood",
             inputs=self.inputs,
             outputs=self.ll,
-            on_unused_input="ignore",
-            name="loglikelihood",
         )
 
-        # define the function to output the predicted probabilities given inputs
-        self.choice_probabilities = function(
-            inputs=self.inputs,
-            outputs=self.p_y_given_x.T,
-            on_unused_input="ignore",
-            name="choice_probabilities",
-        )
-
-        # define the function to output the discrete choice predictions
-        self.choice_predictions = function(
-            inputs=self.inputs,
-            outputs=self.pred,
-            on_unused_input="ignore",
-            name="choice_predictions",
-        )
-
-        # define the function to output the choice prediction error
-        self.prediction_error = function(
-            inputs=self.inputs,
-            outputs=errors(self.p_y_given_x, self.y),
-            on_unused_input="ignore",
-            name="errors",
-        )
-
-        # define the function to ouput the Hessian matrix or the 2nd-order partial
-        # derivatives
-        self.H = function(
-            inputs=self.inputs,
-            outputs=hessians(self.ll, self.betas),
-            on_unused_input="ignore",
-            name="Hessian matrix",
-        )
-
-        # define he Berndt–Hall–Hall–Hausman (BHHH) algorithm output function
-        self.BHHH = function(
-            inputs=self.inputs,
-            outputs=bhhh(self.ll, self.betas),
-            on_unused_input="ignore",
-            name="BHHH matrix",
-        )
-
-        # define the function to output the gradient norm
-        self.gradient_norm = function(
-            inputs=self.inputs,
-            outputs=gnorm(self.cost, self.betas),
-            on_unused_input="ignore",
-        )
+        self.model_choice_probabilities()
+        self.model_choice_predictions()
+        self.model_prediction_error()
+        self.model_H()
+        self.model_BHHH()
+        self.model_gnorm()
 
         build_time = round(timeit.default_timer() - start_time, 3)
         self.results.build_time = time_format(build_time)

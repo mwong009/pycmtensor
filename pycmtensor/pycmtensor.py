@@ -5,10 +5,12 @@ from collections import OrderedDict
 
 import dill as pickle
 import numpy as np
+from aesara import function
 
 from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weights
+from .functions import bhhh, errors, gnorm, hessians
 from .logger import log
 from .results import Results
 from .utils import time_format
@@ -20,9 +22,10 @@ class PyCMTensorModel:
     def __init__(self, db):
         self.name = "PyCMTensorModel"
         self.config = config
-        self.params = []  # keep track of all params
+        self.params = []  # keep track of all the params
         self.betas = []  # keep track of the Betas
         self.weights = []  # keep track of the Weights
+        self.updates = []  # keep track of the updates
         self.inputs = db.all
         self.results = Results()
 
@@ -104,6 +107,63 @@ class PyCMTensorModel:
         """Resets param values to their initial values"""
         for p in self.params:
             p.reset_value()
+
+    def model_choice_probabilities(self):
+        """Loads the function to ``self.choice_probabilities()`` to output discrete
+        choice probabilities. Axes of outputs are swapped"""
+        self.choice_probabilities = function(
+            name="choice probabilities",
+            inputs=self.inputs,
+            outputs=self.p_y_given_x.swapaxes(0, 1),
+        )
+
+    def model_choice_predictions(self):
+        """Loads the function to ``self.choice_predictions()`` to output discrete
+        choice predictions"""
+        self.choice_predictions = function(
+            name="choice predictions",
+            inputs=self.inputs,
+            outputs=self.pred,
+        )
+
+    def model_prediction_error(self):
+        """Loads the function to ``self.prediction_error()`` to output the model error
+        wrt inputs"""
+        self.prediction_error = function(
+            name="prediction error",
+            inputs=self.inputs,
+            outputs=errors(self.p_y_given_x, self.y),
+        )
+
+    def model_H(self):
+        """Loads the function to ``self.H()`` to calculate the Hessian matrix or the
+        2nd-order partial derivatives of the model.
+        """
+        self.H = function(
+            name="Hessian matrix",
+            inputs=self.inputs,
+            outputs=hessians(self.ll, self.betas),
+        )
+
+    def model_BHHH(self):
+        """Loads the function to ``self.BHHH()`` to calculate the Berndt-Hall-Hall-
+        Hausman (BHHH) approximation.
+        """
+        self.BHHH = function(
+            name="BHHH matrix",
+            inputs=self.inputs,
+            outputs=bhhh(self.ll, self.betas),
+        )
+
+    def model_gnorm(self):
+        """Loads the function to ``self.gradient_norm()`` to calculate the gradient
+        norm of the model cost function.
+        """
+        self.gradient_norm = function(
+            name="Gradient norm",
+            inputs=self.inputs,
+            outputs=gnorm(self.cost, self.betas),
+        )
 
     def predict(self, db, return_choices=True, split_type=None):
         """Returns the predicted choice probabilites"""
