@@ -331,7 +331,7 @@ class Weights(Expressions, ModelParam):
 
         Args:
             name (str): name of the weight
-            size (tuple, list): array size of the weight, ndim=2
+            size (tuple, list): array size of the weight
             init_type (str): initialization type, see notes
             init_value (numpy.ndarray, optional): initial value of the weights
             rng (numpy.random.Generator, optional): random generator
@@ -376,12 +376,17 @@ class Weights(Expressions, ModelParam):
             raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_value = init_value
+        self._init_type = init_type
         self._shape = size
         self.reset_value()
 
     @property
     def init_value(self):
         return self._init_value
+
+    @property
+    def init_type(self):
+        return self._init_type
 
     @property
     def shape(self):
