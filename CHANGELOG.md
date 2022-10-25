@@ -1,3 +1,16 @@
+## v1.2.1 (2022-10-25)
+
+### Feat
+
+- added ``pycmtensor.about()`` to output package metadata
+- added EMA function ``functions.exp_mov_average()``
+
+### Fix
+
+- updated syntax for ``expressions.py`` class objects
+- added ``init_type`` property to ``Weights`` class
+- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
+
 ## v1.2.0 (2022-10-14)
 
 ### Feat

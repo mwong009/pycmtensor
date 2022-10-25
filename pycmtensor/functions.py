@@ -7,18 +7,18 @@ import numpy as np
 from .logger import log
 
 
-def exp_mov_average(batch_mean, moving_mean, alpha=0.1):
+def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     """Calculates the exponential moving average (EMA) of a new minibatch
 
-    args:
-        batch_mean (TensorVariable): the new batch value of the mean
-        moving_mean (TensorVariable): the moving value of the accumulated mean
+    Args:
+        batch_avg (TensorVariable): the new batch value of the mean
+        moving_avg (TensorVariable): the moving value of the accumulated mean
         alpha (float): the moving average factor of the batch mean
 
-    returns:
+    Returns:
         TensorVariable: the new moving average
 
-    note:
+    Note:
         The moving average will decay by the difference between the existing value
         and the new value multiplied by the moving average factor. A higher ``alpha``
         value results in faster changing moving average.
@@ -29,7 +29,12 @@ def exp_mov_average(batch_mean, moving_mean, alpha=0.1):
 
             x_{EMA} = \\alpha * x_t + x_{EMA} * (1-\\alpha)
     """
-    return batch_mean * alpha + moving_mean * (1 - alpha)
+
+    while moving_avg.ndim < batch_avg.ndim:
+        moving_avg = aet.expand_dims(moving_avg, -1)
+
+    ema = batch_avg * alpha + moving_avg * (1 - alpha)
+    return ema
 
 
 def logit(utility: list, avail: list = None):
@@ -129,7 +134,7 @@ def mae(y_est, y):
 
         .. math::
 
-            MAE = \frac{\sum_{i=1}^N|\\hat{y}_i-y_i|}{N}
+            MAE = \\frac{\sum_{i=1}^N|\\hat{y}_i-y_i|}{N}
     """
     if y_est.ndim != y.ndim:
         msg = f"y_est should have the same dimensions as y. y_est.ndim: {y_est.ndim}, q.ndim: {y.ndim}"
@@ -188,7 +193,7 @@ def kl_multivar_norm(m0, v0, m1, v1):
 
         .. math::
 
-            D_{KL}(N_0||N_1) = 0.5 * \Big(\\ln\big(\\frac{|v_1|}{|v_0|}\big) + trace(v_1^{-1} v_0) + (m_1-m_0)^T v_1^{-1} (m_1-m_0) - k\Big)
+            D_{KL}(N_0||N_1) = 0.5 * \\Big(\\ln\\big(\\frac{|v_1|}{|v_0|}\\big) + trace(v_1^{-1} v_0) + (m_1-m_0)^T v_1^{-1} (m_1-m_0) - k\\Big)
     """
     if not (
         (m0.ndim >= m1.ndim)
