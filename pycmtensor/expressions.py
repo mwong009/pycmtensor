@@ -8,7 +8,7 @@ from aesara.tensor.random.utils import RandomStream
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from .logger import log
+from .logger import debug
 
 FLOATX = aesara.config.floatX
 
@@ -242,31 +242,38 @@ class Expressions:
             )
 
 
-class ModelParam:
-    def __init__(self, name: str, rng=None):
+class Param(Expressions):
+    def __init__(self, name: str, value=None):
         """Constructor for model param object"""
         self._name = name
-
-        if rng is None:
-            self.rng = np.random.default_rng()
-        else:
-            assert isinstance(rng, np.random.Generator)
-            self.rng = rng
+        if value is not None:
+            if not isinstance(value, np.ndarray):
+                value = np.asarray(value)
+            self.shared_var = aesara.shared(value, name=name, borrow=True)
+            self._init_value = value
 
     @property
     def name(self):
         """Returns the name of the object"""
         return self._name
 
+    @property
+    def init_value(self):
+        return self._init_value
+
+    @property
+    def shape(self):
+        return self._init_value.shape
+
     def __call__(self):
         """Returns the shared value"""
         return self.shared_var
 
     def __repr__(self):
-        return f"{self.name}({self.shared_var.get_value()}, {type(self.shared_var)})"
+        return f"Param({self.name}, {self.shape})"
 
     def get_value(self):
-        """Returns the numpy representation of the Beta value"""
+        """Returns the numpy representation of the parameter value"""
         return self.shared_var.get_value()
 
     def reset_value(self):
@@ -274,7 +281,7 @@ class ModelParam:
         self.shared_var = aesara.shared(self.init_value, name=self.name, borrow=False)
 
 
-class Beta(Expressions, ModelParam):
+class Beta(Param):
     def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
         """Class object for Beta parameters
 
@@ -285,29 +292,20 @@ class Beta(Expressions, ModelParam):
             ub (float): upperbound value. Defaults to ``None``
             status (int): whether to estimate (0) this Beta expression or not (1).
         """
-        ModelParam.__init__(self, name)
-        self._status = status
+        Param.__init__(self, name)
         self.lb = lb
         self.ub = ub
+        self._status = status
+
         self._init_value = np.asarray(value, dtype=FLOATX)
-        self.reset_value()
-
-    @property
-    def init_value(self):
-        return self._init_value
-
-    @init_value.setter
-    def init_value(self, value):
-        self._init_value = value
-        self.reset_value()
+        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
 
     @property
     def status(self):
         return self._status
 
-    @property
-    def beta(self):
-        return self.shared_var
+    def __repr__(self):
+        return f"Beta({self.name}, {self.shape})"
 
 
 class Sigma(Beta):
@@ -320,78 +318,91 @@ class Sigma(Beta):
     def dist(self):
         return self._dist
 
-    @property
-    def sigma(self):
-        return self.shared_var
+
+class Bias(Param):
+    def __init__(self, name: str, size: tuple, init_value=None):
+        Param.__init__(self, name)
+        if not ((len(size) == 1) and isinstance(size, (list, tuple))):
+            raise ValueError(f"Invalid size argument or type")
+        if init_value is None:
+            init_value = np.zeros(size, dtype=FLOATX)
+
+        self._init_value = init_value
+        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+
+    def __repr__(self):
+        return f"Bias({self.name}, {self.shape})"
 
 
-class Weights(Expressions, ModelParam):
-    def __init__(self, name, size, init_type=None, init_value=None, rng=None):
+class Weight(Param):
+    def __init__(
+        self, name: str, size: tuple, init_type=None, init_value=None, rng=None
+    ):
         """Class object for Neural Network weights
 
         Args:
-            name (str): name of the weight
-            size (tuple, list): array size of the weight
+            name (str): name of the parameter
+            size (tuple, list): array size of the parameter
             init_type (str): initialization type, see notes
-            init_value (numpy.ndarray, optional): initial value of the weights
-            rng (numpy.random.Generator, optional): random generator
+            init_value (numpy.ndarray, optional): initial values of the parameter
+            rng (numpy.random.Generator, optional): random number generator
 
         Note:
             Initialization types are one of the following:
 
-            * "he": initialization method for neural networks that takes into account
+            * 'zeros': a 2-D array of zeros
+
+            * 'he': initialization method for neural networks that takes into account
               the non-linearity of activation functions, e.g. ReLU or Softplus [#]_
 
-            * "glorot": initialization method that maintains the variance for
+            * 'glorot': initialization method that maintains the variance for
               symmetric activation functions, e.g. sigm, tanh [#]_
 
             .. [#] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
             .. [#] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
-        """
-        ModelParam.__init__(self, name, rng)
-        if not ((len(size) == 2) and isinstance(size, (list, tuple))):
-            raise ValueError(
-                f"Invalid size argument, len(size)={len(size)}, type(size)={type(size)}"
-            )
 
+        .. hint::
+            Initialization of Weights:
+
+            .. code-block:: python
+
+               w = expressions.Weight(name="w_1", size=(3, 10), init_type="he")
+        """
+        Param.__init__(self, name)
+
+        if rng is None:
+            rng = np.random.default_rng()
+        self.rng = rng
+
+        if not ((len(size) == 2) and isinstance(size, (list, tuple))):
+            raise ValueError(f"Invalid size argument or type")
         n_in, n_out = size
 
         if init_value is None:
             if init_type is None:
-                log(10, f"using default initialization for {name}")
+                debug(f"using default initialization for {name}")
                 init_value = self.rng.uniform(-1.0, 1.0, size=size)
+            elif init_type == "zeros":
+                init_value = np.zeros(size, dtype=FLOATX)
             elif init_type == "he":
-                init_value = self.rng.normal(size=size) * np.sqrt(2 / n_in)
+                init_value = self.rng.normal(0, 1, size=size) * np.sqrt(2 / n_in)
             elif init_type == "glorot":
-                init_value = self.rng.uniform(-1.0, 1.0, size) * np.sqrt(
-                    6 / (n_in + n_out)
-                )
+                init_value = self.rng.uniform(-1, 1, size) * np.sqrt(6 / (n_in + n_out))
             else:
-                log(
-                    10,
-                    f'init_type {name} not implemented yet. Options: "he" or "glorot"',
+                debug(
+                    f"init_type {name} not implemented. Options: 'zeros', 'he' or 'glorot'"
                 )
 
         if not init_value.shape == size:
             raise ValueError(f"init_value argument is not a valid array of size {size}")
 
-        self._init_value = init_value
         self._init_type = init_type
-        self._shape = size
-        self.reset_value()
-
-    @property
-    def init_value(self):
-        return self._init_value
+        self._init_value = init_value
+        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
 
     @property
     def init_type(self):
         return self._init_type
 
-    @property
-    def shape(self):
-        return self._shape
-
-    @property
-    def W(self):
-        return self.shared_var
+    def __repr__(self):
+        return f"Weight({self.name}, {self.shape})"
