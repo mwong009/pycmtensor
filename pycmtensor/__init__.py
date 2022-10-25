@@ -5,7 +5,7 @@ __version__ = "1.2.0"
 
 import numpy as np
 
-from .config import Config
+from .config import Config, about
 from .logger import *
 
 config = Config()
