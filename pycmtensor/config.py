@@ -8,11 +8,22 @@ import subprocess
 import sys
 
 import numpy as np
+from watermark import watermark
 
 from .logger import log
 from .scheduler import *
 
 __all__ = ["Config"]
+
+
+def about():
+    return watermark(
+        python=True,
+        datename=True,
+        updated=True,
+        packages="pycmtensor,aesara,numpy,scipy",
+        machine=True,
+    )
 
 
 def generate_blas_flags():
