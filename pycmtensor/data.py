@@ -1,5 +1,7 @@
 # data.py
 """PyCMTensor data module"""
+from typing import Union
+
 import aesara
 import aesara.tensor as aet
 import numpy as np
@@ -55,9 +57,13 @@ class Data:
     def all(self):
         return self.tensor.all
 
-    def __getitem__(self, item: str) -> TensorVariable:
+    def __getitem__(self, item: Union[str, list]) -> TensorVariable:
+        if isinstance(item, list):
+            return [self.tensor[x.name] for x in self.all if x.name in item]
         if item in [x.name for x in self.all]:
             return self.tensor[item]
+        else:
+            raise ValueError(f"{item} not a valid Variable name")
 
     def split_db(self, split_frac=0.8):
         """Split database data into train and valid sets"""
@@ -139,8 +145,13 @@ class PandasDataFrame:
         self.valid_dataset = [self.pandas]
 
     def __getitem__(self, item):
-        if item not in self.pandas.columns:
-            raise ValueError(f"{item} not in PandasDataFrame class.")
+        if isinstance(item, list):
+            for i in item:
+                if i not in self.pandas.columns:
+                    raise ValueError(f"{item} not in PandasDataFrame class.")
+        else:
+            if item not in self.pandas.columns:
+                raise ValueError(f"{item} not in PandasDataFrame class.")
         return self.pandas[item]
 
     def __setitem__(self, item: str, value):
@@ -176,7 +187,7 @@ class PandasDataFrame:
         else:
             start = index * batch_size + shift
             end = (index + 1) * batch_size + shift
-            datalist = [dataset[t.name][start:end] for t in tensors]
+            datalist = [dataset[t.name].iloc[start:end] for t in tensors]
         return datalist
 
     def split_pandas(self, seed, split_frac):

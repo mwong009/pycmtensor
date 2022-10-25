@@ -9,7 +9,7 @@ from aesara import function
 
 from pycmtensor import config, rng
 
-from .expressions import Beta, ExpressionParser, Weights
+from .expressions import Beta, ExpressionParser, Weight
 from .functions import bhhh, errors, gnorm, hessians
 from .logger import log
 from .results import Results
@@ -33,7 +33,8 @@ class PyCMTensorModel:
         """Method to load locally defined variables
 
         Args:
-                params (dict or list): a dict or list of items which are :class:`expressions.Beta` or :class:`expressions.Weights`
+            params (dict or list): a dict or list of items which are
+                :class:`expressions.Beta` or :class:`expressions.Weight`
         """
         if not isinstance(params, (dict, list)):
             msg = "params must be of Type dict or list"
@@ -52,7 +53,7 @@ class PyCMTensorModel:
         symbols = ExpressionParser().parse(getattr(self, "cost"))
         seen = set()
         for _, p in params.items():
-            if not isinstance(p, (Beta, Weights)):
+            if not isinstance(p, (Beta, Weight)):
                 continue
 
             if p.name in seen:
