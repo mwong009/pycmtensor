@@ -47,15 +47,8 @@ def test_beta_constructor(beta_class):
         b_cost.status = 1
 
 
-def test_beta_reset(beta_class):
-    b_cost = beta_class
-    b_cost.init_value = 5.0
-    assert b_cost.get_value() == 5.0
-
-
 def test_beta_update(beta_class):
     b_cost = beta_class
-    assert b_cost.beta.get_value() == 1.0
     assert b_cost().get_value() == 1.0
     assert b_cost.get_value() == 1.0
     f = function(
@@ -71,7 +64,7 @@ def test_beta_update(beta_class):
 def test_weight_constructor(weight_class):
     w = weight_class
     assert w.shape == (128, 128)
-    assert isinstance(w.W, TensorSharedVariable)
+    assert isinstance(w(), TensorSharedVariable)
 
     with pytest.raises(ValueError):
         new_weight = expressions.Weight("nw", (2,))
