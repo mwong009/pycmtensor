@@ -2,6 +2,8 @@
 """PyCMTensor main module"""
 import timeit
 from collections import OrderedDict
+from multiprocessing.sharedctypes import Value
+from time import perf_counter
 
 import dill as pickle
 import numpy as np
@@ -11,7 +13,7 @@ from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weight
 from .functions import bhhh, errors, gnorm, hessians
-from .logger import log
+from .logger import debug, log
 from .results import Results
 from .utils import time_format
 
@@ -29,6 +31,8 @@ class PyCMTensorModel:
         self.inputs = db.all
         self.results = Results()
 
+        debug(f"Building model...")
+
     def add_params(self, params):
         """Method to load locally defined variables
 
@@ -38,7 +42,6 @@ class PyCMTensorModel:
         """
         if not isinstance(params, (dict, list)):
             msg = "params must be of Type dict or list"
-            log(40, msg)
             raise TypeError(msg)
 
         # create a dict of str(param): param, if params is given as a list
@@ -48,7 +51,7 @@ class PyCMTensorModel:
         # iterate through the dict of params:
         if not hasattr(self, "cost"):
             log(40, "No valid cost function defined.")
-            raise ReferenceError
+            raise ValueError
 
         symbols = ExpressionParser().parse(getattr(self, "cost"))
         seen = set()
@@ -80,7 +83,7 @@ class PyCMTensorModel:
         """Adds regularizer ``l_reg`` to model cost function"""
         if not hasattr(self, "cost"):
             log(40, "No valid cost function defined.")
-            raise ReferenceError
+            raise ValueError
 
         self.cost += l_reg
 
@@ -108,6 +111,15 @@ class PyCMTensorModel:
         """Resets param values to their initial values"""
         for p in self.params:
             p.reset_value()
+
+    def model_loglikelihood(self):
+        """Loads the function to ``self.loglikelihood()`` to output the loglikelihood
+        value of the model given inputs"""
+        self.loglikelihood = function(
+            name="loglikelihood",
+            inputs=self.inputs,
+            outputs=self.ll,
+        )
 
     def model_choice_probabilities(self):
         """Loads the function to ``self.choice_probabilities()`` to output discrete
@@ -220,7 +232,7 @@ class PyCMTensorModel:
         learning_rate = lr_scheduler(step)
 
         # main loop
-        start_time = timeit.default_timer()
+        start_time = perf_counter()
         log(20, f"Start (n={n_train_samples})")
 
         while (step < max_steps) and (not done_looping):
@@ -285,7 +297,7 @@ class PyCMTensorModel:
             # increment step
             step += 1
 
-        train_time = round(timeit.default_timer() - start_time, 3)
+        train_time = round(perf_counter() - start_time, 3)
         self.results.train_time = time_format(train_time)
         self.results.iterations_per_sec = round(iteration / train_time, 2)
         msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.3f}%, LL={self.results.best_loglikelihood}, S={self.results.best_step})"

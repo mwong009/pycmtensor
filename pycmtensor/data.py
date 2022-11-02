@@ -168,7 +168,7 @@ class PandasDataFrame:
         return self.pandas
 
     def inputs(
-        self, tensors, index=None, batch_size=None, shift=None, split_type=None, k=0
+        self, tensors, index=None, batch_size=None, shift=0, split_type=None, k=0
     ) -> list[pd.DataFrame]:
         """Returns a list of DataFrame corresponding to the tensors input arg."""
         if split_type is None:
@@ -185,6 +185,8 @@ class PandasDataFrame:
         if index is None:
             datalist = [dataset[t.name] for t in tensors]
         else:
+            if batch_size is None:
+                batch_size = len(dataset)
             start = index * batch_size + shift
             end = (index + 1) * batch_size + shift
             datalist = [dataset[t.name].iloc[start:end] for t in tensors]
