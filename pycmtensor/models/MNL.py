@@ -1,11 +1,11 @@
 # models.py
-import timeit
+from time import perf_counter
 
 import aesara.tensor as aet
 from aesara import function, pprint
 
 from ..functions import log_likelihood, logit
-from ..logger import log
+from ..logger import debug, log
 from ..optimizers import Adam
 from ..pycmtensor import PyCMTensorModel
 from ..utils import time_format
@@ -19,8 +19,7 @@ class MNL(PyCMTensorModel):
         self.learning_rate = aet.scalar("learning_rate")
 
         # Build model
-        log(10, f"Building model...")
-        start_time = timeit.default_timer()
+        start_time = perf_counter()
 
         # Definition of the symbolic choice output (tensor)
         self.y = db.tensor.choice
@@ -53,13 +52,8 @@ class MNL(PyCMTensorModel):
             updates=self.updates,
         )
 
-        # define the function to output the log likelihood of the model
-        self.loglikelihood = function(
-            name="loglikelihood",
-            inputs=self.inputs,
-            outputs=self.ll,
-        )
-
+        # internal functions
+        self.model_loglikelihood()
         self.model_choice_probabilities()
         self.model_choice_predictions()
         self.model_prediction_error()
@@ -67,14 +61,14 @@ class MNL(PyCMTensorModel):
         self.model_BHHH()
         self.model_gnorm()
 
-        build_time = round(timeit.default_timer() - start_time, 3)
+        build_time = round(perf_counter() - start_time, 3)
         self.results.build_time = time_format(build_time)
-        log(10, f"Build time = {self.results.build_time}")
+        debug(f"Build time = {self.results.build_time}")
 
         # compute the null loglikelihood
         data = db.pandas.inputs(self.inputs, split_type="train")
         self.results.null_loglikelihood = self.loglikelihood(*data)
-        log(10, f"Null loglikelihood = {self.results.null_loglikelihood}")
+        debug(f"Null loglikelihood = {self.results.null_loglikelihood}")
 
     def __str__(self):
         return f"{self.name}"
