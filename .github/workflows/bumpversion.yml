@@ -18,5 +18,6 @@ jobs:
         uses: commitizen-tools/commitizen-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          changelog: true
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"

@@ -9,9 +9,25 @@
 [![Tests](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml)
 [![CodeQL](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml)
 [![Publish](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml)
+[![DOI](https://zenodo.org/badge/460802394.svg)](https://zenodo.org/badge/latestdoi/460802394)
 
-A tensor-based choice modelling Python package with deep learning libraries. 
-~~Documentation available at <https://pycmtensor.readthedocs.io>~~.
+A tensor-based discrete choice modelling Python package. 
+
+## Citation
+
+Cite as:
+
+    @software{melvin_wong_2022_7249280,
+      author       = {Melvin Wong},
+      title        = {mwong009/pycmtensor: v1.2.1},
+      year         = 2022,
+      version      = {v1.2.1},
+      doi          = {10.5281/zenodo.7249280},
+      url          = {https://doi.org/10.5281/zenodo.7249280}
+    }
+
+## Table of contents
+
 
 - [PyCMTensor](#pycmtensor)
 	- [About PyCMTensor](#about-pycmtensor)
