@@ -64,18 +64,20 @@ class TestFunctions:
 
         kld = functions.kl_multivar_norm(m0, v0, m1, v1)
         loss = aesara.function([m0, v0, m1, v1], kld)
-        assert loss(0, 1, 0, 1) == 0
+        assert m0.ndim == v0.ndim == 0
+        assert m1.ndim == v1.ndim == 0
+        assert round(float(loss(0, 1, 0, 1)), 2) == 0
 
         with pytest.raises(ValueError):
             kld = functions.kl_multivar_norm(m0, v0, m1, aet.vector())
 
         g = aet.grad(kld, v0, disconnected_inputs="ignore")
         grad = aesara.function([m0, v0, m1, v1], g)
-        assert float(grad(3, 2, 0, 1)) == 0.25
+        assert round(float(grad(3, 2, 0, 1)), 2) == 0.25
 
         g = aet.grad(kld, m0, disconnected_inputs="ignore")
         grad = aesara.function([m0, v0, m1, v1], g)
-        assert float(grad(4, 2, 0, 1)) == 4
+        assert round(float(grad(4, 2, 0, 1))) == 4
 
     def test_kl_multivar_norm_1(self, rng):
         m0 = aet.vector("m0")
@@ -91,7 +93,7 @@ class TestFunctions:
         g = aet.grad(kld, m0, disconnected_inputs="ignore")
         grad = aesara.function([m0, v0, m1, v1], g)
         output = grad([1, 2, 1], np.diag(rng.uniform(0, 1, 3)), 0, 1)
-        assert [float(o) for o in output] == [1, 2, 1]
+        assert [round(float(o), 2) for o in output] == [1, 2, 1]
 
         g = aet.grad(kld, v0, disconnected_inputs="ignore")
         grad = aesara.function([m0, v0, m1, v1], g)
