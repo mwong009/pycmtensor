@@ -3,7 +3,7 @@
 import aesara
 import aesara.tensor as aet
 import numpy as np
-from aesara.tensor import sigmoid, tanh
+from aesara.tensor.math import sigmoid, tanh
 from aesara.tensor.nnet import relu
 
 from ..functions import exp_mov_average

@@ -2,7 +2,7 @@
 import aesara
 import numpy as np
 import pytest
-from aesara.tensor import sigmoid, tanh
+from aesara.tensor.math import sigmoid, tanh
 from aesara.tensor.nnet import relu
 
 from pycmtensor.expressions import Bias, Param, Weight

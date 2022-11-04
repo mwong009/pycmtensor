@@ -6,6 +6,7 @@ import aesara.tensor as aet
 import numpy as np
 import pytest
 from aesara import function
+from aesara.tensor.math import tanh
 from aesara.tensor.sharedvar import TensorSharedVariable
 
 import pycmtensor.expressions as expressions
@@ -96,6 +97,6 @@ def test_weight_glorot(rng):
 
     for _ in range(22):
         w = copy(glorot)
-        a = aet.tanh(aet.dot(w(), a))
+        a = tanh(aet.dot(w(), a))
     assert round(float(aet.mean(a).eval()), 3) == 0.008
     assert round(float(aet.std(a).eval()), 3) == 0.194

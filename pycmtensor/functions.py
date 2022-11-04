@@ -71,7 +71,7 @@ def logit(
     else:
         U = utility
 
-    prob = aet.nnet.softmax(U, axis=0)
+    prob = aet.special.softmax(U, axis=0)
     if avail != None:
         AV = aet.stack(avail)
         while AV.ndim < prob.ndim:
