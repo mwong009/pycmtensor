@@ -244,7 +244,7 @@ def kl_multivar_norm(m0, v0, m1, v1, epsilon=1e-6):
 
 
 def errors(prob: TensorVariable, y: TensorVariable):
-    """Symbolic representation of the prediction as a percentage error.
+    """Symbolic representation of the discrete prediction as a percentage error.
 
     Args:
         prob (TensorVariable): matrix describing the choice probabilites
