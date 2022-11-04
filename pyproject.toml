@@ -75,7 +75,7 @@ skip_glob = ".pytest_cache/*"
 
 [tool.black]
 line-length = 88
-target-version = ["py38"]
+target-version = ["py39"]
 quiet = false
 
 [tool.commitizen]
@@ -91,7 +91,8 @@ version_files = [
 
 [tool.pytest]
 markers = []
-# poetry run pytest
+# command: 
+# poetry run pytest .
 
 [tool.pytest.ini_options]
 addopts = [
