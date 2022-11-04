@@ -97,8 +97,66 @@ class Adam(Optimizer):
         return updates
 
 
-class Adamax(Optimizer):
-    def __init__(self, params: list, b1=0.9, b2=0.999, **kwargs):
+class Nadam(Adam):
+    def __init__(self, params: list, b1: float = 0.99, b2: float = 0.999, **kwargs):
+        """An optimizer that implements the Nesterov Adam algorithm [#]_
+
+        Args:
+            params (list): a list of ``TensorSharedVariable``
+            b1 (float, optional): exponential decay rate for the 1st moment estimates.
+                Defaults to ``0.9``
+            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
+                Defaults to ``0.999``
+
+        .. [#] Dozat, T., 2016. Incorporating nesterov momentum into adam.(2016). Dostupné z: http://cs229.stanford.edu/proj2015/054_report.pdf.
+        """
+        super().__init__(params, b1, b2)
+        self.name = "Nadam"
+
+    def update(self, cost, params: list, lr: float = 0.001):
+        """Generate a list of updates
+
+        Args:
+            cost (TensorVariable): a scalar element for the expression of the cost
+                function where the derivatives are calculated
+            params (list): a list of ``TensorSharedVariable``
+            lr (float, optional): learning rate. Defaults to 0.001
+
+        Returns:
+            list: a list of tuples of ``(p, p_t), (m, m_t), (v, v_t), (t, t_new)``
+        """
+        params = [p() for p in params if p.status != 1]
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+
+        t_new = self.t + 1.0
+        b1 = self.b1 * (1 - 0.5 * aet.pow(0.96, self.t / 250))
+        b1_t = self.b1 * (1 - 0.5 * aet.pow(0.96, t_new / 250))
+        for m, v, param, grad in zip(self.m_prev, self.v_prev, params, grads):
+            g_t = grad / (1.0 - aet.pow(self.b1, self.t))
+
+            m_t = self.b1 * m + (1.0 - self.b1) * grad
+            m_t_hat = m_t / (1.0 - aet.pow(self.b1, t_new))
+
+            v_t = self.b2 * v + (1.0 - self.b2) * aet.sqr(grad)
+            v_t_hat = v_t / (1.0 - aet.pow(self.b2, self.t))
+
+            m_t_hat = (1 - b1) * g_t + b1_t * m_t_hat
+            g_t_hat = lr * m_t_hat / (aet.sqrt(v_t_hat) + self.epsilon)
+            p_t = param - g_t_hat
+
+            updates.append((m, m_t))
+            updates.append((v, v_t))
+            updates.append((param, p_t))
+
+        updates.append((self.t, t_new))
+
+        return updates
+
+
+class Adamax(Adam):
+    def __init__(self, params: list, b1: float = 0.9, b2: float = 0.999, **kwargs):
         """An optimizer that implements the Adamax algorithm [#]_. It is a variant of
         the Adam algorithm
 
