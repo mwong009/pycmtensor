@@ -10,11 +10,14 @@ from pycmtensor.statistics import elasticities
 cmt.logger.set_level(cmt.logger.INFO)
 
 swissmetro = pd.read_csv("../data/swissmetro.dat", sep="\t")
-swissmetro.drop(swissmetro[swissmetro["CHOICE"] == 0].index, inplace=True)
-swissmetro["CHOICE"] -= 1  # set the first choice index to 0
-db = cmt.Data(df=swissmetro, choice="CHOICE")
-db.autoscale_data(except_for=["ID", "ORIGIN", "DEST"])  # scales dataset
-db.split_db(split_frac=0.8)  # split dataset
+db = cmt.Data(
+    df=swissmetro,
+    choice="CHOICE",
+    drop=[swissmetro["CHOICE"] == 0],
+    autoscale=True,
+    autoscale_except=["ID", "ORIGIN", "DEST", "CHOICE"],
+    split=0.8,
+)
 
 b_cost = Beta("b_cost", 0.0, None, None, 0)
 b_time = Beta("b_time", 0.0, None, None, 0)

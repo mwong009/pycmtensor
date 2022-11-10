@@ -1,6 +1,6 @@
 # data.py
 """PyCMTensor data module"""
-from typing import Union
+from typing import Literal, Union
 
 import aesara
 import aesara.tensor as aet
@@ -10,7 +10,7 @@ from aesara.tensor.var import TensorVariable
 
 from pycmtensor import config
 
-from .logger import log
+from .logger import debug
 
 __all__ = ["Data", "FLOATX"]
 
@@ -19,12 +19,32 @@ FLOATX = aesara.config.floatX
 
 
 class Data:
-    def __init__(self, df: pd.DataFrame, choice: str):
-        """Base Data class object
+    def __init__(self, df: pd.DataFrame, choice: str, **kwargs):
+        """Base Data class object.
 
         Args:
             df (pandas.DataFrame): the input Pandas dataframe
             choice (str): column string name of the choice dependent variable
+            **kwargs: Keyword arguments, accepted arguments are `drop:pd.Series`,
+                `autoscale:bool`, `autoscale_except:list[str]`, `split:float`
+
+        Attributes:
+            x (list[TensorVariable]): list of tensors corresponding to input features
+            y (list[TensorVariable]): list of the dependent choice variable tensor
+            all (list[TensorVariable]): combined list of x and y variables
+
+        Note:
+            The following is an example initialization of the swissmetro dataset::
+
+                swissmetro = pd.read_csv(\"../data/swissmetro.dat\", sep=\"\\t\")
+                db = pycmtensor.Data(
+                    df=swissmetro,
+                    choice=\"CHOICE\",
+                    drop=[swissmetro[\"CHOICE\"]==0],
+                    autoscale=True,
+                    autoscale_except=[\"ID\", \"ORIGIN\", \"DEST\"],
+                    split=0.8,
+                )
         """
         self.seed = config["seed"]
         self.split_frac = None
@@ -33,17 +53,29 @@ class Data:
         self.choice = choice
         self.scales = {}
 
-        self.tensor = Variables(choice)
+        # drop rows for "drop" in kwargs
+        if "drop" in kwargs:
+            for d in kwargs["drop"]:
+                df.drop(df[d].index, inplace=True)
+
+        # reindex choices to start from index-0
+        if df[choice].min() != 0:
+            df[choice] -= df[choice].min()
+
+        # prepare tensor and pandas data
         self.pandas = PandasDataFrame(df, choice)
-        self.shared = SharedVariables()
+        self.tensor = Variables(choice, self.pandas.columns)
+        self.scales = {column: 1.0 for column in self.pandas.columns}
 
-        for column in self.pandas.columns:
-            if column == choice:
-                self.tensor[column] = aet.ivector(column)
-            else:
-                self.tensor[column] = aet.vector(column)
+        # autoscale data if argument is set
+        if "autoscale" in kwargs:
+            ex = None
+            if "autoscale_except" in kwargs:
+                ex = kwargs["autoscale_except"]
+            self.autoscale_data(except_for=ex)
 
-            self.scales[column] = 1.0
+        if "split" in kwargs:
+            self.split_db(split_frac=kwargs["split"])
 
     @property
     def x(self):
@@ -65,8 +97,12 @@ class Data:
         else:
             raise ValueError(f"{item} not a valid Variable name")
 
-    def split_db(self, split_frac=0.8):
-        """Split database data into train and valid sets"""
+    def split_db(self, split_frac: float):
+        """Split database data into train and valid sets
+
+        Arg:
+            split_frac (float): fractional value between 0.0 and 1.0.
+        """
         self.split_frac = split_frac
         self.pandas.split_pandas(self.seed, split_frac)
 
@@ -75,19 +111,29 @@ class Data:
         return len(self.pandas())
 
     def get_train_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
-        """Alias to get train data slice from self.pandas.inputs()"""
+        """Alias to get train data slice from `self.pandas.inputs()`
+
+        See :meth:`PandasDataFrame.inputs()` for details
+        """
         return self.pandas.inputs(tensors, index, batch_size, shift, "train", k)
 
     def get_valid_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
-        """Alias to get valid data slice from self.pandas.inputs()"""
+        """Alias to get valid data slice from `self.pandas.inputs()`
+
+        See :meth:`PandasDataFrame.inputs()` for details
+        """
         return self.pandas.inputs(tensors, index, batch_size, shift, "valid", k)
 
     def scale_data(self, **kwargs):
-        """Scales data values by data/scale from ``kwargs:{column=scale}``"""
+        """Scales data values by data/scale from `key=scale` keyword argument
+
+        Args:
+            **kwargs: {key: scale} keyword arguments
+        """
         for key, scale in kwargs.items():
             self.pandas[key] = self.pandas[key] / scale
             self.scales[key] *= scale
-            log(10, f"Scaling {key} by {scale}")
+            debug(f"Scaling {key} by {scale}")
 
     def autoscale_data(self, except_for=[None]):
         """Autoscale variable values to within -10.0 < x < 10.0
@@ -106,12 +152,11 @@ class Data:
                 continue
             scale = 1.0
             while max_val > 10:
-                self.pandas[column] = self.pandas[column] / 10.0
-                key = column
+                self.scale_data(**{column: 10.0})
                 scale = scale * 10.0
+                key = column
                 max_val = np.max(np.abs(self.pandas[column]))
-            # scaling complete
-            log(10, f"Autoscaling {key} by {scale}")
+
             self.scales[key] = scale
 
     def info(self):
@@ -168,18 +213,35 @@ class PandasDataFrame:
         return self.pandas
 
     def inputs(
-        self, tensors, index=None, batch_size=None, shift=0, split_type=None, k=0
+        self,
+        tensors: list[TensorVariable],
+        index: int = None,
+        batch_size: int = None,
+        shift: int = 0,
+        split_type: Literal["train", "valid"] = "train",
     ) -> list[pd.DataFrame]:
-        """Returns a list of DataFrame corresponding to the tensors input arg."""
-        if split_type is None:
-            dataset = self.pandas
+        """Returns a list of DataFrame corresponding to the tensors input
+
+        Args:
+            tensors (list[TensorVariable]): list of tensors as an index to call the
+                pandas dataset
+            index (int, optional): starting index of the return dataset slice. Defaults
+                to `None` and returns the entire dataset.
+            batch_size (int, optional): dataset slice length. Defaults to maximum
+                length of the dataset.
+            shift (int, optional): index offset. Defaults to 0.
+            split_type (str, optional): {'train', 'valid'}
+                Defines the specific split of the dataset to return. Possible values
+                are `train` or `valid`. If `self.split_pandas()` was not called, both
+                `train` or `valid` arguments return the same dataset.
+
+        """
+        if split_type == "train":
+            dataset = self.train_dataset[0]
+        elif split_type == "valid":
+            dataset = self.valid_dataset[0]
         else:
-            if split_type == "train":
-                dataset = self.train_dataset[k]
-            elif split_type == "valid":
-                dataset = self.valid_dataset[k]
-            else:
-                raise ValueError(f'Valid arg for split:"train" or "valid"')
+            raise ValueError(f"Valid arg {split_type} for split_type")
 
         datalist = []
         if index is None:
@@ -187,13 +249,18 @@ class PandasDataFrame:
         else:
             if batch_size is None:
                 batch_size = len(dataset)
-            start = index * batch_size + shift
-            end = (index + 1) * batch_size + shift
+            start = index * batch_size + min(batch_size, shift)
+            end = (index + 1) * batch_size + min(batch_size, shift)
             datalist = [dataset[t.name].iloc[start:end] for t in tensors]
         return datalist
 
-    def split_pandas(self, seed, split_frac):
-        """Function to split the pandas dataset into train and valid splits"""
+    def split_pandas(self, seed: int, split_frac: float):
+        """Function to split the pandas dataset into train and valid splits
+
+        Args:
+            seed (int): random seed value
+            split_frac (float): fractional value between 0.0 and 1.0
+        """
         df = self.pandas
         df = df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
         n_train_samples = round(len(df) * split_frac)
@@ -204,14 +271,27 @@ class PandasDataFrame:
 
 
 class Variables:
-    def __init__(self, choice: str):
-        """Class object to store TensorVariable.
+    def __init__(self, choice: str, columns: list[str]):
+        """Class object to store `TensorVariable`.
 
         Args:
-            choice (str): column string name of the choice dependent variable
+            choice (str): column string label of the choice dependent variable
+            columns (list[str]): list of pandas column labels
+
+        Attributes:
+            x (list[TensorVariable]): list of tensors corresponding to input features
+            y (list[TensorVariable]): list of the dependent choice variable tensor
+            all (list[TensorVariable]): combined list of x and y variables
         """
         self.variables = {}
         self.choice = choice
+
+        for column in columns:
+            if column == choice:
+                self[column] = aet.ivector(column)
+
+            else:
+                self[column] = aet.vector(column)
 
     def __getitem__(self, item: str):
         if item not in self.variables:
@@ -244,18 +324,3 @@ class Variables:
     def all(self) -> list[aet.TensorVariable]:
         """Returns all ``TensorVariable`` objects"""
         return self.x + [self.y]
-
-
-class SharedVariables:
-    def __init__(self):
-        """Class object to store TensorSharedVariables"""
-        pass
-
-    def __getitem__(self):
-        pass
-
-    def __setitem__(self):
-        pass
-
-    def add_item(self):
-        pass

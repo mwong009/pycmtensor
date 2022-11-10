@@ -98,4 +98,4 @@ class TestLayers:
         assert len(params) == 2
 
         out = g(*db.pandas.inputs(db.x))
-        assert out.shape == (10719, 8)
+        assert out.shape == (8575, 8)
