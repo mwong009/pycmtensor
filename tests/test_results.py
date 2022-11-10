@@ -52,9 +52,9 @@ def test_prediction(trained_model, swissmetro_db):
     model = trained_model
     db = swissmetro_db
     prediction = model.predict(db, return_choices=False)
-    assert prediction.shape == (10719, 3)
+    assert prediction.shape == (2143, 3)
     choices = model.predict(db, return_choices=True)
-    assert choices.shape == (10719,)
+    assert choices.shape == (2143,)
 
 
 def test_elasticities(trained_model, swissmetro_db):

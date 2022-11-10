@@ -24,7 +24,6 @@ def test_adagrad(mnl_model):
 
 def test_momentum(mnl_model):
     nesterov = opt.Momentum(mnl_model.params)
-    assert repr(nesterov) == "NAG"
     updates = nesterov.update(mnl_model.cost, mnl_model.params)
 
     momentum = opt.Momentum(mnl_model.params, nesterov=False)

@@ -5,7 +5,7 @@ import aesara.tensor as aet
 from aesara import function, pprint
 
 from ..functions import log_likelihood, logit
-from ..logger import debug, log
+from ..logger import debug
 from ..optimizers import Adam
 from ..pycmtensor import PyCMTensorModel
 from ..utils import time_format
