@@ -1,27 +1,26 @@
 # pycmtensor.py
 """PyCMTensor main module"""
-import timeit
 from collections import OrderedDict
-from multiprocessing.sharedctypes import Value
 from time import perf_counter
+from typing import Union
 
 import dill as pickle
 import numpy as np
 from aesara import function
+from aesara.tensor.var import TensorVariable
 
 from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weight
 from .functions import bhhh, errors, gnorm, hessians
-from .logger import debug, log
+from .logger import debug, info, warning
 from .results import Results
 from .utils import time_format
 
 
 class PyCMTensorModel:
-    """Base model class object"""
-
     def __init__(self, db):
+        """Base model class object"""
         self.name = "PyCMTensorModel"
         self.config = config
         self.params = []  # keep track of all the params
@@ -33,16 +32,14 @@ class PyCMTensorModel:
 
         debug(f"Building model...")
 
-    def add_params(self, params):
+    def add_params(self, params: Union[dict, list]):
         """Method to load locally defined variables
 
         Args:
-            params (dict or list): a dict or list of items which are
-                :class:`expressions.Beta` or :class:`expressions.Weight`
+            params (Union[dict, list]): a dict or list of ``TensorSharedVariable``
         """
         if not isinstance(params, (dict, list)):
-            msg = "params must be of Type dict or list"
-            raise TypeError(msg)
+            raise TypeError(f"params must be of Type dict or list")
 
         # create a dict of str(param): param, if params is given as a list
         if isinstance(params, list):
@@ -50,8 +47,7 @@ class PyCMTensorModel:
 
         # iterate through the dict of params:
         if not hasattr(self, "cost"):
-            log(40, "No valid cost function defined.")
-            raise ValueError
+            raise ValueError(f"No valid cost function defined.")
 
         symbols = ExpressionParser().parse(getattr(self, "cost"))
         seen = set()
@@ -60,13 +56,10 @@ class PyCMTensorModel:
                 continue
 
             if p.name in seen:
-                msg = f"Duplicate param names defined: {p.name}."
-                log(40, msg)
-                raise NameError(msg)
+                raise NameError(f"Duplicate param names defined: {p.name}.")
 
             if (p.name not in symbols) and (p.status == 0):
-                msg = f"Unused Beta {p.name} removed from computational graph"
-                log(30, msg)
+                warning(f"Unused Beta {p.name} removed from computational graph")
                 continue
 
             self.params.append(p)
@@ -79,19 +72,22 @@ class PyCMTensorModel:
 
         self.n_params = self.get_n_params()
 
-    def add_regularizers(self, l_reg):
-        """Adds regularizer ``l_reg`` to model cost function"""
+    def add_regularizers(self, l_reg: TensorVariable):
+        """Adds regularizer to model cost function
+
+        Args:
+            l_reg (TensorVariable): symbolic variable defining the regularizer term
+        """
         if not hasattr(self, "cost"):
-            log(40, "No valid cost function defined.")
-            raise ValueError
+            raise ValueError("No valid cost function defined.")
 
         self.cost += l_reg
 
-    def get_n_params(self):
+    def get_n_params(self) -> int:
         """Get the total number of parameters"""
         return self.get_n_betas() + sum(self.get_n_weights())
 
-    def get_n_betas(self):
+    def get_n_betas(self) -> int:
         """Get the count of Beta parameters"""
         return len(self.betas)
 
@@ -99,8 +95,8 @@ class PyCMTensorModel:
         """Returns the Beta (key, value) pairs as a dict"""
         return {beta.name: beta.get_value() for beta in self.betas}
 
-    def get_n_weights(self):
-        """Get the total size of each weight matrix"""
+    def get_n_weights(self) -> list[int]:
+        """Get the total number of elements of each weight matrix"""
         return [w.size for w in self.get_weights()]
 
     def get_weights(self) -> list[np.ndarray]:
@@ -178,7 +174,7 @@ class PyCMTensorModel:
             outputs=gnorm(self.cost, self.betas),
         )
 
-    def predict(self, db, return_choices=True, split_type=None):
+    def predict(self, db, return_choices=True, split_type="valid"):
         """Returns the predicted choice probabilites"""
         predict_data = db.pandas.inputs(self.inputs, split_type=split_type)
         if not return_choices:
@@ -207,8 +203,9 @@ class PyCMTensorModel:
         n_train_batches = n_train_samples // batch_size
         validation_frequency = n_train_batches
         max_iterations = max_steps * n_train_batches
-        msg = f"batch_size={batch_size}, max_steps={max_steps}, n_samples={n_train_samples}"
-        log(10, msg)
+        debug(
+            f"batch_size={batch_size}, max_steps={max_steps}, n_samples={n_train_samples}"
+        )
 
         # initalize results array
         self.results.performance_graph = OrderedDict()
@@ -233,7 +230,7 @@ class PyCMTensorModel:
 
         # main loop
         start_time = perf_counter()
-        log(20, f"Start (n={n_train_samples})")
+        info(f"Start (n={n_train_samples})")
 
         while (step < max_steps) and (not done_looping):
 
@@ -242,7 +239,7 @@ class PyCMTensorModel:
             for index in range(n_train_batches):
                 if patience <= iteration:
                     done_looping = True
-                    log(10, f"Early stopping... (s={step})")
+                    debug(f"Early stopping... (s={step})")
                     break
 
                 # increment iteration
@@ -274,9 +271,9 @@ class PyCMTensorModel:
 
                 if valid_error >= self.results.best_valid_error:
                     continue
-
-                msg = f"Best validation error = {valid_error*100:.3f}%, (s={step}, i={iteration}, p={patience}, ll={train_ll:.2f})"
-                log(10, msg)
+                debug(
+                    f"Best validation error = {valid_error*100:.3f}%, (s={step}, i={iteration}, p={patience}, ll={train_ll:.2f})"
+                )
 
                 self.results.best_step = step
                 self.results.best_iteration = iteration
@@ -301,7 +298,7 @@ class PyCMTensorModel:
         self.results.train_time = time_format(train_time)
         self.results.iterations_per_sec = round(iteration / train_time, 2)
         msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.3f}%, LL={self.results.best_loglikelihood}, S={self.results.best_step})"
-        log(20, msg)
+        info(msg)
 
         self.betas = self.results.betas
         self.weights = self.results.weights
