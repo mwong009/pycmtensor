@@ -1,3 +1,28 @@
+## v1.3.0 (2022-11-10)
+
+### Feat
+
+- **optimizers**: added ``Nadam`` optimizer
+- **layers.py**: added ``DenseLayer`` ``BatchNormLayer`` ``ResidualLayer``
+- added ``pycmtensor.about()`` to output package metadata
+- added EMA function ``functions.exp_mov_average()``
+
+### Fix
+
+- renamed depreceated instances of ``aesara`` modules
+- **data.py**: defaults ``batch_size`` argument to 0 if batch_size is ``None``
+- added argument type hints in function.py
+- updated syntax for ``expressions.py`` class objects
+- added ``init_type`` property to ``Weights`` class
+- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
+
+### Refactor
+
+- **data**: added import dataset cleaning step as arguments in `Data()`
+- moved ResidualLayer to ``pycmtensor.models.layers``
+- updated timing to perf_counter
+- **pycmtensor**: refactoring model_loglikelihood
+
 ## v1.2.1 (2022-10-25)
 
 ### Feat
