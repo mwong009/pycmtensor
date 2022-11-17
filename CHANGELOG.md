@@ -1,3 +1,9 @@
+## v1.3.1 (2022-11-17)
+
+### Fix
+
+- fix utility dimensions for asc only cases
+
 ## v1.3.0 (2022-11-10)
 
 ### Feat
