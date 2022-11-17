@@ -1,13 +1,15 @@
 # functions.py
 """PyCMTensor functions module"""
+from ctypes import util
 from typing import Union
 
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
+from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta
+from pycmtensor.expressions import Beta, Param
 
 from .logger import error, log
 
@@ -67,9 +69,19 @@ def logit(
         if (avail != None) and (len(utility) != len(avail)):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
+        _utility = utility
+        for n, u in enumerate(_utility):
+            if not isinstance(u, (TensorVariable, TensorSharedVariable)):
+                utility[n] = u()
+            if utility[n].ndim == 0:
+                utility[n] = aet.expand_dims(utility[n], -1)
         U = aet.stack(utility)
-    else:
+    elif isinstance(utility, TensorVariable):
         U = utility
+    else:
+        raise NotImplementedError(
+            f"utility {utility} has to be a list, tuple or TensorVariable instance"
+        )
 
     prob = aet.special.softmax(U, axis=0)
     if avail != None:

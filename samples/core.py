@@ -33,7 +33,7 @@ U_3 = b_cost * db["CAR_CO"] + b_time * db["CAR_TT"] + asc_car
 U = [U_1, U_2, U_3]  # utility
 AV = [db["TRAIN_AV"], db["SM_AV"], db["CAR_AV"]]  # availability
 
-mymodel = MNL(U, AV, locals(), db, name="MNL")
+mymodel = MNL(db, locals(), U, AV, name="MNL")
 mymodel.config.set_hyperparameter("max_steps", 200)
 mymodel.config.set_lr_scheduler(StepLR())
 mymodel.train(db)

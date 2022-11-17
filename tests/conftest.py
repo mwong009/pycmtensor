@@ -64,4 +64,4 @@ def availability(swissmetro_db):
 
 @pytest.fixture(scope="session")
 def mnl_model(utility, availability, betas, swissmetro_db):
-    return MNL(utility, availability, betas, swissmetro_db)
+    return MNL(swissmetro_db, betas, utility, availability)

@@ -30,6 +30,8 @@ Cite as:
 
 
 - [PyCMTensor](#pycmtensor)
+	- [Citation](#citation)
+	- [Table of contents](#table-of-contents)
 	- [About PyCMTensor](#about-pycmtensor)
 	- [Features](#features)
 - [Quick start](#quick-start)
@@ -159,7 +161,7 @@ Make sure you are using the correct Conda environment and/or the required packag
 
 3. Define the Multinomial Logit model
 	```python
-	mymodel = MNL(U, AV, locals(), db, name="MNL")
+	mymodel = MNL(db, locals(), U, AV, name="MNL")
 	```
 
 4. Train the model and generate model statistics (Optionally, you can also set the training hyperparameters)

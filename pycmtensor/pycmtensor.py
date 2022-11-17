@@ -56,7 +56,8 @@ class PyCMTensorModel:
                 continue
 
             if p.name in seen:
-                raise NameError(f"Duplicate param names defined: {p.name}.")
+                continue
+                # raise NameError(f"Duplicate param names defined: {p.name}.")
 
             if (p.name not in symbols) and (p.status == 0):
                 warning(f"Unused Beta {p.name} removed from computational graph")

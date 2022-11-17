@@ -12,7 +12,7 @@ from ..utils import time_format
 
 
 class MNL(PyCMTensorModel):
-    def __init__(self, utility, av, params, db, optimizer=Adam, name="MNL"):
+    def __init__(self, db, params, utility, av=None, optimizer=Adam, name="MNL"):
         super().__init__(db)
 
         self.name = name
