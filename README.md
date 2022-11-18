@@ -267,19 +267,19 @@ The following model functions outputs the statistics, results of the model, and 
 **Windows**
 
 ```
-conda env create -f environment_windows.yml
+conda env create -f environment/environment_windows.yml
 ```
 
 **Linux**
 
 ```
-conda env create -f environment_linux.yml
+conda env create -f environment/environment_linux.yml
 ```
 
 **Mac OSX**
 
 ```
-conda env create -f environment_macos.yml
+conda env create -f environment/environment_macos.yml
 ```
 
 Next, activate the virtual environment and install ``poetry`` dependency manager via ``pip``
