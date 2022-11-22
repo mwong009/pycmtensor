@@ -23,8 +23,12 @@ def test_aesara_rc(config_class, config_file):
 
 def test_set_hyperparameters(config_class):
     print(config_class)
-    config_class.set_hyperparameter("max_steps", 100)
+    old_max_steps = config_class.hyperparameters["max_steps"]
+    old_batch_size = config_class.hyperparameters["batch_size"]
+    config_class.set_hyperparameter(max_steps=100, batch_size=128)
     assert config_class.hyperparameters["max_steps"] == 100
+    assert config_class.hyperparameters["batch_size"] == 128
+    config_class.set_hyperparameter(max_steps=old_max_steps, batch_size=old_batch_size)
 
 
 def test_call_magic(config_class):

@@ -127,8 +127,7 @@ The following is a replication of the results from Biogeme using the ``Adam`` op
 
 4. Train the model and generate model statistics (Optionally, you can also set the training hyperparameters)
 	```python
-	mymodel.config.set_hyperparameter("max_steps", 200)  # set the max number of train steps
-	mymodel.config.set_hyperparameter("batch_size", 128)  # set the training batch size
+	mymodel.config.set_hyperparameter(max_steps=200, batch_size=128)  # set the max number of train steps and the training batch size
 	mymodel.train(db)  # run the model training on the dataset `db`
 	```
 

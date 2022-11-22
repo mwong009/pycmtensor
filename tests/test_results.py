@@ -8,7 +8,7 @@ from pycmtensor.statistics import elasticities
 def trained_model(swissmetro_db, mnl_model):
     model = mnl_model
     db = swissmetro_db
-    model.config.set_hyperparameter("max_steps", 10)
+    model.config.set_hyperparameter(max_steps=10)
     model.train(db)
     return model
 

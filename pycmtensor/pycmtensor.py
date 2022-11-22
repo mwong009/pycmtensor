@@ -183,42 +183,38 @@ class PyCMTensorModel:
         else:
             return self.choice_predictions(*predict_data)
 
-    def train(self, db, steps=np.inf, k=0):
-        """Function to train the model"""
-        self.config.check_values()  # assert config.hyperparameters
+    def train(self, db, **kwargs):
+        """Function to train the model
+
+        Args:
+            db (pycmtensor.Data): database used to train the model
+            **kwargs: keyword arguments for adjusting training configuration.
+                Possible values are `max_steps:int`, `patience:int`,
+                `lr_scheduler:scheduler.Scheduler`, `batch_size:int`. For more
+                information and other possible options, see
+                `config.Config.hyperparameters`
+        """
+        self.config.set_hyperparameter(**kwargs)
 
         # [train-start]
         lr_scheduler = self.config["lr_scheduler"]
         batch_size = self.config["batch_size"]
-        max_steps = min(self.config["max_steps"], steps)
+        max_steps = self.config["max_steps"]
         patience = self.config["patience"]
         patience_increase = self.config["patience_increase"]
         validation_threshold = self.config["validation_threshold"]
 
-        if db.split_frac is not None:
-            n_train_samples = len(db.pandas.train_dataset[k])
-            n_valid_samples = len(db.pandas.valid_dataset[k])
-        else:
-            n_train_samples = db.get_nrows()
-            n_valid_samples = db.get_nrows()
-        n_train_batches = n_train_samples // batch_size
-        validation_frequency = n_train_batches
-        max_iterations = max_steps * n_train_batches
-        debug(
-            f"batch_size={batch_size}, max_steps={max_steps}, n_samples={n_train_samples}"
-        )
+        db.n_train_batches = db.n_train_samples // batch_size
+        validation_frequency = db.n_train_batches
+        max_iterations = max_steps * db.n_train_batches
 
         # initalize results array
         self.results.performance_graph = OrderedDict()
 
-        # set training and validation datasets
-        train_data = db.pandas.inputs(self.inputs, split_type="train")
-        valid_data = db.pandas.inputs(self.inputs, split_type="valid")
-
         # compute the inital results of the model
-        self.results.init_loglikelihood = self.loglikelihood(*train_data)
+        self.results.init_loglikelihood = self.loglikelihood(*db.train_data)
         self.results.best_loglikelihood = self.results.init_loglikelihood
-        self.results.best_valid_error = self.prediction_error(*valid_data)
+        self.results.best_valid_error = self.prediction_error(*db.valid_data)
 
         # loop parameters
         done_looping = False
@@ -231,16 +227,16 @@ class PyCMTensorModel:
 
         # main loop
         start_time = perf_counter()
-        info(f"Start (n={n_train_samples})")
+        info(f"Start (n={db.n_train_samples})")
 
         while (step < max_steps) and (not done_looping):
 
             # loop over batch
             learning_rate = lr_scheduler(step)
-            for index in range(n_train_batches):
+            for index in range(db.n_train_batches):
                 if patience <= iteration:
                     done_looping = True
-                    debug(f"Early stopping... (s={step})")
+                    debug(f"Early stopping... (step={step})")
                     break
 
                 # increment iteration
@@ -248,13 +244,11 @@ class PyCMTensorModel:
 
                 # set index and shift slices
                 if self.config["batch_shuffle"]:
-                    index = rng.integers(0, n_train_batches)
+                    index = rng.integers(0, db.n_train_batches)
                     shift = rng.integers(0, batch_size)
 
                 # get data slice from dataset
-                batch_data = db.pandas.inputs(
-                    self.inputs, index, batch_size, shift, split_type="train"
-                )
+                batch_data = db.get_train_data(self.inputs, index, batch_size, shift)
 
                 # model update step
                 self.update_wrt_cost(*batch_data, learning_rate)
@@ -263,8 +257,8 @@ class PyCMTensorModel:
                 if iteration % validation_frequency != 0:
                     continue
 
-                train_ll = self.loglikelihood(*train_data)
-                valid_error = self.prediction_error(*valid_data)
+                train_ll = self.loglikelihood(*db.train_data)
+                valid_error = self.prediction_error(*db.valid_data)
                 self.results.performance_graph[step] = (
                     np.round(train_ll, 2),
                     np.round(valid_error, 4),
@@ -272,9 +266,8 @@ class PyCMTensorModel:
 
                 if valid_error >= self.results.best_valid_error:
                     continue
-                debug(
-                    f"Best validation error = {valid_error*100:.3f}%, (s={step}, i={iteration}, p={patience}, ll={train_ll:.2f})"
-                )
+                msg = f"Best validation error = {valid_error*100:.3f}%, (s={step}, i={iteration}, p={patience}, ll={train_ll:.2f})"
+                debug(msg)
 
                 self.results.best_step = step
                 self.results.best_iteration = iteration
@@ -298,21 +291,21 @@ class PyCMTensorModel:
         train_time = round(perf_counter() - start_time, 3)
         self.results.train_time = time_format(train_time)
         self.results.iterations_per_sec = round(iteration / train_time, 2)
-        msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.3f}%, LL={self.results.best_loglikelihood}, S={self.results.best_step})"
+        msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.2f}%, LL={self.results.best_loglikelihood:.2f}, Step={self.results.best_step})"
         info(msg)
 
         self.betas = self.results.betas
         self.weights = self.results.weights
-        self.results.n_train_samples = n_train_samples
-        self.results.n_valid_samples = n_valid_samples
+        self.results.n_train_samples = db.n_train_samples
+        self.results.n_valid_samples = db.n_valid_samples
         self.results.n_params = self.n_params
         self.results.seed = self.config["seed"]
         self.results.lr_history_graph = self.config["lr_scheduler"].history
 
         # statistical analysis step
-        self.results.gnorm = self.gradient_norm(*train_data)
-        self.results.hessian_matrix = self.H(*train_data)
-        self.results.bhhh_matrix = self.BHHH(*train_data)
+        self.results.gnorm = self.gradient_norm(*db.train_data)
+        self.results.hessian_matrix = self.H(*db.train_data)
+        self.results.bhhh_matrix = self.BHHH(*db.train_data)
 
     def export_to_pickle(self, f):
         model = self
