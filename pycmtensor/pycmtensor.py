@@ -15,12 +15,13 @@ from pycmtensor import config, rng
 from .expressions import Beta, ExpressionParser, Weight
 from .functions import bhhh, errors, gnorm, hessians
 from .logger import debug, info, warning
+from .optimizers import Adam, Optimizer
 from .results import Results
 from .utils import time_format
 
 
 class PyCMTensorModel:
-    def __init__(self, db):
+    def __init__(self, db, **kwargs):
         """Base model class object"""
         self.name = "PyCMTensorModel"
         self.config = config
@@ -30,7 +31,14 @@ class PyCMTensorModel:
         self.updates = []  # keep track of the updates
         self.inputs = db.all
         self.learning_rate = aet.scalar("learning_rate")
+        self.optimizer = Adam
         self.results = Results()
+
+        for key, value in kwargs.items():
+            if key == "optimizer" or key == "opt":
+                if not isinstance(value, Optimizer):
+                    raise TypeError(f"invalid optimizer {value}")
+                self.optimizer = value
 
         debug(f"Building model...")
 

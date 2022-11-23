@@ -1,23 +1,41 @@
 # models.py
 from time import perf_counter
+from typing import Dict, List, Union
 
 import aesara.tensor as aet
 from aesara import function, pprint
+from aesara.tensor.var import TensorVariable
 
 from ..functions import log_likelihood, logit
 from ..logger import debug
-from ..optimizers import Adam
 from ..pycmtensor import PyCMTensorModel
 from ..utils import time_format
 
 
 class MNL(PyCMTensorModel):
-    def __init__(self, db, params, utility, av=None, optimizer=Adam):
-        super().__init__(db)
-        self.name = "MNL"
+    def __init__(
+        self,
+        db,
+        params: Dict,
+        utility: Union[list[TensorVariable], TensorVariable],
+        av: List[TensorVariable] = None,
+        **kwargs,
+    ):
+        """Defines a Multinomial Logit model
 
-        # Build model
+        Args:
+            db (pycmtensor.Data): the database object
+            params (dict): dictionary of parameters
+            utility (list or TensorVariable): the vector of utility functions
+            av (list, optional): list of availability conditions. If `None`, all
+                availability is set to 1
+            **kwargs: keyword arguments. Possible options are
+                `optimizer: pycmtensor.optimizer=Adam` set the optimizer to use. see
+                `:mod:pycmtensor.optimizer` for available options.
+        """
         start_time = perf_counter()
+        super().__init__(db, kwargs)
+        self.name = "MNL"
 
         # Definition of the symbolic choice output (tensor)
         self.y = db.tensor.choice
@@ -39,7 +57,7 @@ class MNL(PyCMTensorModel):
         self.add_params(params)
 
         # define the optimizer for the model
-        self.opt = optimizer(self.params)
+        self.opt = self.optimizer(self.params)
         self.updates += self.opt.update(self.cost, self.params, self.learning_rate)
 
         # define the update function to update the parameters wrt to the cost
