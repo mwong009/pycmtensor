@@ -12,11 +12,9 @@ from ..utils import time_format
 
 
 class MNL(PyCMTensorModel):
-    def __init__(self, db, params, utility, av=None, optimizer=Adam, name="MNL"):
+    def __init__(self, db, params, utility, av=None, optimizer=Adam):
         super().__init__(db)
-
-        self.name = name
-        self.learning_rate = aet.scalar("learning_rate")
+        self.name = "MNL"
 
         # Build model
         start_time = perf_counter()

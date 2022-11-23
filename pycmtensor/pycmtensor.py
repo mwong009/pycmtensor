@@ -4,6 +4,7 @@ from collections import OrderedDict
 from time import perf_counter
 from typing import Union
 
+import aesara.tensor as aet
 import dill as pickle
 import numpy as np
 from aesara import function
@@ -28,6 +29,7 @@ class PyCMTensorModel:
         self.weights = []  # keep track of the Weights
         self.updates = []  # keep track of the updates
         self.inputs = db.all
+        self.learning_rate = aet.scalar("learning_rate")
         self.results = Results()
 
         debug(f"Building model...")
