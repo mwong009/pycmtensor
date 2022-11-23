@@ -13,6 +13,20 @@ from pycmtensor.expressions import Beta, Param
 
 from .logger import error, log
 
+__all__ = [
+    "exp_mov_average",
+    "logit",
+    "loglikelihood",
+    "rmse",
+    "mae",
+    "kl_divergence",
+    "kl_multivar_norm",
+    "errors",
+    "hessians",
+    "bhhh",
+    "gnorm",
+]
+
 
 def exp_mov_average(
     batch_avg: TensorVariable, moving_avg: TensorVariable, alpha: float = 0.1

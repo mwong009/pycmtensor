@@ -7,6 +7,18 @@ from aesara.tensor.sharedvar import TensorSharedVariable
 
 from .data import FLOATX
 
+__all__ = [
+    "Adam",
+    "Nadam",
+    "Adamax",
+    "Adadelta",
+    "RMSProp",
+    "Momentum",
+    "NAG",
+    "Adagrad",
+    "SGD",
+]
+
 
 class Optimizer:
     def __init__(self, name, epsilon=1e-8, **kwargs):
