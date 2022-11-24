@@ -202,7 +202,7 @@ class PyCMTensorModel:
                 Possible values are `max_steps:int`, `patience:int`,
                 `lr_scheduler:scheduler.Scheduler`, `batch_size:int`. For more
                 information and other possible options, see
-                `config.Config.hyperparameters`
+                :py:data:`hyperparameters <pycmtensor.config.Config.hyperparameters>`
         """
         self.config.set_hyperparameter(**kwargs)
 

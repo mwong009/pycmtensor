@@ -1,6 +1,6 @@
 name: pycmtensor-dev
 dependencies:
-    - python=3.9
+    - python=3.9.13
     - mkl-service
     - conda-forge::cxx-compiler
     - conda-forge::m2w64-toolchain

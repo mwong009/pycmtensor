@@ -31,7 +31,7 @@ class MNL(PyCMTensorModel):
                 availability is set to 1
             **kwargs: keyword arguments. Possible options are
                 `optimizer: pycmtensor.optimizer=Adam` set the optimizer to use. see
-                `:mod:pycmtensor.optimizer` for available options.
+                :py:mod:`pycmtensor.optimizer` for available options.
         """
         start_time = perf_counter()
         super().__init__(db, kwargs)

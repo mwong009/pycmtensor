@@ -28,11 +28,6 @@ class Data:
             **kwargs: Keyword arguments, accepted arguments are `drop:pd.Series`,
                 `autoscale:bool`, `autoscale_except:list[str]`, `split:float`
 
-        Attributes:
-            x (list[TensorVariable]): list of tensors corresponding to input features
-            y (list[TensorVariable]): list of the dependent choice variable tensor
-            all (list[TensorVariable]): combined list of x and y variables
-
         Note:
             The following is an example initialization of the swissmetro dataset::
 
