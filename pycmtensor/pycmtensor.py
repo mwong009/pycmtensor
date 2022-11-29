@@ -81,8 +81,6 @@ class PyCMTensorModel:
             else:
                 self.weights.append(p)
 
-        self.n_params = self.get_n_params()
-
     def add_regularizers(self, l_reg: TensorVariable):
         """Adds regularizer to model cost function
 
@@ -94,21 +92,24 @@ class PyCMTensorModel:
 
         self.cost += l_reg
 
-    def get_n_params(self) -> int:
+    @property
+    def n_params(self):
         """Get the total number of parameters"""
-        return self.get_n_betas() + sum(self.get_n_weights())
+        return self.n_betas + sum(self.n_weights)
 
-    def get_n_betas(self) -> int:
+    @property
+    def n_betas(self):
         """Get the count of Beta parameters"""
         return len(self.betas)
+
+    @property
+    def n_weights(self):
+        """Get the total number of elements of each weight matrix"""
+        return [w.size for w in self.get_weights()]
 
     def get_betas(self) -> dict:
         """Returns the Beta (key, value) pairs as a dict"""
         return {beta.name: beta.get_value() for beta in self.betas}
-
-    def get_n_weights(self) -> list[int]:
-        """Get the total number of elements of each weight matrix"""
-        return [w.size for w in self.get_weights()]
 
     def get_weights(self) -> list[np.ndarray]:
         """Returns the Weights as a list of matrices"""
@@ -185,13 +186,21 @@ class PyCMTensorModel:
             outputs=gnorm(self.cost, self.betas),
         )
 
-    def predict(self, db, return_choices=True, split_type="valid"):
-        """Returns the predicted choice probabilites"""
-        predict_data = db.pandas.inputs(self.inputs, split_type=split_type)
+    def predict(self, db, return_choices: bool = True):
+        """Returns the predicted choice or choice probabilites
+
+        Args:
+            db (pycmtensor.Data): database for prediction
+            return_choices (bool): if `True` then returns discrete choices instead of
+                probabilities
+
+        Returns:
+            numpy.ndarray: the output vector
+        """
         if not return_choices:
-            return self.choice_probabilities(*predict_data)
+            return self.choice_probabilities(*db.valid_data)
         else:
-            return self.choice_predictions(*predict_data)
+            return self.choice_predictions(*db.valid_data)
 
     def train(self, db, **kwargs):
         """Function to train the model
@@ -318,6 +327,7 @@ class PyCMTensorModel:
         self.results.bhhh_matrix = self.BHHH(*db.train_data)
 
     def export_to_pickle(self, f):
+        """to be removed in 1.4.0"""
         model = self
         pickle.dump(model, f)
 

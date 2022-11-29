@@ -34,7 +34,7 @@ class MNL(PyCMTensorModel):
                 :py:mod:`pycmtensor.optimizer` for available options.
         """
         start_time = perf_counter()
-        super().__init__(db, kwargs)
+        super().__init__(db, **kwargs)
         self.name = "MNL"
 
         # Definition of the symbolic choice output (tensor)

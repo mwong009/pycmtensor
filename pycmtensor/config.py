@@ -10,7 +10,7 @@ import sys
 import numpy as np
 from watermark import watermark
 
-from .logger import info, log, warning
+from .logger import info, warning
 from .scheduler import *
 
 __all__ = ["Config"]
