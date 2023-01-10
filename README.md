@@ -5,6 +5,7 @@
 [![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor)
 [![Documentation Status](https://readthedocs.org/projects/pycmtensor/badge/?version=latest)](https://pycmtensor.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor)
+[![Downloads](https://static.pepy.tech/personalized-badge/pycmtensor?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Downloads)](https://pepy.tech/project/pycmtensor)
 
 [![Tests](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/tests.yml)
 [![CodeQL](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/codeql-analysis.yml)
