@@ -1,6 +1,6 @@
 name: pycmtensor-dev
 dependencies:
-    - python=3.9.13
+    - python=3.11
     - mkl-service
     - conda-forge::cxx-compiler
     - conda-forge::m2w64-toolchain
@@ -9,6 +9,6 @@ dependencies:
 # conda env create -f .\environment_windows.yml
 # conda activate pycmtensor-dev
 # python -m pip install --upgrade pip
-# pip install poetry
+# conda install poetry
 # poetry update
 # poetry install -E dev

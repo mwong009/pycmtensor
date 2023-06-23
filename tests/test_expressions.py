@@ -80,7 +80,6 @@ def test_weight_init(rng):
 
 
 def test_weight_he(weight_class, rng):
-
     a = aesara.shared(rng.normal(size=(128,)))
 
     for _ in range(22):

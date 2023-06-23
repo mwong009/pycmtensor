@@ -249,7 +249,6 @@ class PyCMTensorModel:
         info(f"Start (n={db.n_train_samples})")
 
         while (step < max_steps) and (not done_looping):
-
             # loop over batch
             learning_rate = lr_scheduler(step)
             for index in range(db.n_train_batches):

@@ -10,18 +10,23 @@ jobs:
     strategy:
       matrix:
         os: ["windows-latest", "ubuntu-latest", "macos-latest"]
-        python-version: ["3.9"]
+        python-version: ["3.11"]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
     
+    #########
+    # Setup #
+    #########
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     
-    - name: Display Python version
-      run: python --version
+    - name: Display Python version and OS
+      run: |
+        python --version
+        python -c "import sys; print(sys.platform)"
     
     - name: Add conda to path (Bash)
       run: |
@@ -30,39 +35,53 @@ jobs:
         echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
       shell: bash
 
+    ###########
+    # Windows #
+    ###########
     - name: Install Conda dependencies (windows)
       if: matrix.os == 'windows-latest'
       run: |
         conda install mkl-service conda-forge::cxx-compiler conda-forge::m2w64-toolchain -y
 
+    ##################
+    # Linux (Ubuntu) #
+    ##################
     - name: Install conda dependencies (linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
         conda install mkl-service conda-forge::cxx-compiler -y
 
+    ###########
+    # Mac OSX #
+    ###########
     - name: Install conda dependencies (macos)
       if: matrix.os == 'macos-latest'
       run: |
         conda install mkl-service Clang -y
     
-    - name: Install package dependencies
-      run: |
-        pip install poetry
-        poetry install
-        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
-
     - name: Xcode check (macos)
       if: matrix.os == 'macos-latest'
       run: |
         clang --version
         xcrun --show-sdk-path
     
+    ##################
+    # Install Poetry #
+    ##################
+    - name: Install package dependencies
+      run: |
+        pip install poetry
+        poetry install
+        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
+
     - name: Show contents of .aesararc
       run: |
-        python -c "import sys; print(sys.platform)"
         cat ~/.aesararc
       shell: bash
     
+    ########
+    # Test #
+    ########
     - name: Test with pytest
       run: |
         poetry run pytest
@@ -70,7 +89,7 @@ jobs:
     - name: Upload coverage to codecov.io
       if: |
         (matrix.os == 'ubuntu-latest') &&
-        (matrix.python-version == '3.9')
+        (matrix.python-version == '3.11')
       uses: codecov/codecov-action@v2
       with:
         files: coverage.xml

@@ -11,28 +11,17 @@
 [![Publish](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml/badge.svg)](https://github.com/mwong009/pycmtensor/actions/workflows/publish.yml)
 [![DOI](https://zenodo.org/badge/460802394.svg)](https://zenodo.org/badge/latestdoi/460802394)
 
-A tensor-based discrete choice modelling Python package. 
-
-## Citation
-
-Cite this software as:
-
-    @software{melvin_wong_2022_7249280,
-      author       = {Melvin Wong},
-      title        = {mwong009/pycmtensor: v1.3.1},
-      year         = 2022,
-      version      = {v1.3.1},
-      doi          = {10.5281/zenodo.7249280},
-      url          = {https://doi.org/10.5281/zenodo.7249280}
-    }
+PyCMTensor is a discrete choice modelling development tool on deep learning libraries, enabling development of complex models using deep neural networks.
+PyCMTensor is build with [Aesara](https://github.com/aesara-devs/aesara) package, similar to ``Tensorflow`` or ``Keras``.
+``Aesara`` is used the backend library because of its hackable, open-source nature.
+Users of [Biogeme](https://biogeme.epfl.ch) would be familiar with the syntax of PyCMTensor.
+PyCMTensor improves on [Biogeme](https://biogeme.epfl.ch) in situations where much more complex models are necessary, for example, integrating neural networks into discrete choice models.
+PyCMTensor also include the ability to estimate models using stochastic gradient descent methods by default, e.g. Nesterov Accelerated Gradient (NAG), Adaptive momentum (ADAM), or RMSProp.
 
 ## Table of contents
 
-
 - [PyCMTensor](#pycmtensor)
-  - [Citation](#citation)
   - [Table of contents](#table-of-contents)
-  - [About PyCMTensor](#about-pycmtensor)
   - [Features](#features)
 - [Quick start](#quick-start)
   - [Installation](#installation)
@@ -42,23 +31,14 @@ Cite this software as:
 - [Development](#development)
   - [Installing the virtual environment](#installing-the-virtual-environment)
   - [Install the project and development dependencies](#install-the-project-and-development-dependencies)
-- [Credits](#credits)
+  - [Citation](#citation)
 
-## About PyCMTensor
-
-PyCMTensor is a discrete choice modelling development tool on deep learning libraries, enabling development of complex models using deep neural networks.
-PyCMTensor is build on [Aesara](https://github.com/aesara-devs/aesara), a tensor library which uses features commonly found in deep learning packages such as ``Tensorflow`` and ``Keras``.
-``Aesara`` was chosen as the back end mathematical library because of its hackable, open-source nature.
-Users of [Biogeme](https://biogeme.epfl.ch) would be familiar with the syntax of PyCMTensor.
-
-PyCMTensor improves on [Biogeme](https://biogeme.epfl.ch) in situations where much more complex models are necessary, for example, integrating neural networks into discrete choice models.
-PyCMTensor also include the ability to estimate models using 1st order stochastic gradient descent methods by default, such as Nesterov Accelerated Gradient (NAG), Adaptive momentum (ADAM), or RMSProp.
 
 ## Features
 
-* Estimate complex choice models with neural networks using deep learning algorithms
-* Combines traditional econometric models (e.g. Multinomial Logit) with deep learning models (e.g. ResNets)
-* Shares similar programming syntax with ``Biogeme``, allowing easy transition between models
+* Estimate complex choice models using deep learning methods
+* Combines traditional econometric models (Multinomial Logit) with neural networks
+* Similar programming syntax as ``Biogeme``
 * Uses tensor features found in the ``Aesara`` library
 
 ---
@@ -310,4 +290,15 @@ pip install poetry
 poetry install -E dev
 ```
 
-# Credits
+## Citation
+
+Cite this software as:
+
+    @software{melvin_wong_2022_7249280,
+      author       = {Melvin Wong},
+      title        = {mwong009/pycmtensor: v1.3.1},
+      year         = 2022,
+      version      = {v1.3.1},
+      doi          = {10.5281/zenodo.7249280},
+      url          = {https://doi.org/10.5281/zenodo.7249280}
+    }
