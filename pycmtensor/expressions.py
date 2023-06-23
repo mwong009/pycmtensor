@@ -10,6 +10,7 @@ from aesara.tensor.var import TensorVariable
 
 from .logger import debug
 
+__all__ = ["FLOATX", "Param", "Beta", "Sigma", "Bias", "Weight"]
 FLOATX = aesara.config.floatX
 
 

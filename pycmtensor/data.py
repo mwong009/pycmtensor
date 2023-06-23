@@ -28,11 +28,6 @@ class Data:
             **kwargs: Keyword arguments, accepted arguments are `drop:pd.Series`,
                 `autoscale:bool`, `autoscale_except:list[str]`, `split:float`
 
-        Attributes:
-            x (list[TensorVariable]): list of tensors corresponding to input features
-            y (list[TensorVariable]): list of the dependent choice variable tensor
-            all (list[TensorVariable]): combined list of x and y variables
-
         Note:
             The following is an example initialization of the swissmetro dataset::
 
@@ -89,6 +84,22 @@ class Data:
     def all(self):
         return self.tensor.all
 
+    @property
+    def n_train_samples(self):
+        return len(self.pandas.train_dataset[0])
+
+    @property
+    def n_valid_samples(self):
+        return len(self.pandas.valid_dataset[0])
+
+    @property
+    def train_data(self):
+        return self.pandas.inputs(self.all, split_type="train")
+
+    @property
+    def valid_data(self):
+        return self.pandas.inputs(self.all, split_type="valid")
+
     def __getitem__(self, item: Union[str, list]) -> TensorVariable:
         if isinstance(item, list):
             return [self.tensor[x.name] for x in self.all if x.name in item]
@@ -110,19 +121,19 @@ class Data:
         """Returns the lenth of the DataFrame object"""
         return len(self.pandas())
 
-    def get_train_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
+    def get_train_data(self, tensors, index=None, batch_size=None, shift=None):
         """Alias to get train data slice from `self.pandas.inputs()`
 
         See :meth:`PandasDataFrame.inputs()` for details
         """
-        return self.pandas.inputs(tensors, index, batch_size, shift, "train", k)
+        return self.pandas.inputs(tensors, index, batch_size, shift, "train")
 
-    def get_valid_data(self, tensors, index=None, batch_size=None, shift=None, k=0):
+    def get_valid_data(self, tensors, index=None, batch_size=None, shift=None):
         """Alias to get valid data slice from `self.pandas.inputs()`
 
         See :meth:`PandasDataFrame.inputs()` for details
         """
-        return self.pandas.inputs(tensors, index, batch_size, shift, "valid", k)
+        return self.pandas.inputs(tensors, index, batch_size, shift, "valid")
 
     def scale_data(self, **kwargs):
         """Scales data values by data/scale from `key=scale` keyword argument

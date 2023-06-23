@@ -1,3 +1,15 @@
+## Unreleased
+
+### Fix
+
+- make arguments in `MNL` as optional keyword arguments
+- moved learning rate variable to `PyCMTensorModel` class
+
+### Refactor
+
+- update `__all__` package variables
+- added `train_data` and `valid_data` property to `Data` class
+
 ## v1.3.1 (2022-11-17)
 
 ### Fix
@@ -10,17 +22,12 @@
 
 - **optimizers**: added ``Nadam`` optimizer
 - **layers.py**: added ``DenseLayer`` ``BatchNormLayer`` ``ResidualLayer``
-- added ``pycmtensor.about()`` to output package metadata
-- added EMA function ``functions.exp_mov_average()``
 
 ### Fix
 
 - renamed depreceated instances of ``aesara`` modules
 - **data.py**: defaults ``batch_size`` argument to 0 if batch_size is ``None``
 - added argument type hints in function.py
-- updated syntax for ``expressions.py`` class objects
-- added ``init_type`` property to ``Weights`` class
-- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 
 ### Refactor
 
@@ -34,12 +41,17 @@
 ### Feat
 
 - added ``pycmtensor.about()`` to output package metadata
+- added ``pycmtensor.about()`` to output package metadata
+- added EMA function ``functions.exp_mov_average()``
 - added EMA function ``functions.exp_mov_average()``
 
 ### Fix
 
 - updated syntax for ``expressions.py`` class objects
+- updated syntax for ``expressions.py`` class objects
 - added ``init_type`` property to ``Weights`` class
+- added ``init_type`` property to ``Weights`` class
+- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 - moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 
 ## v1.2.0 (2022-10-14)

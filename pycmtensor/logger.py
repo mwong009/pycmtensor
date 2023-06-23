@@ -53,9 +53,9 @@ def get_default_logger(name, level):
 
 
 default_formatter = logging.Formatter(
-    "[{asctime:s}] {levelname:s}: {message:s}",
+    "{asctime:s} [{levelname:s}] {message:s}",
     style="{",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    datefmt="%H:%M:%S",
 )
 
 main_logger = get_default_logger("pycmtensor", VERBOSITY_DEFAULT)

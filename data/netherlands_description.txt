@@ -1,0 +1,20 @@
+# Data description
+
+Variable name
+- choice: the choice variable 0=car, 1=rail
+- business_trip: the trip was a business trip 1=yes, 0=no
+- age41+: the traveller is over 41 years old 1=yes, 0=no
+- unemployed: the traveller is unemployed 1=yes, 0=no
+- female: the traveller is female 1=yes, 0=no
+- npersons: number of persons travelling together
+- train_cost: alternative specific variable cost for train choice
+- train_tt: alternative specific variable travel time for train choice
+- train_xfers: alternative specific variable number of transfers for train choice
+- train_egress_walk: alternative specific variable dummy traveller walked from the train station 1=yes, 0=no
+- train_ingress_walk: alternative specific variable dummy traveller walked to the train station 1=yes, 0=no
+- train_1st_class: alternative specific variable dummy traveller used 1st class
+- car_cost: alternative specific variable cost for car choice
+- car_tt: alternative specific variable travel time for car choice
+- car_walk_time: alternative specific variable total walking time parking/destination
+- free_parking: alternative specific variable dummy for free parking 1=yes, 0=no
+- flex_arrival_time: dummy if arrival time is flexible for traveller 1=yes, 0=no

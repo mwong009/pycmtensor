@@ -53,7 +53,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "autoapi.extension",
     "sphinx.ext.napoleon",
-    "myst_parser",
+    # "myst_parser",
+    "myst_nb",
     "sphinx_design",
 ]
 
@@ -76,7 +77,8 @@ todo_include_todos = False
 #
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "markdown",
+    ".md": "myst-nb",
+    ".ipynb": "myst-nb",
 }
 
 # The master toctree document.
@@ -86,11 +88,20 @@ suppress_warnings = ["autoapi"]
 
 # -- Options for myst-nb -----------------------------------------------------
 
-jupyter_execute_notebooks = "off"
-
+myst_url_schemes = ("http", "https", "mailto")
+nb_execution_mode = "off"
+nb_execution_allow_errors = True
+nb_number_source_lines = True
+myst_render_markdown_format = "myst"
 # -- Options for myst-parser -------------------------------------------------
 
-myst_enable_extensions = ["colon_fence", "dollarmath", "amsmath"]
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
+]
 
 # -- Options for autoapi -----------------------------------------------------
 

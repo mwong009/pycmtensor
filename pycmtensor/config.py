@@ -10,7 +10,7 @@ import sys
 import numpy as np
 from watermark import watermark
 
-from .logger import log
+from .logger import info, warning
 from .scheduler import *
 
 __all__ = ["Config"]
@@ -116,11 +116,11 @@ class Config:
             "max_learning_rate": None,
             "batch_size": 250,
             "max_steps": 1000,
-            "clr_cycle_steps": 16,
-            "clr_gamma": None,
             "batch_shuffle": False,
+            "lr_scheduler": ConstantLR(),
+            "clr_gamma": None,
+            "clr_cycle_steps": 16,
         }
-        self.hyperparameters["lr_scheduler"] = ConstantLR(self["base_learning_rate"])
         self.aesara_rc = init_aesara_rc()
         init_environment_variables()
 
@@ -143,10 +143,15 @@ class Config:
     def __call__(self):
         return self.hyperparameters
 
-    def set_hyperparameter(self, key: str, value):
-        """Helper command to set hyperparameters to ``key: value``"""
-        self.hyperparameters[key] = value
-        log(10, f"set {key}={value}")
+    def set_hyperparameter(self, **kwargs):
+        """function to set hyperparameters"""
+        for key, value in kwargs.items():
+            if key not in self.hyperparameters:
+                warning(f"{key} not a valid training hyperparameter, skipping.")
+            else:
+                self.hyperparameters[key] = value
+                info(f"Hyperparameter set {key}={value}")
+        self.check_values()
 
     def set_lr_scheduler(self, scheduler):
         """Sets the config option ``lr_scheduler`` and ``base_learning rate``"""
