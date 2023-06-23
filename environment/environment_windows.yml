@@ -9,6 +9,6 @@ dependencies:
 # conda env create -f .\environment_windows.yml
 # conda activate pycmtensor-dev
 # python -m pip install --upgrade pip
-# conda install poetry
+# pip install poetry
 # poetry update
 # poetry install -E dev

@@ -70,7 +70,7 @@ jobs:
     ##################
     - name: Install package dependencies
       run: |
-        conda install poetry
+        pip install poetry
         poetry install
         poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
 
