@@ -86,7 +86,7 @@ PyCMTensor also include the ability to estimate models using stochastic gradient
 3. Install the ``PyCMTensor`` package from PyPI via pip
 
     ```
-    pip install -U pycmtensor==1.3.1
+    pip install -U pycmtensor==1.3.2
     ```
 
     Alternatively, the latest development version is available via [Github](https://github.com/mwong009/pycmtensor). It can be installed via 
@@ -297,9 +297,9 @@ Cite this software as:
 
     @software{melvin_wong_2022_7249280,
       author       = {Melvin Wong},
-      title        = {mwong009/pycmtensor: v1.3.1},
+      title        = {mwong009/pycmtensor: v1.3.2},
       year         = 2022,
-      version      = {v1.3.1},
+      version      = {v1.3.2},
       doi          = {10.5281/zenodo.7249280},
       url          = {https://doi.org/10.5281/zenodo.7249280}
     }

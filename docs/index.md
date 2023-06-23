@@ -74,7 +74,7 @@ PyCMTensor also include the ability to estimate models using 1st order stochasti
     PyCMTensor is available on [PyPI](https://pypi.org/project/pycmtensor). It can be installed with ``pip``
 
     ```console
-    pip install -U pycmtensor==1.3.1
+    pip install -U pycmtensor==1.3.2
     ```
 
     Alternatively, the latest development version is available via [Github](https://github.com/mwong009/pycmtensor). It can be installed via 

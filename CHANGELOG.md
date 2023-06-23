@@ -1,4 +1,4 @@
-## Unreleased
+## v1.3.2 (2023-06-23)
 
 ### Fix
 
@@ -7,6 +7,7 @@
 
 ### Refactor
 
+- make model variables as property
 - update `__all__` package variables
 - added `train_data` and `valid_data` property to `Data` class
 

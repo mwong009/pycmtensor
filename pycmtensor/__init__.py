@@ -1,7 +1,7 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 import numpy as np
 
