@@ -133,16 +133,14 @@ class TestFunctions:
             functions.errors(prob, y_test)
 
     def test_hessians(self, mnl_model):
-        h = functions.hessians(mnl_model.ll, mnl_model.betas)
+        h = functions.hessians(mnl_model.cost, mnl_model.betas)
         assert h.ndim == 2
         assert list(h.shape.eval()) == [4, 4]
 
-    def test_bhhh(self, swissmetro_db, mnl_model):
-        db = swissmetro_db
-        data = db.pandas.inputs(mnl_model.inputs)
-        bhhh = mnl_model.BHHH(*data)
-        assert bhhh.ndim == 2
-        assert list(bhhh.shape) == [4, 4]
+    def test_gradient_vector(self, mnl_model):
+        gradients = functions.gradient_vector(mnl_model.cost, mnl_model.betas)
+        assert gradients.ndim == 1
+        assert list(gradients.shape.eval()) == [4]
 
     def test_gnorm(self, mnl_model):
         gn = functions.gnorm(mnl_model.cost, mnl_model.betas)

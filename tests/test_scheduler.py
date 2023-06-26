@@ -4,12 +4,17 @@ from collections import OrderedDict
 
 import pytest
 
+from pycmtensor.optimizers import Adadelta
 from pycmtensor.scheduler import *
 
 
 def test_set_lr_scheduler(config_class):
     config = copy.copy(config_class)
     config.set_lr_scheduler(ConstantLR())
+    with pytest.raises(TypeError):
+        config.set_lr_scheduler(Adadelta())
+    with pytest.raises(TypeError):
+        config.set_lr_scheduler(Scheduler())
 
     assert config["lr_scheduler"].name == "ConstantLR"
 

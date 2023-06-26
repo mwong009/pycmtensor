@@ -114,7 +114,7 @@ class Config:
             "validation_threshold": 1.005,
             "base_learning_rate": 0.01,
             "max_learning_rate": None,
-            "batch_size": 250,
+            "batch_size": 32,
             "max_steps": 1000,
             "batch_shuffle": False,
             "lr_scheduler": ConstantLR(),
@@ -124,7 +124,7 @@ class Config:
         self.aesara_rc = init_aesara_rc()
         init_environment_variables()
 
-    def __print__(self):
+    def __repr__(self):
         rval = f"\nhyperparameters\n---------------\n"
         for key, val in self.hyperparameters.items():
             rval += f"{key:<24}: {val}\n"

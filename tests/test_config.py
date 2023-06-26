@@ -30,6 +30,9 @@ def test_set_hyperparameters(config_class):
     assert config_class.hyperparameters["batch_size"] == 128
     config_class.set_hyperparameter(max_steps=old_max_steps, batch_size=old_batch_size)
 
+    # skip invalid hyperparameter
+    config_class.set_hyperparameter(abcdefg=12345)
+
 
 def test_call_magic(config_class):
     seed = config_class["seed"]
@@ -43,6 +46,7 @@ def test_setitem_magic(config_class):
 
 
 def test_getitem_magic(config_class):
+    config_class.set_hyperparameter(patience_increase=2, batch_size=250)
     assert config_class["patience_increase"] == 2
     assert config_class["batch_size"] == 250
 
