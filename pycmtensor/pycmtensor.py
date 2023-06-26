@@ -13,7 +13,7 @@ from aesara.tensor.var import TensorVariable
 from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weight
-from .functions import bhhh, errors, gnorm, hessians
+from .functions import errors, gnorm, gradient_vector, hessians
 from .logger import debug, info, warning
 from .optimizers import Adam, Optimizer
 from .results import Results
@@ -163,17 +163,17 @@ class PyCMTensorModel:
         self.H = function(
             name="Hessian matrix",
             inputs=self.inputs,
-            outputs=hessians(self.ll, self.betas),
+            outputs=hessians(self.cost, self.betas),
         )
 
-    def model_BHHH(self):
-        """Loads the function to ``self.BHHH()`` to calculate the Berndt-Hall-Hall-
-        Hausman (BHHH) approximation.
+    def model_G(self):
+        """Loads the function to ``self.G()`` to calculate the first order gradients
+        of the model.
         """
-        self.BHHH = function(
+        self.G = function(
             name="BHHH matrix",
             inputs=self.inputs,
-            outputs=bhhh(self.ll, self.betas),
+            outputs=gradient_vector(self.cost, self.betas),
         )
 
     def model_gnorm(self):
@@ -314,6 +314,8 @@ class PyCMTensorModel:
 
         self.betas = self.results.betas
         self.weights = self.results.weights
+        self.gradients = self.G(*db.train_data)
+
         self.results.n_train_samples = db.n_train_samples
         self.results.n_valid_samples = db.n_valid_samples
         self.results.n_params = self.n_params
@@ -323,7 +325,9 @@ class PyCMTensorModel:
         # statistical analysis step
         self.results.gnorm = self.gradient_norm(*db.train_data)
         self.results.hessian_matrix = self.H(*db.train_data)
-        self.results.bhhh_matrix = self.BHHH(*db.train_data)
+        self.results.bhhh_matrix = (
+            np.outer(self.gradients, self.gradients) * db.n_train_samples
+        )
 
     def export_to_pickle(self, f):
         """to be removed in 1.4.0"""

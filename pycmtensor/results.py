@@ -89,7 +89,7 @@ class Results:
         """Returns a pandas DataFrame of the model beta statistics"""
         betas = self.betas
         h = self.hessian_matrix
-        bhhh = self.bhhh_matrix
+        bh = self.bhhh_matrix
 
         stats = pd.DataFrame(
             index=[b.name for b in betas if (b.status != 1)], columns=["value"]
@@ -98,7 +98,7 @@ class Results:
         stats["t-test"] = t_test(stats["std err"], betas)
         stats["p-value"] = p_value(stats["std err"], betas)
 
-        stats["rob. std err"] = rob_stderror(h, bhhh, betas)
+        stats["rob. std err"] = rob_stderror(h, bh, betas)
         stats["rob. t-test"] = t_test(stats["rob. std err"], betas)
         stats["rob. p-value"] = p_value(stats["rob. std err"], betas)
         stats.drop("value", axis=1, inplace=True)
@@ -129,12 +129,12 @@ class Results:
         """Returns a pandas DataFrame of the model (robust) correlation matrix"""
         betas = self.betas
         h = self.hessian_matrix
-        bhhh = self.bhhh_matrix
+        bh = self.bhhh_matrix
 
         mat = pd.DataFrame(
             columns=[b.name for b in betas if (b.status != 1)],
             index=[b.name for b in betas if (b.status != 1)],
-            data=rob_correlation_matrix(h, bhhh),
+            data=rob_correlation_matrix(h, bh),
         )
 
         return mat

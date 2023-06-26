@@ -19,16 +19,16 @@ __all__ = [
 
 
 def variance_covariance(h):
-    """Returns the var-covar matrix given the Hessian (``h``)"""
-    return -nlinalg.pinv(nan2num(h)).eval()
+    """Returns the variance covariance matrix given the Hessian (``h``)"""
+    return nlinalg.pinv(nan2num(-h)).eval()
 
 
-def rob_variance_covariance(h, bhhh):
-    """Returns the rob. var-covar matrix given the Hessian (``h``) and the BHHH
-    matrix (``bhhh``)
+def rob_variance_covariance(h, bh):
+    """Returns the rob. var-covar matrix given the Cramer-Rao bound (``h``) and the BHHH
+    matrix (``bh``)
     """
-    var_covar = variance_covariance(h)
-    return var_covar.dot(bhhh.dot(var_covar))
+    cr = variance_covariance(h)
+    return cr.dot(bh.dot(cr))
 
 
 def t_test(stderr, params):
@@ -44,7 +44,12 @@ def p_value(stderr, params):
 
 
 def stderror(h, params):
-    """Returns the standard error of ``params`` given the Hessian (``h``)"""
+    """Returns the standard error of ``params`` given the Hessian (``h``)
+
+    The std err is calculated as the square root of the variance covariance
+    matrix.
+
+    """
     params = [p() for p in params if (p.status != 1)]
     varCovar = variance_covariance(h)
     stdErr = []
@@ -57,13 +62,13 @@ def stderror(h, params):
     return stdErr
 
 
-def rob_stderror(h, bhhh, params):
+def rob_stderror(h, bh, params):
     """Returns the rob. standard error of ``params`` given the Hessian (``h``) and the
-    BHHH matrix (``bhhh``)
+    BHHH matrix (``bh``)
     """
     params = [p() for p in params if (p.status != 1)]
     varCovar = variance_covariance(h)
-    robVarCovar = varCovar.dot(bhhh.dot(varCovar))
+    robVarCovar = varCovar.dot(bh.dot(varCovar))
     robstderr = []
     for i in range(len(params)):
         if robVarCovar[i, i] < 0:
@@ -88,9 +93,9 @@ def correlation_matrix(h):
     return mat
 
 
-def rob_correlation_matrix(h, bhhh):
+def rob_correlation_matrix(h, bh):
     """Returns the correlation matrix given the Hessian and the BHHH matrix"""
-    rob_var_covar = rob_variance_covariance(h, bhhh)
+    rob_var_covar = rob_variance_covariance(h, bh)
     rd = np.diag(rob_var_covar)
     if (rd > 0).all():
         diag = np.diag(np.sqrt(rd))

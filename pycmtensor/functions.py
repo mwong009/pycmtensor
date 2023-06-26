@@ -3,6 +3,7 @@
 from ctypes import util
 from typing import Union
 
+import aesara
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
@@ -11,6 +12,7 @@ from aesara.tensor.var import TensorVariable
 
 from pycmtensor.expressions import Beta, Param
 
+from .data import FLOATX
 from .logger import error, log
 
 __all__ = [
@@ -23,7 +25,6 @@ __all__ = [
     "kl_multivar_norm",
     "errors",
     "hessians",
-    "bhhh",
     "gnorm",
 ]
 
@@ -287,11 +288,11 @@ def errors(prob: TensorVariable, y: TensorVariable):
         raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
-def hessians(ll: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the Hessian matrix given the log likelihood.
+def hessians(cost: TensorVariable, params: list[Beta]):
+    """Symbolic representation of the 2nd order Hessian matrix given the neg. log likelihood.
 
     Args:
-        ll (TensorVariable): the loglikelihood to compute the gradients over
+        cost (TensorVariable): the neg loglikelihood to compute the gradients over
         params (list): list of params to compute the gradients over
 
     Returns:
@@ -303,7 +304,7 @@ def hessians(ll: TensorVariable, params: list[Beta]):
     if not isinstance(params, list):
         raise TypeError(f"params is not list instance. type(params)={type(params)}")
     params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(ll, params, disconnected_inputs="ignore")
+    grads = aet.grad(-cost, params, disconnected_inputs="ignore")
     mat = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
         mat = aet.set_subtensor(
@@ -313,16 +314,15 @@ def hessians(ll: TensorVariable, params: list[Beta]):
     return mat
 
 
-def bhhh(ll: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the Berndt-Hall-Hall-Hausman (BHHH) algorithm given
-    the log likelihood.
+def gradient_vector(cost: TensorVariable, params: list[Beta]):
+    """Symbolic representation of the 1st order gradient vector given the neg. log likelihood.
 
     Args:
-        ll (TensorVariable): the loglikelihood to compute the gradients over
+        cost (TensorVariable): the neg loglikelihood to compute the gradients over
         params (list): list of params to compute the gradients over
 
     Returns:
-        TensorVariable: the outer product of the gradient with ndim=2
+        TensorVariable: the gradient vector
 
     Note:
         Parameters with status=1 are ignored.
@@ -334,9 +334,8 @@ def bhhh(ll: TensorVariable, params: list[Beta]):
     if isinstance(params, dict):
         params = list(params.values())
     params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(ll, params, disconnected_inputs="ignore")
-    mat = aet.outer(aet.as_tensor_variable(grads), aet.as_tensor_variable(grads).T)
-    return mat
+    grads = aet.grad(-cost, params, disconnected_inputs="ignore")
+    return aet.as_tensor_variable(grads)
 
 
 def gnorm(cost: TensorVariable, params: list[Beta]):
