@@ -121,19 +121,23 @@ class Data:
         """Returns the lenth of the DataFrame object"""
         return len(self.pandas())
 
-    def get_train_data(self, tensors, index=None, batch_size=None, shift=None):
+    def get_train_data(
+        self, tensors, index=None, batch_size=None, shift=0, numpy_out=False
+    ):
         """Alias to get train data slice from `self.pandas.inputs()`
 
         See :meth:`PandasDataFrame.inputs()` for details
         """
-        return self.pandas.inputs(tensors, index, batch_size, shift, "train")
+        return self.pandas.inputs(tensors, index, batch_size, shift, "train", numpy_out)
 
-    def get_valid_data(self, tensors, index=None, batch_size=None, shift=None):
+    def get_valid_data(
+        self, tensors, index=None, batch_size=None, shift=0, numpy_out=False
+    ):
         """Alias to get valid data slice from `self.pandas.inputs()`
 
         See :meth:`PandasDataFrame.inputs()` for details
         """
-        return self.pandas.inputs(tensors, index, batch_size, shift, "valid")
+        return self.pandas.inputs(tensors, index, batch_size, shift, "valid", numpy_out)
 
     def scale_data(self, **kwargs):
         """Scales data values by data/scale from `key=scale` keyword argument
@@ -230,6 +234,7 @@ class PandasDataFrame:
         batch_size: int = None,
         shift: int = 0,
         split_type: Literal["train", "valid"] = "train",
+        numpy=False,
     ) -> list[pd.DataFrame]:
         """Returns a list of DataFrame corresponding to the tensors input
 
@@ -256,6 +261,7 @@ class PandasDataFrame:
 
         datalist = []
         if index is None:
+            # get the entire dataframe
             datalist = [dataset[t.name] for t in tensors]
         else:
             if batch_size is None:
@@ -263,6 +269,9 @@ class PandasDataFrame:
             start = index * batch_size + min(batch_size, shift)
             end = (index + 1) * batch_size + min(batch_size, shift)
             datalist = [dataset[t.name].iloc[start:end] for t in tensors]
+
+        if numpy:
+            datalist = [d.values for d in datalist]
         return datalist
 
     def split_pandas(self, seed: int, split_frac: float):
