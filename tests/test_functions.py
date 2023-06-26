@@ -141,7 +141,3 @@ class TestFunctions:
         gradients = functions.gradient_vector(mnl_model.cost, mnl_model.betas)
         assert gradients.ndim == 1
         assert list(gradients.shape.eval()) == [4]
-
-    def test_gnorm(self, mnl_model):
-        gn = functions.gnorm(mnl_model.cost, mnl_model.betas)
-        assert gn.ndim == 0
