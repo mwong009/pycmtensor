@@ -5,7 +5,6 @@ from time import perf_counter
 from typing import Union
 
 import aesara.tensor as aet
-import dill as pickle
 import numpy as np
 from aesara import function
 from aesara.tensor.var import TensorVariable
@@ -13,7 +12,7 @@ from aesara.tensor.var import TensorVariable
 from pycmtensor import config, rng
 
 from .expressions import Beta, ExpressionParser, Weight
-from .functions import errors, gnorm, gradient_vector, hessians
+from .functions import errors, gradient_vector, hessians
 from .logger import debug, info, warning
 from .optimizers import Adam, Optimizer
 from .results import Results
@@ -164,6 +163,7 @@ class PyCMTensorModel:
             name="Hessian matrix",
             inputs=self.inputs,
             outputs=hessians(self.cost, self.betas),
+            allow_input_downcast=True,
         )
 
     def model_G(self):
@@ -174,17 +174,18 @@ class PyCMTensorModel:
             name="BHHH matrix",
             inputs=self.inputs,
             outputs=gradient_vector(self.cost, self.betas),
+            allow_input_downcast=True,
         )
 
-    def model_gnorm(self):
-        """Loads the function to ``self.gradient_norm()`` to calculate the gradient
-        norm of the model cost function.
-        """
-        self.gradient_norm = function(
-            name="Gradient norm",
-            inputs=self.inputs,
-            outputs=gnorm(self.cost, self.betas),
-        )
+    # def model_gnorm(self):
+    #     """Loads the function to ``self.gradient_norm()`` to calculate the gradient
+    #     norm of the model cost function.
+    #     """
+    #     self.gradient_norm = function(
+    #         name="Gradient norm",
+    #         inputs=self.inputs,
+    #         outputs=gnorm(self.cost, self.betas),
+    #     )
 
     def predict(self, db, return_choices: bool = True):
         """Returns the predicted choice or choice probabilites
@@ -312,27 +313,30 @@ class PyCMTensorModel:
         msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.2f}%, LL={self.results.best_loglikelihood:.2f}, Step={self.results.best_step})"
         info(msg)
 
-        self.betas = self.results.betas
-        self.weights = self.results.weights
-        self.gradients = self.G(*db.train_data)
-
+        # save results
         self.results.n_train_samples = db.n_train_samples
         self.results.n_valid_samples = db.n_valid_samples
         self.results.n_params = self.n_params
         self.results.seed = self.config["seed"]
         self.results.lr_history_graph = self.config["lr_scheduler"].history
+        self.betas = self.results.betas
+        self.weights = self.results.weights
 
-        # statistical analysis step
-        self.results.gnorm = self.gradient_norm(*db.train_data)
-        self.results.hessian_matrix = self.H(*db.train_data)
-        self.results.bhhh_matrix = (
-            np.outer(self.gradients, self.gradients) * db.n_train_samples
-        )
-
-    def export_to_pickle(self, f):
-        """to be removed in 1.4.0"""
-        model = self
-        pickle.dump(model, f)
+        # Calculate the 1st and 2nd order gradients
+        n = db.n_train_samples
+        k = len([p for p in self.betas if (p.status != 1)])
+        G = np.zeros((n, k))
+        H = np.zeros((n, k, k))
+        covar_data = db.get_train_data(self.inputs, numpy_out=True)
+        for i in range(n):
+            g_vector = self.G(*[[d[i]] for d in covar_data])
+            hess = self.H(*[[d[i]] for d in covar_data])
+            G[i, :] = g_vector
+            H[i, :, :] = hess
+        self.gradients = G
+        self.results.gnorm = np.linalg.norm(G, None, axis=1).mean()
+        self.results.hessian_matrix = H.mean(axis=0)
+        self.results.bhhh_matrix = (G[:, :, None] * G[:, None, :]).mean(axis=0)
 
     def __str__(self):
         return f"{self.name}"
