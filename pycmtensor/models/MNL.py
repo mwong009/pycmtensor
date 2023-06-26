@@ -75,7 +75,6 @@ class MNL(PyCMTensorModel):
         self.model_prediction_error()
         self.model_H()
         self.model_G()
-        self.model_gnorm()
 
         build_time = round(perf_counter() - start_time, 3)
         self.results.build_time = time_format(build_time)

@@ -25,7 +25,6 @@ __all__ = [
     "kl_multivar_norm",
     "errors",
     "hessians",
-    "gnorm",
 ]
 
 
@@ -336,27 +335,3 @@ def gradient_vector(cost: TensorVariable, params: list[Beta]):
     params = [p() for p in params if (p.status != 1)]
     grads = aet.grad(-cost, params, disconnected_inputs="ignore")
     return aet.as_tensor_variable(grads)
-
-
-def gnorm(cost: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the gradient norm given the cost.
-
-    Args:
-        cost (TensorVariable): the cost to compute the gradients over
-        params (list): list of params to compute the gradients over
-
-    Returns:
-        TensorVariable: the gradient norm value
-
-    Note:
-        Parameters with status=1 are ignored.
-    """
-    if not isinstance(params, (dict, list)):
-        raise TypeError(
-            f"params is not list or dict instance. type(params)={type(params)}"
-        )
-    if isinstance(params, dict):
-        params = list(params.values())
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
-    return nlinalg.norm(grads, ord=None)
