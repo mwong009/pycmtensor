@@ -27,7 +27,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 # Core
-python = "^3.9"
+python = "^3.9, <3.12"
 aesara = "^2.9"
 scipy = "^1.7.1"
 numpy = "1.24.3"
