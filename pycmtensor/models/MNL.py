@@ -30,7 +30,7 @@ class MNL(PyCMTensorModel):
             av (list, optional): list of availability conditions. If `None`, all
                 availability is set to 1
             **kwargs: keyword arguments. Possible options are
-                `optimizer: pycmtensor.optimizer=Adam` set the optimizer to use. see
+                `optimizer` set the optimizer to use. see
                 :py:mod:`pycmtensor.optimizer` for available options.
         """
         start_time = perf_counter()
@@ -57,18 +57,12 @@ class MNL(PyCMTensorModel):
         self.add_params(params)
 
         # define the optimizer for the model
-        self.opt = self.optimizer(self.params)
+        optimizer = self.config.optimizer
+        self.opt = optimizer(self.params)
         self.updates += self.opt.update(self.cost, self.params, self.learning_rate)
 
-        # define the update function to update the parameters wrt to the cost
-        self.update_wrt_cost = function(
-            name="update_wrt_cost",
-            inputs=self.inputs + [self.learning_rate],
-            outputs=self.cost,
-            updates=self.updates,
-        )
-
         # internal functions
+        self.model_update_wrt_cost()
         self.model_loglikelihood()
         self.model_choice_probabilities()
         self.model_choice_predictions()
@@ -81,9 +75,8 @@ class MNL(PyCMTensorModel):
         debug(f"Build time = {self.results.build_time}")
 
         # compute the null loglikelihood
-        data = db.pandas.inputs(self.inputs, split_type="train")
+        data = db.train()
         self.results.null_loglikelihood = self.loglikelihood(*data)
-        debug(f"Null loglikelihood = {self.results.null_loglikelihood}")
 
     def __str__(self):
         return f"{self.name}"
