@@ -10,7 +10,7 @@ __all__ = [
     "StepLR",
     "PolynomialLR",
     "CyclicLR",
-    "Triangular2CLR",
+    "TriangularCLR",
     "ExpRangeCLR",
 ]
 
@@ -18,9 +18,11 @@ __all__ = [
 class Scheduler:
     """Base class for Scheduler object"""
 
-    def __init__(self):
+    def __init__(self, lr):
         """Constructor for Scheduler class object"""
         self.name = "Scheduler"
+        self._base_lr = lr
+        self._history = OrderedDict()
 
     def __str__(self):
         return f"{self.name}"
@@ -36,20 +38,6 @@ class Scheduler:
 
         return msg[:-2] + ")"
 
-
-class ConstantLR(Scheduler):
-    """Base class for constant learning rate scheduler"""
-
-    def __init__(self, lr=0.01):
-        """Constructor for ConstantLR class object
-
-        Args:
-            lr (float, optional): learning rate value
-        """
-        self.name = "ConstantLR"
-        self._base_lr = lr
-        self._history = OrderedDict()
-
     @property
     def lr(self):
         """Returns the learning rate value"""
@@ -60,21 +48,34 @@ class ConstantLR(Scheduler):
         """Returns the histroy of the learning rate"""
         return self._history
 
-    def __call__(self, step):
-        """Computes the learning rate for this step"""
-        self._record(step, self.lr)
-        return self.lr
-
     def _record(self, step, lr):
         """Saves the history of the learning rate and returns the current rate"""
         self._history[step] = lr
         return lr
 
 
+class ConstantLR(Scheduler):
+    """Base class for constant learning rate scheduler"""
+
+    def __init__(self, lr=0.01, **kwargs):
+        """Constructor for ConstantLR class object
+
+        Args:
+            lr (float, optional): learning rate value
+        """
+        super().__init__(lr)
+        self.name = "ConstantLR"
+
+    def __call__(self, step):
+        """Computes the learning rate for this step"""
+        self._record(step, self.lr)
+        return self.lr
+
+
 class StepLR(ConstantLR):
     """Base class for step learning rate scheduler"""
 
-    def __init__(self, lr=0.01, factor=0.25, drop_every=10):
+    def __init__(self, lr=0.01, factor=0.25, drop_every=10, **kwargs):
         """Constructor for StepLR class object
 
         Args:
@@ -113,7 +114,7 @@ class StepLR(ConstantLR):
 class PolynomialLR(ConstantLR):
     """Base class for polynomial decay learning rate scheduler"""
 
-    def __init__(self, max_steps, lr=0.01, power=1.0):
+    def __init__(self, max_steps, lr=0.01, power=1.0, **kwargs):
         """Constructor for PolynomialLR class object
 
         Args:
@@ -149,7 +150,7 @@ class PolynomialLR(ConstantLR):
 class CyclicLR(ConstantLR):
     """Base class for cyclical learning rate scheduler"""
 
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, scale_fn=None):
+    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, scale_fn=None, **kwargs):
         """Constructor for ConstantLR class object
 
         Args:
@@ -187,16 +188,13 @@ class CyclicLR(ConstantLR):
 
     def scale_fn(self, k):
         """Custom scaling policy"""
-        if self._scale_fn is None:
-            return 1.0
-        else:
-            return self._scale_fn(k)
+        return 1.0
 
 
-class Triangular2CLR(CyclicLR):
-    """Class object for the Triangular2 Cyclic LR scheduler"""
+class TriangularCLR(CyclicLR):
+    """Class object for the Triangular Cyclic LR scheduler"""
 
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16):
+    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, **kwargs):
         """Constructor for Triangular2CLR class object
 
         Args:
@@ -215,7 +213,7 @@ class Triangular2CLR(CyclicLR):
 class ExpRangeCLR(CyclicLR):
     """Class object for the exponential range Cyclic LR scheduler"""
 
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, gamma=0.5):
+    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, gamma=0.5, **kwargs):
         """Constructor for Triangular2CLR class object
 
         Args:
