@@ -42,7 +42,7 @@ jobs:
     - name: Install Conda dependencies (windows)
       if: matrix.os == 'windows-latest'
       run: |
-        conda install mkl-service conda-forge::cxx-compiler conda-forge::m2w64-toolchain -y
+        conda install -c conda-forge mkl-service m2w64-toolchain vs2019_win-64 blas aesara -y
 
     ##################
     # Linux (Ubuntu) #
@@ -50,7 +50,7 @@ jobs:
     - name: Install conda dependencies (linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        conda install mkl-service conda-forge::cxx-compiler -y
+        conda install -c conda-forge mkl-service gcc_linux-64 gxx_linux-64 blas aesara -y
 
     ###########
     # Mac OSX #
@@ -58,7 +58,7 @@ jobs:
     - name: Install conda dependencies (macos)
       if: matrix.os == 'macos-latest'
       run: |
-        conda install mkl-service Clang -y
+        conda install -c conda-forge mkl-service Clang blas aesara -y
     
     - name: Xcode check (macos)
       if: matrix.os == 'macos-latest'
@@ -79,6 +79,11 @@ jobs:
       run: |
         cat ~/.aesararc
       shell: bash
+
+    - name: Show aesara.config ldflags
+      run: |
+        poetry run python -c "import aesara; print(aesara.config.blas__ldflags)"
+        poetry run python -c "import aesara; print(aesara.config.gcc_cxxflags)"
     
     ########
     # Test #
