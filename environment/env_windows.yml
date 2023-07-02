@@ -8,12 +8,13 @@ dependencies:
     - m2w64-toolchain
     - vs2019_win-64
     - blas
+    - aesara
 
 # windows 
-# conda env create -f environment_windows.yml
+# conda env create -f environment/env_windows.yml
 # conda activate pycmtensor-dev
 # python -m pip install --upgrade pip
-# pip cache clear
+# pip cache purge
 # pip install poetry
 # poetry update
 # poetry install -E dev

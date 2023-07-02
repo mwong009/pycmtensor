@@ -8,12 +8,13 @@ dependencies:
     - gcc_linux-64
     - gxx_linux-64
     - blas
+    - aesara
 
 # linux
 # conda env create -f environment_linux.yml
 # conda activate pycmtensor-dev
 # python -m pip install --upgrade pip
-# pip cache clear
+# pip cache purge
 # pip install poetry
 # poetry update
 # poetry install -E dev

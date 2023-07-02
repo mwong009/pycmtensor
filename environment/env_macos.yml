@@ -7,12 +7,13 @@ dependencies:
     - mkl-service
     - Clang
     - blas
+    - aesara
 
 # macos
 # conda env create -f environment_macos.yml
 # conda activate pycmtensor-dev
 # python -m pip install --upgrade pip
-# pip cache clear
+# pip cache purge
 # pip install poetry
 # poetry update
 # poetry install -E dev
