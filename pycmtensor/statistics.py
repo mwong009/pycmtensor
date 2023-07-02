@@ -67,8 +67,7 @@ def rob_stderror(h, bh, params):
     BHHH matrix (``bh``)
     """
     params = [p() for p in params if (p.status != 1)]
-    varCovar = variance_covariance(h)
-    robVarCovar = varCovar.dot(bh.dot(varCovar))
+    robVarCovar = rob_variance_covariance(h, bh)
     robstderr = []
     for i in range(len(params)):
         if robVarCovar[i, i] < 0:
@@ -128,5 +127,5 @@ def elasticities(model, db, y: int, x: str):
         / model.p_y_given_x[y],
         on_unused_input="ignore",
     )
-    data = db.pandas.inputs(model.inputs, split_type="train")
+    data = db.train(model.inputs)
     return fn_elasticity(*data)
