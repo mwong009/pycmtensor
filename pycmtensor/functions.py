@@ -10,7 +10,7 @@ import numpy as np
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta, Param
+from pycmtensor.expressions import Beta, Expressions, Param
 
 from .data import FLOATX
 from .logger import error, log
@@ -85,11 +85,24 @@ def logit(
             raise ValueError(msg)
         _utility = utility
         for n, u in enumerate(_utility):
-            if not isinstance(u, (TensorVariable, TensorSharedVariable)):
-                utility[n] = u()
-            if utility[n].ndim == 0:
-                utility[n] = aet.expand_dims(utility[n], -1)
+            # convert u to vector representation if u is a scalar
+            if isinstance(u, Beta):
+                utility[n] = aet.as_tensor_variable(u())
+
+        # get maximum ndim from set of utlity equations
+        max_ndim = max([u.ndim for u in utility])
+        _utility = utility
+
+        # pad tensors to have the same number of dimensions
+        utility = [aet.atleast_Nd(u, n=max_ndim) for u in utility]
+
+        # broadcast tensors across each other before stacking
+        utility = aet.broadcast_arrays(*utility)
+
+        # stack list of tensors to into a max_ndim+1 tensor
         U = aet.stack(utility)
+
+    # use the utility inputs as is if given as a TensorVariable
     elif isinstance(utility, TensorVariable):
         U = utility
     else:
@@ -97,13 +110,23 @@ def logit(
             f"utility {utility} has to be a list, tuple or TensorVariable instance"
         )
 
+    # calculate the probabilities
     prob = aet.special.softmax(U, axis=0)
+
+    # update probabilities by availability conditions
     if avail != None:
+        # stack availabilities and convert to tensor
         AV = aet.stack(avail)
+
         while AV.ndim < prob.ndim:
-            AV = aet.expand_dims(AV, 1)
+            # insert new axes after choice axis (choice axis = 0)
+            AV = aet.shape_padaxis(AV, axis=1)
+
         prob = prob * AV
+
+        # normalize probabilities to sum to 1
         prob = prob / aet.sum(prob, axis=0, keepdims=1)
+
     return prob
 
 
@@ -120,7 +143,14 @@ def log_likelihood(prob: TensorVariable, y: TensorVariable):
     Note:
         The 0-th dimension is the numbering of alternatives.
     """
-    return aet.sum(aet.log(prob)[y, ..., aet.arange(y.shape[0])])
+    # calculate the log probabilitiy of axis 0
+    logprob = aet.log(prob)[y, ..., aet.arange(y.shape[0])]
+
+    # take the average over all other non choice, non-n axes
+    while logprob.ndim > 1:
+        logprob = aet.mean(logprob, axis=1)
+
+    return aet.sum(logprob)
 
 
 def rmse(y_hat: TensorVariable, y: TensorVariable):
