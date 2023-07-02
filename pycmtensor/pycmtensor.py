@@ -9,12 +9,11 @@ import numpy as np
 from aesara import function
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor import config, rng
+from pycmtensor import config
 
 from .expressions import Beta, ExpressionParser, Weight
 from .functions import errors, gradient_vector, hessians
 from .logger import debug, info, warning
-from .optimizers import Adam, Optimizer
 from .results import Results
 from .utils import time_format
 
@@ -24,20 +23,17 @@ class PyCMTensorModel:
         """Base model class object"""
         self.name = "PyCMTensorModel"
         self.config = config
-        self.params = []  # keep track of all the params
+        self.rng = np.random.default_rng(config.seed)
+        self.params = []  # keep track of all the Params
         self.betas = []  # keep track of the Betas
         self.weights = []  # keep track of the Weights
         self.updates = []  # keep track of the updates
         self.inputs = db.all
         self.learning_rate = aet.scalar("learning_rate")
-        self.optimizer = Adam
         self.results = Results()
 
         for key, value in kwargs.items():
-            if key == "optimizer" or key == "opt":
-                if not isinstance(value, Optimizer):
-                    raise TypeError(f"invalid optimizer {value}")
-                self.optimizer = value
+            self.config.add(key, value)
 
         debug(f"Building model...")
 
@@ -55,6 +51,7 @@ class PyCMTensorModel:
             params = {str(p): p for p in params}
 
         # iterate through the dict of params:
+
         if not hasattr(self, "cost"):
             raise ValueError(f"No valid cost function defined.")
 
@@ -68,8 +65,8 @@ class PyCMTensorModel:
                 continue
                 # raise NameError(f"Duplicate param names defined: {p.name}.")
 
-            if (p.name not in symbols) and (p.status == 0):
-                warning(f"Unused Beta {p.name} removed from computational graph")
+            if p.name not in symbols:
+                warning(f"Unused Beta {p.name} not in any utility functions")
                 continue
 
             self.params.append(p)
@@ -115,9 +112,19 @@ class PyCMTensorModel:
         return [w.get_value() for w in self.weights]
 
     def reset_values(self):
-        """Resets param values to their initial values"""
+        """Resets Model parameters to their initial value"""
         for p in self.params:
             p.reset_value()
+
+    def model_update_wrt_cost(self):
+        """Loads the function to ``self.update_wrt_cost()`` to output the cost
+        and updates the model parameters given inputs"""
+        self.update_wrt_cost = function(
+            name="update_wrt_cost",
+            inputs=self.inputs + [self.learning_rate],
+            outputs=self.cost,
+            updates=self.updates,
+        )
 
     def model_loglikelihood(self):
         """Loads the function to ``self.loglikelihood()`` to output the loglikelihood
@@ -177,16 +184,6 @@ class PyCMTensorModel:
             allow_input_downcast=True,
         )
 
-    # def model_gnorm(self):
-    #     """Loads the function to ``self.gradient_norm()`` to calculate the gradient
-    #     norm of the model cost function.
-    #     """
-    #     self.gradient_norm = function(
-    #         name="Gradient norm",
-    #         inputs=self.inputs,
-    #         outputs=gnorm(self.cost, self.betas),
-    #     )
-
     def predict(self, db, return_choices: bool = True):
         """Returns the predicted choice or choice probabilites
 
@@ -199,9 +196,9 @@ class PyCMTensorModel:
             numpy.ndarray: the output vector
         """
         if not return_choices:
-            return self.choice_probabilities(*db.valid_data)
+            return self.choice_probabilities(*db.valid())
         else:
-            return self.choice_predictions(*db.valid_data)
+            return self.choice_predictions(*db.valid())
 
     def train(self, db, **kwargs):
         """Function to train the model
@@ -212,62 +209,94 @@ class PyCMTensorModel:
                 Possible values are `max_steps:int`, `patience:int`,
                 `lr_scheduler:scheduler.Scheduler`, `batch_size:int`. For more
                 information and other possible options, see
-                :py:data:`hyperparameters <pycmtensor.config.Config.hyperparameters>`
+                :py:data:`hyperparameters <pycmtensor.config.Config>`
         """
-        self.config.set_hyperparameter(**kwargs)
+        for key, value in kwargs.items():
+            self.config.add(key, value)
 
         # [train-start]
-        lr_scheduler = self.config["lr_scheduler"]
-        batch_size = self.config["batch_size"]
-        max_steps = self.config["max_steps"]
-        patience = self.config["patience"]
-        patience_increase = self.config["patience_increase"]
-        validation_threshold = self.config["validation_threshold"]
+        batch_size = self.config.batch_size
+        if (batch_size == 0) or (batch_size == None):
+            batch_size = db.n_train
 
-        db.n_train_batches = db.n_train_samples // batch_size
+        db.n_train_batches = db.n_train // batch_size
+
+        patience = max(self.config.patience, db.n_train_batches)
+        patience_increase = self.config.patience_increase
+        max_steps = self.config.max_steps
+        validation_threshold = self.config.validation_threshold
+        convergence_threshold = self.config.convergence_threshold
+
         validation_frequency = db.n_train_batches
-        max_iterations = max_steps * db.n_train_batches
+        max_steps = max_steps * db.n_train_batches
+
+        lr_scheduler = self.config.lr_scheduler(
+            lr=self.config.base_learning_rate,
+            factor=self.config.lr_stepLR_factor,
+            power=self.config.lr_PolynomialLR_power,
+            cycle_steps=self.config.lr_CLR_cycle_steps,
+            gamma=self.config.lr_ExpRangeCLR_gamma,
+        )
 
         # initalize results array
         self.results.performance_graph = OrderedDict()
 
         # compute the inital results of the model
-        self.results.init_loglikelihood = self.loglikelihood(*db.train_data)
+        self.results.init_loglikelihood = self.loglikelihood(*db.train())
         self.results.best_loglikelihood = self.results.init_loglikelihood
-        self.results.best_valid_error = self.prediction_error(*db.valid_data)
+        self.results.best_valid_error = self.prediction_error(*db.valid())
+        self.results.betas = self.betas
 
         # loop parameters
         done_looping = False
+        converged = False
         step = 0
         iteration = 0
         shift = 0
+
+        prev_step_betas = [b.get_value() for b in self.results.betas]
 
         # set learning rate
         learning_rate = lr_scheduler(step)
 
         # main loop
         start_time = perf_counter()
-        info(f"Start (n={db.n_train_samples})")
+        info(
+            f"Start (n={db.n_train}, Step={step}, LL={self.results.null_loglikelihood:.2f}, Error={self.results.best_valid_error*100:.2f}%)"
+        )
 
         while (step < max_steps) and (not done_looping):
+            # increment step
+            step += 1
+
             # loop over batch
             learning_rate = lr_scheduler(step)
             for index in range(db.n_train_batches):
-                if patience <= iteration:
+                if (iteration > patience) or converged:
+                    step -= 1
+                    if converged:
+                        info(f"Model converged... Step={step}")
+                        if self.results.best_step != step:
+                            warning(
+                                "Model converged before reaching maximum likelihood. Reduce base_learning_rate or increase batch_size."
+                            )
+                    else:
+                        info(
+                            f"Maximum number of iterations reached: {iteration}/{patience} Step={step}"
+                        )
                     done_looping = True
-                    debug(f"Early stopping... (step={step})")
                     break
 
                 # increment iteration
                 iteration += 1
 
                 # set index and shift slices
-                if self.config["batch_shuffle"]:
-                    index = rng.integers(0, db.n_train_batches)
-                    shift = rng.integers(0, batch_size)
+                if self.config.batch_shuffle:
+                    index = self.rng.integers(0, db.n_train_batches)
+                    shift = self.rng.integers(0, batch_size)
 
                 # get data slice from dataset
-                batch_data = db.get_train_data(self.inputs, index, batch_size, shift)
+                batch_data = db.train(self.inputs, index, batch_size, shift)
 
                 # model update step
                 self.update_wrt_cost(*batch_data, learning_rate)
@@ -276,67 +305,78 @@ class PyCMTensorModel:
                 if iteration % validation_frequency != 0:
                     continue
 
-                train_ll = self.loglikelihood(*db.train_data)
-                valid_error = self.prediction_error(*db.valid_data)
-                self.results.performance_graph[step] = (
-                    np.round(train_ll, 2),
-                    np.round(valid_error, 4),
-                )
+                train_ll = self.loglikelihood(*db.train())
 
-                if valid_error >= self.results.best_valid_error:
+                self.results.performance_graph[step] = {
+                    "likelihood": np.round(train_ll, 3),
+                }
+
+                # convergence check step
+                diff = []
+                if not converged:
+                    for n, betas in enumerate(self.betas):
+                        d = np.abs(prev_step_betas[n] - betas.get_value())
+                        diff.append(d)
+                    if np.mean(diff) > convergence_threshold:
+                        # increase patience if model is not converged
+                        patience = min(
+                            max(patience, iteration * patience_increase), max_steps
+                        )
+                    else:
+                        # model converged
+                        converged = True
+
+                    prev_step_betas = [b.get_value() for b in self.betas]
+
+                # maximum likelihood check step
+                if train_ll < self.results.best_loglikelihood:
+                    # skip to next iteration if maximum likelihood not reached
                     continue
-                msg = f"Best validation error = {valid_error*100:.3f}%, (s={step}, i={iteration}, p={patience}, ll={train_ll:.2f})"
-                debug(msg)
+
+                valid_error = self.prediction_error(*db.valid())
+                info(
+                    f"Train (Step={step}, LL={train_ll:.2f}, Error={valid_error*100:.2f}%, diff={np.mean(diff):.5f}, {iteration}/{patience})"
+                )
 
                 self.results.best_step = step
                 self.results.best_iteration = iteration
                 self.results.best_loglikelihood = train_ll
                 self.results.best_valid_error = valid_error
-
                 self.results.betas = self.betas
                 self.results.weights = self.weights
-
-                # increase patience if past validation threshold
-                if train_ll > (self.results.best_loglikelihood / validation_threshold):
-                    continue
-
-                patience = min(
-                    max(patience, iteration * patience_increase), max_iterations
-                )
-
-            # increment step
-            step += 1
 
         train_time = round(perf_counter() - start_time, 3)
         self.results.train_time = time_format(train_time)
         self.results.iterations_per_sec = round(iteration / train_time, 2)
-        msg = f"End (t={self.results.train_time}, VE={self.results.best_valid_error*100:.2f}%, LL={self.results.best_loglikelihood:.2f}, Step={self.results.best_step})"
-        info(msg)
+        info(f"End (t={self.results.train_time})")
+        info(
+            f"Best results obtained at Step {self.results.best_step}: LL={self.results.best_loglikelihood:.2f}, Error={self.results.best_valid_error*100:.2f}%"
+        )
 
         # save results
-        self.results.n_train_samples = db.n_train_samples
-        self.results.n_valid_samples = db.n_valid_samples
+        self.results.n_train = db.n_train
+        self.results.n_valid = db.n_valid
         self.results.n_params = self.n_params
-        self.results.seed = self.config["seed"]
-        self.results.lr_history_graph = self.config["lr_scheduler"].history
+        self.results.seed = self.config.seed
+        self.results.lr_history_graph = self.config.lr_scheduler.history
         self.betas = self.results.betas
         self.weights = self.results.weights
 
         # Calculate the 1st and 2nd order gradients
-        n = db.n_train_samples
-        k = len([p for p in self.betas if (p.status != 1)])
+        n = db.n_train
+        k = len([p for p in self.results.betas if (p.status != 1)])
         G = np.zeros((n, k))
         H = np.zeros((n, k, k))
-        covar_data = db.get_train_data(self.inputs, numpy_out=True)
+        covar_data = db.train(self.inputs, numpy_out=True)
         for i in range(n):
             g_vector = self.G(*[[d[i]] for d in covar_data])
             hess = self.H(*[[d[i]] for d in covar_data])
             G[i, :] = g_vector
             H[i, :, :] = hess
         self.gradients = G
-        self.results.gnorm = np.linalg.norm(G, None, axis=1).mean()
-        self.results.hessian_matrix = H.mean(axis=0)
-        self.results.bhhh_matrix = (G[:, :, None] * G[:, None, :]).mean(axis=0)
+        self.results.hessian_matrix = H
+        self.results.bhhh_matrix = G[:, :, None] * G[:, None, :]
+        self.results.gnorm = np.linalg.norm(G.mean(axis=0), None)
 
     def __str__(self):
         return f"{self.name}"
