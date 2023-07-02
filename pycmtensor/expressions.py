@@ -17,8 +17,9 @@ FLOATX = aesara.config.floatX
 class ExpressionParser:
     """Base class for the ExpressionParser object"""
 
-    def __init__(self):
-        pass
+    def __init__(self, expression=None):
+        if expression is not None:
+            self.expression = str(pprint(expression))
 
     def parse(self, expression):
         """Returns a list of str words found in expression
@@ -40,9 +41,9 @@ class ExpressionParser:
             "}",
             "=",
             "-1",
-            "Shape",
             "AdvancedSubtensor",
             "Reshape",
+            "Abs",
             "join",
             "sum",
             "dtype",
@@ -53,6 +54,21 @@ class ExpressionParser:
             "Softmax",
             "None",
             "log",
+            "Assert",
+            "i0",
+            "i1",
+            "i2",
+            "i3",
+            "AND",
+            "OR",
+            "EQ",
+            "not",
+            "Shape",
+            "Switch",
+            "BroadcastTo",
+            "Composite",
+            "Could",
+            "ScalarFromTensor",
         ]:
             stdout = str.replace(stdout, s, " ")
         symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
@@ -242,6 +258,13 @@ class Expressions:
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
+    # def is_dataarray(self, other):
+    #     if isinstance(other, xr.DataArray):
+    #         if hasattr(other, "x"):
+    #             return other.x
+    #         return other.y
+    #     return other
+
 
 class Param(Expressions):
     def __init__(self, name: str, value=None):
@@ -279,7 +302,7 @@ class Param(Expressions):
 
     def reset_value(self):
         """Resets the value of the shared variable to the initial value"""
-        self.shared_var = aesara.shared(self.init_value, name=self.name, borrow=False)
+        self.shared_var.set_value(self.init_value)
 
 
 class Beta(Param):
@@ -318,6 +341,39 @@ class Sigma(Beta):
     @property
     def dist(self):
         return self._dist
+
+
+class RandomDraws(Expressions):
+    """Constructor for model random draws"""
+
+    def __init__(self, name: str, draw_type: str, n_draws: int):
+        self._name = name
+        self.n_draws = n_draws
+        srng = RandomStream(seed=234)
+        draw_type = draw_type.lower()
+        if draw_type == "normal":
+            rv_n = srng.normal(0, 1, size=(n_draws, 1))
+        elif draw_type == "lognormal":
+            rv_n = srng.lognormal(0, 1, size=(n_draws, 1))
+        else:
+            rv_n = getattr(srng, draw_type.lower())(size=(n_draws, 1))
+        self.shared_var = rv_n
+
+    @property
+    def name(self):
+        return self._name
+
+    def __call__(self, coeff):
+        if not isinstance(coeff, Beta):
+            raise ValueError(f"{coeff} must be a Beta variable")
+        return coeff * self.shared_var
+
+    def __repr__(self):
+        return f"RandomDraws({self.name}, size=(1, {self.n_draws}))"
+
+    def get_value(self):
+        """Returns the numpy representation of the parameter value"""
+        return self.shared_var.get_value()
 
 
 class Bias(Param):
