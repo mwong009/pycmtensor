@@ -28,13 +28,13 @@ classifiers = [
 [tool.poetry.dependencies]
 # Core
 python = "^3.9, <3.12"
+xarray = "2023.6.0"
+pandas = "^1.4.1"
+watermark = "^2.3.1"
 aesara = "^2.9"
 scipy = "^1.7.1"
-numpy = "1.24.3"
-pandas = "^1.4.1"
-pydot = "^1.4.2"
-dill = "^0.3.4"
-watermark = "^2.3.1"
+numpy = "^1.24.3"
+# pydot = "^1.4.2"
 
 # Formatters
 black = { version = "^23.3.0", optional = true } 
