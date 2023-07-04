@@ -70,7 +70,8 @@ config.add(
 
 config.add("lr_ExpRangeCLR_gamma", 0.5, "Default gamma value for ExpRangeCLR")
 
-config.add("lr_stepLR_factor", 0.25, "Default step factor value for stepLR")
+config.add("lr_stepLR_factor", 0.5, "Default step factor value for stepLR")
+config.add("lr_stepLR_drop_every", 1, "Default drop every value for stepLR")
 
 config.add("lr_CLR_cycle_steps", 16, "Default steps per cycle for CyclicLR")
 

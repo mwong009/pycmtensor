@@ -233,6 +233,7 @@ class PyCMTensorModel:
         lr_scheduler = self.config.lr_scheduler(
             lr=self.config.base_learning_rate,
             factor=self.config.lr_stepLR_factor,
+            drop_every=self.config.lr_stepLR_drop_every,
             power=self.config.lr_PolynomialLR_power,
             cycle_steps=self.config.lr_CLR_cycle_steps,
             gamma=self.config.lr_ExpRangeCLR_gamma,
