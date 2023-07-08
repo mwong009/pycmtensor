@@ -17,8 +17,8 @@ class Results:
         self.train_time = None
         self.iterations_per_sec = None
         self.n_params = None
-        self.n_train_samples = None
-        self.n_valid_samples = None
+        self.n_train = None
+        self.n_valid = None
         self.seed = None
 
         self.null_loglikelihood = -np.inf
@@ -57,7 +57,7 @@ class Results:
     def BIC(self):
         """Returns the Bayesian Information Criterion"""
         k = self.n_params
-        n = self.n_train_samples
+        n = self.n_train
         return -2.0 * self.best_loglikelihood + k * np.log(n)
 
     def benchmark(self):
@@ -72,8 +72,8 @@ class Results:
     def model_statistics(self):
         """Returns a pandas DataFrame of a summary of the model training"""
         stats = pd.DataFrame(columns=["value"]).astype("object")
-        stats.loc["Number of training samples used"] = int(self.n_train_samples)
-        stats.loc["Number of validation samples used"] = int(self.n_valid_samples)
+        stats.loc["Number of training samples used"] = int(self.n_train)
+        stats.loc["Number of validation samples used"] = int(self.n_valid)
         stats.loc["Init. log likelihood"] = self.init_loglikelihood
         stats.loc["Final log likelihood"] = self.best_loglikelihood
         stats.loc["Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
@@ -87,9 +87,10 @@ class Results:
 
     def beta_statistics(self):
         """Returns a pandas DataFrame of the model beta statistics"""
+        n = len(self.hessian_matrix)
         betas = self.betas
-        h = self.hessian_matrix
-        bhhh = self.bhhh_matrix
+        h = self.hessian_matrix.sum(axis=0)
+        bh = self.bhhh_matrix.sum(axis=0)
 
         stats = pd.DataFrame(
             index=[b.name for b in betas if (b.status != 1)], columns=["value"]
@@ -98,7 +99,7 @@ class Results:
         stats["t-test"] = t_test(stats["std err"], betas)
         stats["p-value"] = p_value(stats["std err"], betas)
 
-        stats["rob. std err"] = rob_stderror(h, bhhh, betas)
+        stats["rob. std err"] = rob_stderror(h, bh, betas)
         stats["rob. t-test"] = t_test(stats["rob. std err"], betas)
         stats["rob. p-value"] = p_value(stats["rob. std err"], betas)
         stats.drop("value", axis=1, inplace=True)
@@ -115,7 +116,7 @@ class Results:
     def model_correlation_matrix(self):
         """Returns a pandas DataFrame of the model correlation matrix"""
         betas = self.betas
-        h = self.hessian_matrix
+        h = self.hessian_matrix.sum(axis=0)
 
         mat = pd.DataFrame(
             columns=[b.name for b in betas if (b.status != 1)],
@@ -128,13 +129,13 @@ class Results:
     def model_robust_correlation_matrix(self):
         """Returns a pandas DataFrame of the model (robust) correlation matrix"""
         betas = self.betas
-        h = self.hessian_matrix
-        bhhh = self.bhhh_matrix
+        h = self.hessian_matrix.sum(axis=0)
+        bh = self.bhhh_matrix.sum(axis=0)
 
         mat = pd.DataFrame(
             columns=[b.name for b in betas if (b.status != 1)],
             index=[b.name for b in betas if (b.status != 1)],
-            data=rob_correlation_matrix(h, bhhh),
+            data=rob_correlation_matrix(h, bh),
         )
 
         return mat

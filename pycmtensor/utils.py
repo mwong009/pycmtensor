@@ -1,11 +1,5 @@
 # utils.py
 """PyCMTensor utils module"""
-import dill as pickle
-
-
-def save_to_pickle(model):
-    with open(model.name + ".pkl", "wb") as f:
-        pickle.dump(model, f)  # save model to pickle
 
 
 def time_format(seconds):

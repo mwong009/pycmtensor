@@ -1,0 +1,64 @@
+site_name: PyCMTensor - Documentation
+
+nav:
+  - Home: index.md
+  - Getting started: 
+    - Introduction: getting_started/index.md
+    - Installation: getting_started/installation.md
+    - Overview: getting_started/overview.md
+    - Troubleshooting & tips: getting_started/troubleshooting.md
+  - Examples: examples.md
+  - User guide:
+    - User guide: user_guide/index.md
+    - Configuration: user_guide/configuration.md
+  - Developer guide:
+    - Developer guide: developer_guide/index.md
+    - API reference: developer_guide/api.md
+  - About:
+    - Contributing: about/contributing.md
+    - Release notes: about/release_notes.md
+    - Licence: about/licence.md
+    - Citation: about/citation.md
+
+theme: flatly
+
+markdown_extensions:
+  - admonition
+  - fenced_code
+  - codehilite:
+      guess_lang: False
+      linenums: False
+      use_pygments: False
+  - pymdownx.arithmatex
+  - pymdownx.b64
+  - pymdownx.betterem
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.definition
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji
+  - pymdownx.escapeall
+  - pymdownx.extra
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.pathconverter
+  - pymdownx.progressbar
+  - pymdownx.saneheaders
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.striphtml
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist:
+      custom_checkbox: True
+      clickable_checkbox: False
+  - pymdownx.tilde
+  - toc:
+      permalink: True
+
+extra_css:
+  - css/extra.css

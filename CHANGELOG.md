@@ -1,3 +1,30 @@
+## Unreleased
+
+### Feat
+
+- **pycmtensor.py**: Implemented early stopping on coefficient convergence in training loop
+- **functions.py**: logit method now takes uneven dimensioned-utilities
+- **expression.py**: Added RandomDraws expression for sampling in mixed logit
+- get_train_data optional argument numpy_out to return numpy arrays rather than pandas arrays
+- BHHH algorithm for calculating var-covar matrix applies to each data row
+
+### Fix
+
+- **tests.yml**: Update tests workflow file conda packages
+- **optimizers.py**: Fixed name typo in __all__
+- Corrected calculation of hessian and bhhh matrices
+- **scheduler.py**: Moved class function calls to parent class
+- **statistics.py**: Fixed rob varcovar calculation error
+- **MNL.py**: Moved aesara function to parent class
+- **data.py**: Streamlined class function calls and removed unnecessary code
+- removed package import clashes with config.py
+- removed gnorm calculation
+- update hessian matrix and bhhh algorithm functions
+
+### Refactor
+
+- removed unused code
+
 ## v1.3.2 (2023-06-23)
 
 ### Fix
@@ -23,11 +50,16 @@
 
 - **optimizers**: added ``Nadam`` optimizer
 - **layers.py**: added ``DenseLayer`` ``BatchNormLayer`` ``ResidualLayer``
+- added ``pycmtensor.about()`` to output package metadata
+- added EMA function ``functions.exp_mov_average()``
 
 ### Fix
 
 - renamed depreceated instances of ``aesara`` modules
 - **data.py**: defaults ``batch_size`` argument to 0 if batch_size is ``None``
+- updated syntax for ``expressions.py`` class objects
+- added ``init_type`` property to ``Weights`` class
+- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 - added argument type hints in function.py
 
 ### Refactor
@@ -42,17 +74,12 @@
 ### Feat
 
 - added ``pycmtensor.about()`` to output package metadata
-- added ``pycmtensor.about()`` to output package metadata
-- added EMA function ``functions.exp_mov_average()``
 - added EMA function ``functions.exp_mov_average()``
 
 ### Fix
 
 - updated syntax for ``expressions.py`` class objects
-- updated syntax for ``expressions.py`` class objects
 - added ``init_type`` property to ``Weights`` class
-- added ``init_type`` property to ``Weights`` class
-- moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 - moved model aesara compile functions from ``models.MNL`` to ``pycmtensor.PyCMTensorModel``
 
 ## v1.2.0 (2022-10-14)
@@ -88,23 +115,17 @@
 
 ## v1.0.7 (2022-08-12)
 
-### Fix
-
-- **config**: added optimizing speedups to config
-
-### Refactor
-
-- **models**: refactored build_functions() into models.py
-
 ## v1.0.6 (2022-08-12)
 
 ### Fix
 
+- **config**: added optimizing speedups to config
 - **config**: set default `cyclic_lr_mode` and `cyclic_lr_step_size` to `None`
 - **pre-commit-config**: update black to `22.6.0` in pre-commit check
 
 ### Refactor
 
+- **models**: refactored build_functions() into models.py
 - **database**: refactor set_choice(choiceVar)
 
 ## v1.0.5 (2022-07-27)
@@ -112,12 +133,12 @@
 ### Fix
 
 - **tests**: removed depreciated tests
+- **routine**: remove depreciated tqdm module
 
 ## v1.0.4 (2022-07-27)
 
 ### Fix
 
-- **routine**: remove depreciated tqdm module
 - **pycmtensor.py**: update training method
 - **config.py**: new config option verbosity: "high", "low"
 - **pycmtensor.py**: remove warnings for max_iter<patience

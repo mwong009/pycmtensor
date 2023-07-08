@@ -5,7 +5,7 @@ import aesara.tensor as aet
 from aesara import shared
 from aesara.tensor.sharedvar import TensorSharedVariable
 
-from .data import FLOATX
+FLOATX = aesara.config.floatX
 
 __all__ = [
     "Adam",
@@ -15,7 +15,7 @@ __all__ = [
     "RMSProp",
     "Momentum",
     "NAG",
-    "Adagrad",
+    "AdaGrad",
     "SGD",
 ]
 

@@ -1,4 +1,0 @@
-sphinx-book-theme
-sphinx-autoapi
-myst-nb
-sphinx-design

@@ -3,14 +3,16 @@
 from ctypes import util
 from typing import Union
 
+import aesara
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta, Param
+from pycmtensor.expressions import Beta, Expressions, Param
 
+from .data import FLOATX
 from .logger import error, log
 
 __all__ = [
@@ -23,8 +25,6 @@ __all__ = [
     "kl_multivar_norm",
     "errors",
     "hessians",
-    "bhhh",
-    "gnorm",
 ]
 
 
@@ -85,11 +85,24 @@ def logit(
             raise ValueError(msg)
         _utility = utility
         for n, u in enumerate(_utility):
-            if not isinstance(u, (TensorVariable, TensorSharedVariable)):
-                utility[n] = u()
-            if utility[n].ndim == 0:
-                utility[n] = aet.expand_dims(utility[n], -1)
+            # convert u to vector representation if u is a scalar
+            if isinstance(u, Beta):
+                utility[n] = aet.as_tensor_variable(u())
+
+        # get maximum ndim from set of utlity equations
+        max_ndim = max([u.ndim for u in utility])
+        _utility = utility
+
+        # pad tensors to have the same number of dimensions
+        utility = [aet.atleast_Nd(u, n=max_ndim) for u in utility]
+
+        # broadcast tensors across each other before stacking
+        utility = aet.broadcast_arrays(*utility)
+
+        # stack list of tensors to into a max_ndim+1 tensor
         U = aet.stack(utility)
+
+    # use the utility inputs as is if given as a TensorVariable
     elif isinstance(utility, TensorVariable):
         U = utility
     else:
@@ -97,13 +110,23 @@ def logit(
             f"utility {utility} has to be a list, tuple or TensorVariable instance"
         )
 
+    # calculate the probabilities
     prob = aet.special.softmax(U, axis=0)
+
+    # update probabilities by availability conditions
     if avail != None:
+        # stack availabilities and convert to tensor
         AV = aet.stack(avail)
+
         while AV.ndim < prob.ndim:
-            AV = aet.expand_dims(AV, 1)
+            # insert new axes after choice axis (choice axis = 0)
+            AV = aet.shape_padaxis(AV, axis=1)
+
         prob = prob * AV
+
+        # normalize probabilities to sum to 1
         prob = prob / aet.sum(prob, axis=0, keepdims=1)
+
     return prob
 
 
@@ -120,7 +143,14 @@ def log_likelihood(prob: TensorVariable, y: TensorVariable):
     Note:
         The 0-th dimension is the numbering of alternatives.
     """
-    return aet.sum(aet.log(prob)[y, ..., aet.arange(y.shape[0])])
+    # calculate the log probabilitiy of axis 0
+    logprob = aet.log(prob)[y, ..., aet.arange(y.shape[0])]
+
+    # take the average over all other non choice, non-n axes
+    while logprob.ndim > 1:
+        logprob = aet.mean(logprob, axis=1)
+
+    return aet.sum(logprob)
 
 
 def rmse(y_hat: TensorVariable, y: TensorVariable):
@@ -287,11 +317,11 @@ def errors(prob: TensorVariable, y: TensorVariable):
         raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
-def hessians(ll: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the Hessian matrix given the log likelihood.
+def hessians(cost: TensorVariable, params: list[Beta]):
+    """Symbolic representation of the 2nd order Hessian matrix given the neg. log likelihood.
 
     Args:
-        ll (TensorVariable): the loglikelihood to compute the gradients over
+        cost (TensorVariable): the neg loglikelihood to compute the gradients over
         params (list): list of params to compute the gradients over
 
     Returns:
@@ -303,7 +333,7 @@ def hessians(ll: TensorVariable, params: list[Beta]):
     if not isinstance(params, list):
         raise TypeError(f"params is not list instance. type(params)={type(params)}")
     params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(ll, params, disconnected_inputs="ignore")
+    grads = aet.grad(-cost, params, disconnected_inputs="ignore")
     mat = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
         mat = aet.set_subtensor(
@@ -313,16 +343,15 @@ def hessians(ll: TensorVariable, params: list[Beta]):
     return mat
 
 
-def bhhh(ll: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the Berndt-Hall-Hall-Hausman (BHHH) algorithm given
-    the log likelihood.
+def gradient_vector(cost: TensorVariable, params: list[Beta]):
+    """Symbolic representation of the 1st order gradient vector given the neg. log likelihood.
 
     Args:
-        ll (TensorVariable): the loglikelihood to compute the gradients over
+        cost (TensorVariable): the neg loglikelihood to compute the gradients over
         params (list): list of params to compute the gradients over
 
     Returns:
-        TensorVariable: the outer product of the gradient with ndim=2
+        TensorVariable: the gradient vector
 
     Note:
         Parameters with status=1 are ignored.
@@ -334,30 +363,5 @@ def bhhh(ll: TensorVariable, params: list[Beta]):
     if isinstance(params, dict):
         params = list(params.values())
     params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(ll, params, disconnected_inputs="ignore")
-    mat = aet.outer(aet.as_tensor_variable(grads), aet.as_tensor_variable(grads).T)
-    return mat
-
-
-def gnorm(cost: TensorVariable, params: list[Beta]):
-    """Symbolic representation of the gradient norm given the cost.
-
-    Args:
-        cost (TensorVariable): the cost to compute the gradients over
-        params (list): list of params to compute the gradients over
-
-    Returns:
-        TensorVariable: the gradient norm value
-
-    Note:
-        Parameters with status=1 are ignored.
-    """
-    if not isinstance(params, (dict, list)):
-        raise TypeError(
-            f"params is not list or dict instance. type(params)={type(params)}"
-        )
-    if isinstance(params, dict):
-        params = list(params.values())
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
-    return nlinalg.norm(grads, ord=None)
+    grads = aet.grad(-cost, params, disconnected_inputs="ignore")
+    return aet.as_tensor_variable(grads)

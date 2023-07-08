@@ -1,0 +1,20 @@
+name: pycmtensor-dev
+channels:
+    - conda-forge
+    - defaults
+dependencies:
+    - python=3.11
+    - mkl-service
+    - gcc_linux-64
+    - gxx_linux-64
+    - blas
+    - aesara
+
+# linux
+# conda env create -f environment_linux.yml
+# conda activate pycmtensor-dev
+# python -m pip install --upgrade pip
+# pip cache purge
+# pip install poetry
+# poetry update
+# poetry install --with=dev,test,doc
