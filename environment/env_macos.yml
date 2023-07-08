@@ -16,4 +16,4 @@ dependencies:
 # pip cache purge
 # pip install poetry
 # poetry update
-# poetry install -E dev
+# poetry install --with=dev,test,doc
