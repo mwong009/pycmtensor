@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Release notes - PyCMTensor - Documentation</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">PyCMTensor - Documentation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../getting_started/" class="dropdown-item">Introduction</a>
+</li>
+                                    
+<li>
+    <a href="../../getting_started/installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="../../getting_started/overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../getting_started/troubleshooting/" class="dropdown-item">Troubleshooting & tips</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../user_guide/" class="dropdown-item">User guide</a>
+</li>
+                                    
+<li>
+    <a href="../../user_guide/configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Developer guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../developer_guide/" class="dropdown-item">Developer guide</a>
+</li>
+                                    
+<li>
+    <a href="../../developer_guide/api/" class="dropdown-item">API reference</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../contributing/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Release notes</a>
+</li>
+                                    
+<li>
+    <a href="../licence/" class="dropdown-item">Licence</a>
+</li>
+                                    
+<li>
+    <a href="../citation/" class="dropdown-item">Citation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../contributing/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../licence/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#release-notes" class="nav-link">Release notes</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#unreleased" class="nav-link">Unreleased</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v132-2023-06-23" class="nav-link">v1.3.2 (2023-06-23)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v131-2022-11-17" class="nav-link">v1.3.1 (2022-11-17)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v130-2022-11-10" class="nav-link">v1.3.0 (2022-11-10)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v121-2022-10-25" class="nav-link">v1.2.1 (2022-10-25)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v120-2022-10-14" class="nav-link">v1.2.0 (2022-10-14)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v110-2022-09-23" class="nav-link">v1.1.0 (2022-09-23)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v107-2022-08-12" class="nav-link">v1.0.7 (2022-08-12)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v106-2022-08-12" class="nav-link">v1.0.6 (2022-08-12)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v105-2022-07-27" class="nav-link">v1.0.5 (2022-07-27)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v104-2022-07-27" class="nav-link">v1.0.4 (2022-07-27)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v103-2022-05-12" class="nav-link">v1.0.3 (2022-05-12)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v102-2022-05-12" class="nav-link">v1.0.2 (2022-05-12)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v101-2022-05-12" class="nav-link">v1.0.1 (2022-05-12)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v100-2022-05-10" class="nav-link">v1.0.0 (2022-05-10)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v080-2022-05-10" class="nav-link">v0.8.0 (2022-05-10)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v071-2022-05-10" class="nav-link">v0.7.1 (2022-05-10)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v070-2022-03-17" class="nav-link">v0.7.0 (2022-03-17)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v065-2022-03-14" class="nav-link">v0.6.5 (2022-03-14)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v064-2022-03-13" class="nav-link">v0.6.4 (2022-03-13)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#v050-2022-03-02" class="nav-link">v0.5.0 (2022-03-02)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="release-notes">Release notes<a class="headerlink" href="#release-notes" title="Permanent link">&para;</a></h1>
+<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="feat">Feat<a class="headerlink" href="#feat" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>pycmtensor.py</strong>: Implemented early stopping on coefficient convergence in training loop</li>
+<li><strong>functions.py</strong>: logit method now takes uneven dimensioned-utilities</li>
+<li><strong>expression.py</strong>: Added RandomDraws expression for sampling in mixed logit</li>
+<li>get_train_data optional argument numpy_out to return numpy arrays rather than pandas arrays</li>
+<li>BHHH algorithm for calculating var-covar matrix applies to each data row</li>
+</ul>
+<h3 id="fix">Fix<a class="headerlink" href="#fix" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>tests.yml</strong>: Update tests workflow file conda packages</li>
+<li><strong>optimizers.py</strong>: Fixed name typo in <code>__all__</code></li>
+<li><strong>results.py</strong>: Corrected calculation of hessian and bhhh matrices</li>
+<li><strong>scheduler.py</strong>: Moved class function calls to parent class</li>
+<li><strong>statistics.py</strong>: Fixed rob varcovar calculation error</li>
+<li><strong>MNL.py</strong>: Moved aesara function to parent class</li>
+<li><strong>data.py</strong>: Streamlined class function calls and removed unnecessary code</li>
+<li>removed package import clashes with config.py</li>
+<li>removed gnorm calculation</li>
+<li>update hessian matrix and bhhh algorithm functions</li>
+</ul>
+<h3 id="refactor">Refactor<a class="headerlink" href="#refactor" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>utils.py</strong>: Removed unused code</li>
+</ul>
+<h2 id="v132-2023-06-23">v1.3.2 (2023-06-23)<a class="headerlink" href="#v132-2023-06-23" title="Permanent link">&para;</a></h2>
+<h3 id="fix_1">Fix<a class="headerlink" href="#fix_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>make arguments in <code>MNL</code> as optional keyword arguments</li>
+<li>moved learning rate variable to <code>PyCMTensorModel</code> class</li>
+</ul>
+<h3 id="refactor_1">Refactor<a class="headerlink" href="#refactor_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>make model variables as property</li>
+<li>update <code>__all__</code> package variables</li>
+<li>added <code>train_data</code> and <code>valid_data</code> property to <code>Data</code> class</li>
+</ul>
+<h2 id="v131-2022-11-17">v1.3.1 (2022-11-17)<a class="headerlink" href="#v131-2022-11-17" title="Permanent link">&para;</a></h2>
+<h3 id="fix_2">Fix<a class="headerlink" href="#fix_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix utility dimensions for asc only cases</li>
+</ul>
+<h2 id="v130-2022-11-10">v1.3.0 (2022-11-10)<a class="headerlink" href="#v130-2022-11-10" title="Permanent link">&para;</a></h2>
+<h3 id="feat_1">Feat<a class="headerlink" href="#feat_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>optimizers</strong>: added <code>Nadam</code> optimizer</li>
+<li><strong>layers.py</strong>: added <code>DenseLayer</code> <code>BatchNormLayer</code> <code>ResidualLayer</code></li>
+<li>added <code>pycmtensor.about()</code> to output package metadata</li>
+<li>added EMA function <code>functions.exp_mov_average()</code></li>
+</ul>
+<h3 id="fix_3">Fix<a class="headerlink" href="#fix_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>renamed depreceated instances of <code>aesara</code> modules</li>
+<li><strong>data.py</strong>: defaults <code>batch_size</code> argument to 0 if batch_size is <code>None</code></li>
+<li>updated syntax for <code>expressions.py</code> class objects</li>
+<li>added <code>init_type</code> property to <code>Weights</code> class</li>
+<li>moved model aesara compile functions from <code>models.MNL</code> to <code>pycmtensor.PyCMTensorModel</code></li>
+<li>added argument type hints in function.py</li>
+</ul>
+<h3 id="refactor_2">Refactor<a class="headerlink" href="#refactor_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>data</strong>: added import dataset cleaning step as arguments in <code>Data()</code></li>
+<li>moved ResidualLayer to <code>pycmtensor.models.layers</code></li>
+<li>updated timing to perf_counter</li>
+<li><strong>pycmtensor</strong>: refactoring model_loglikelihood</li>
+</ul>
+<h2 id="v121-2022-10-25">v1.2.1 (2022-10-25)<a class="headerlink" href="#v121-2022-10-25" title="Permanent link">&para;</a></h2>
+<h3 id="feat_2">Feat<a class="headerlink" href="#feat_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>added <code>pycmtensor.about()</code> to output package metadata</li>
+<li>added EMA function <code>functions.exp_mov_average()</code></li>
+</ul>
+<h3 id="fix_4">Fix<a class="headerlink" href="#fix_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>updated syntax for <code>expressions.py</code> class objects</li>
+<li>added <code>init_type</code> property to <code>Weights</code> class</li>
+<li>moved model aesara compile functions from <code>models.MNL</code> to <code>pycmtensor.PyCMTensorModel</code></li>
+</ul>
+<h2 id="v120-2022-10-14">v1.2.0 (2022-10-14)<a class="headerlink" href="#v120-2022-10-14" title="Permanent link">&para;</a></h2>
+<h3 id="feat_3">Feat<a class="headerlink" href="#feat_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>expressions</strong>: added Weights class object (#59)</li>
+<li><strong>functions</strong>: added rmse and mae objective functions (#58)</li>
+<li>batch shuffle for training</li>
+<li><strong>function</strong>: added KL divergence loss function (#50)</li>
+</ul>
+<h3 id="fix_5">Fix<a class="headerlink" href="#fix_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>added expand_dims into logit function</li>
+<li>replace class function Beta.Beta with Beta.beta</li>
+<li>removed flatten() from logit function</li>
+</ul>
+<h2 id="v110-2022-09-23">v1.1.0 (2022-09-23)<a class="headerlink" href="#v110-2022-09-23" title="Permanent link">&para;</a></h2>
+<h3 id="feat_4">Feat<a class="headerlink" href="#feat_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>scheduler</strong>: added learning rate scheduling to train()</li>
+<li><strong>code</strong>: overhaul and cleanup</li>
+</ul>
+<h3 id="fix_6">Fix<a class="headerlink" href="#fix_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>environment</strong>: update project deps and pre-commit routine</li>
+<li><strong>config</strong>: remove unnecessary cxx flags from macos builds</li>
+</ul>
+<h3 id="perf">Perf<a class="headerlink" href="#perf" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>config</strong>: misc optimization changes</li>
+</ul>
+<h2 id="v107-2022-08-12">v1.0.7 (2022-08-12)<a class="headerlink" href="#v107-2022-08-12" title="Permanent link">&para;</a></h2>
+<h2 id="v106-2022-08-12">v1.0.6 (2022-08-12)<a class="headerlink" href="#v106-2022-08-12" title="Permanent link">&para;</a></h2>
+<h3 id="fix_7">Fix<a class="headerlink" href="#fix_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>config</strong>: added optimizing speedups to config</li>
+<li><strong>config</strong>: set default <code>cyclic_lr_mode</code> and <code>cyclic_lr_step_size</code> to <code>None</code></li>
+<li><strong>pre-commit-config</strong>: update black to <code>22.6.0</code> in pre-commit check</li>
+</ul>
+<h3 id="refactor_3">Refactor<a class="headerlink" href="#refactor_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>models</strong>: refactored build_functions() into models.py</li>
+<li><strong>database</strong>: refactor set_choice(choiceVar)</li>
+</ul>
+<h2 id="v105-2022-07-27">v1.0.5 (2022-07-27)<a class="headerlink" href="#v105-2022-07-27" title="Permanent link">&para;</a></h2>
+<h3 id="fix_8">Fix<a class="headerlink" href="#fix_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>tests</strong>: removed depreciated tests</li>
+<li><strong>routine</strong>: remove depreciated tqdm module</li>
+</ul>
+<h2 id="v104-2022-07-27">v1.0.4 (2022-07-27)<a class="headerlink" href="#v104-2022-07-27" title="Permanent link">&para;</a></h2>
+<h3 id="fix_9">Fix<a class="headerlink" href="#fix_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>pycmtensor.py</strong>: update training method</li>
+<li><strong>config.py</strong>: new config option verbosity: "high", "low"</li>
+<li><strong>pycmtensor.py</strong>: remove warnings for max_iter&lt;patience</li>
+</ul>
+<h2 id="v103-2022-05-12">v1.0.3 (2022-05-12)<a class="headerlink" href="#v103-2022-05-12" title="Permanent link">&para;</a></h2>
+<h2 id="v102-2022-05-12">v1.0.2 (2022-05-12)<a class="headerlink" href="#v102-2022-05-12" title="Permanent link">&para;</a></h2>
+<h2 id="v101-2022-05-12">v1.0.1 (2022-05-12)<a class="headerlink" href="#v101-2022-05-12" title="Permanent link">&para;</a></h2>
+<h3 id="fix_10">Fix<a class="headerlink" href="#fix_10" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>scheduler</strong>: fix missing args in input parameters</li>
+<li><strong>scheduler</strong>: fix constantLR missing input paramerer</li>
+</ul>
+<h2 id="v100-2022-05-10">v1.0.0 (2022-05-10)<a class="headerlink" href="#v100-2022-05-10" title="Permanent link">&para;</a></h2>
+<h3 id="feat_5">Feat<a class="headerlink" href="#feat_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>python</strong>: update to python 3.10</li>
+</ul>
+<h3 id="fix_11">Fix<a class="headerlink" href="#fix_11" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>tests</strong>: update tests files to reflect changes in biogeme removal</li>
+</ul>
+<h2 id="v080-2022-05-10">v0.8.0 (2022-05-10)<a class="headerlink" href="#v080-2022-05-10" title="Permanent link">&para;</a></h2>
+<h3 id="feat_6">Feat<a class="headerlink" href="#feat_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>deps</strong>: remove Biogeme dependencies</li>
+</ul>
+<h2 id="v071-2022-05-10">v0.7.1 (2022-05-10)<a class="headerlink" href="#v071-2022-05-10" title="Permanent link">&para;</a></h2>
+<h3 id="fix_12">Fix<a class="headerlink" href="#fix_12" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>expressions</strong>: remove Biogeme dependencies</li>
+<li><strong>database</strong>: remove dependencies of Biogeme</li>
+<li><strong>debug</strong>: remove debug handler after each run to prevent duplication</li>
+<li><strong>models</strong>: add function to return layer output -&gt; get_layer_outputs()</li>
+<li><strong>debug</strong>: disables tqdm if debug mode is on and activates debug_log</li>
+</ul>
+<h3 id="refactor_4">Refactor<a class="headerlink" href="#refactor_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>move elasticites from models to statistics for consistency</li>
+</ul>
+<h2 id="v070-2022-03-17">v0.7.0 (2022-03-17)<a class="headerlink" href="#v070-2022-03-17" title="Permanent link">&para;</a></h2>
+<h3 id="feat_7">Feat<a class="headerlink" href="#feat_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>models</strong>: add functionality to compute elasticities of choice vs attribute in models.py</li>
+</ul>
+<h3 id="fix_13">Fix<a class="headerlink" href="#fix_13" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>results</strong>: remove unnessary <code>show_weights</code> option in Results</li>
+<li>set default max_epoch on training run to adaptive rule</li>
+<li>print valid config options when invalid options are given as args to train()</li>
+<li><strong>scheduler</strong>: modified cyclic_lr config loading sequence to fix unboundError</li>
+<li><strong>train</strong>: turn saving model off for now</li>
+<li><strong>config</strong>: generate os dependent ld_flags</li>
+</ul>
+<h3 id="refactor_5">Refactor<a class="headerlink" href="#refactor_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>utils</strong>: refactored save_to_pickle and disables it</li>
+</ul>
+<h3 id="perf_1">Perf<a class="headerlink" href="#perf_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>IterationTracker</strong>: use numpy array to store iteration data</li>
+</ul>
+<h2 id="v065-2022-03-14">v0.6.5 (2022-03-14)<a class="headerlink" href="#v065-2022-03-14" title="Permanent link">&para;</a></h2>
+<h3 id="feat_8">Feat<a class="headerlink" href="#feat_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>models</strong>: Implement the ResLogit layer</li>
+</ul>
+<h3 id="fix_14">Fix<a class="headerlink" href="#fix_14" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>config</strong>: set default learning schedule to ConstantLR</li>
+<li><strong>config</strong>: set default seed to a random number on init</li>
+</ul>
+<h2 id="v064-2022-03-13">v0.6.4 (2022-03-13)<a class="headerlink" href="#v064-2022-03-13" title="Permanent link">&para;</a></h2>
+<h3 id="feat_9">Feat<a class="headerlink" href="#feat_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>scheduler.py</strong>: add new scheduler (CyclicLR) for adaptive LR</li>
+</ul>
+<h3 id="fix_15">Fix<a class="headerlink" href="#fix_15" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>project</strong>: fix project metadata and ci</li>
+<li><strong>config</strong>: loadout config from train() to configparser</li>
+<li><strong>utils</strong>: fix TypeError check</li>
+</ul>
+<h2 id="v050-2022-03-02">v0.5.0 (2022-03-02)<a class="headerlink" href="#v050-2022-03-02" title="Permanent link">&para;</a></h2>
+<h3 id="feat_10">Feat<a class="headerlink" href="#feat_10" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>config</strong>: add PyCMTensorConfig class to store config settings</li>
+<li><strong>expressions</strong>: add magic methods lt le gt le ne eq</li>
+<li><strong>config.py</strong>: enable pre-writing of .aesararc config file on module load</li>
+<li><strong>models</strong>: add method prob() to MNLogit to output prob slices</li>
+<li><strong>time_format</strong>: enable logging of build and estimation time</li>
+<li><strong>results</strong>: add Predict class to output probs or discrete choices</li>
+<li><strong>optimizers</strong>: add AdaGram algorithm</li>
+<li><strong>Database</strong>: add <strong>getattr</strong> build-in type to Database</li>
+<li><strong>pycmtensor.py</strong>: add model.output_choices to generate choices</li>
+</ul>
+<h3 id="fix_16">Fix<a class="headerlink" href="#fix_16" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>statistics</strong>: add small value to stderror calculation to address sqrt(0)</li>
+<li><strong>dependencies</strong>: move ipywidgets and pydot to dependencies</li>
+<li>renamed .rst to .md fix FileNotFoundError</li>
+<li><strong>result</strong>: print more verbose results and options</li>
+<li><strong>Database</strong>: add name to shared_data</li>
+<li><strong>train</strong>: model instance now load initiated model class (not input Class as argument)</li>
+<li><strong>Database</strong>: set choiceVar to mandatory argument</li>
+<li><strong>PyCMTensor</strong>: rename append_to_params to add_params for consistency</li>
+<li><strong>PyCMTensor</strong>: new method to add regularizers to cost function</li>
+<li><strong>Expressions</strong>: invokes different operator for Beta Beta maths</li>
+<li>show excluded data in model est. output</li>
+<li><strong>results</strong>: standardized naming conventions in modules db-&gt;database</li>
+<li><strong>tqdm</strong>: add arg in train() to enable notebook progressbar</li>
+<li><strong>swissmetro_test.ipynb</strong>: update swissmetro example</li>
+</ul>
+<h3 id="refactor_6">Refactor<a class="headerlink" href="#refactor_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>PyCMTensor</strong>: refactoring models from pycmtensor.py</li>
+<li><strong>Database</strong>: refactor(Database): refactoring database.py from pycmtensor.py</li>
+<li><strong>optimizers</strong>: refactor base Optimizer class</li>
+<li>moved Beta Weights to expressions.py</li>
+</ul>
+<h3 id="perf_2">Perf<a class="headerlink" href="#perf_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>shared_data</strong>: improve iteration speed by implementing shared() on input data</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

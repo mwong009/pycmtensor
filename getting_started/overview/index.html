@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Overview - PyCMTensor - Documentation</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">PyCMTensor - Documentation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Introduction</a>
+</li>
+                                    
+<li>
+    <a href="../installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../troubleshooting/" class="dropdown-item">Troubleshooting & tips</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../user_guide/" class="dropdown-item">User guide</a>
+</li>
+                                    
+<li>
+    <a href="../../user_guide/configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Developer guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../developer_guide/" class="dropdown-item">Developer guide</a>
+</li>
+                                    
+<li>
+    <a href="../../developer_guide/api/" class="dropdown-item">API reference</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../about/contributing/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="../../about/release_notes/" class="dropdown-item">Release notes</a>
+</li>
+                                    
+<li>
+    <a href="../../about/licence/" class="dropdown-item">Licence</a>
+</li>
+                                    
+<li>
+    <a href="../../about/citation/" class="dropdown-item">Citation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../installation/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../troubleshooting/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#importing-data-from-csv" class="nav-link">Importing data from csv</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#defining-taste-parameters" class="nav-link">Defining taste parameters</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#specifying-utility-equations" class="nav-link">Specifying utility equations</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#specifying-the-model" class="nav-link">Specifying the model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#estimating-the-model" class="nav-link">Estimating the model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#printing-statistical-test-results" class="nav-link">Printing statistical test results</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#prediction-and-validation" class="nav-link">Prediction and validation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#putting-it-all-together" class="nav-link">Putting it all together</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
+<hr />
+<p>Follow the steps below and learn how to use PyCMTensor to estimate a discrete choice model. In this tutorial, we will use the London Passenger Mode Choice (LPMC) <a href="">dataset</a>. Download the dataset from <a href="">here</a> and place it in the working directory.</p>
+<p>Jump to <a href="./#putting-it-all-together">Putting it all together</a> for the final Python script.</p>
+<h2 id="importing-data-from-csv">Importing data from csv<a class="headerlink" href="#importing-data-from-csv" title="Permanent link">&para;</a></h2>
+<p>Import the PyCMTensor package and read the data using <code>pandas</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pycmtensor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">lpmc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;lpmc.dat&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">lpmc</span> <span class="o">=</span> <span class="n">lpmc</span><span class="p">[</span><span class="n">lpmc</span><span class="p">[</span><span class="s2">&quot;travel_year&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">2015</span><span class="p">]</span>  <span class="c1"># select only the 2015 data to use</span>
+</code></pre></div>
+<h4 id="create-a-dataset-object">Create a dataset object<a class="headerlink" href="#create-a-dataset-object" title="Permanent link">&para;</a></h4>
+<p>From the <code>pycmtensor</code> package, import the <code>Dataset</code> object, which stores and handles the tensors and arrays of the data variables. Denote the column with the choice variable with the argument <code>choice=</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pycmtensor.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">lpmc</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;travel_mode&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>The <code>Dataset</code> object takes the following arguments:</p>
+<ul>
+<li><code>df</code>: The <code>pandas.DataFrame</code> object</li>
+<li><code>choice</code>: The name of the choice variable found in the heading of the dataframe</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the range of alternatives in the choice column does not start with <code>0</code>, e.g. <code>[1, 2, 3, 4]</code> instead of <code>[0, 1, 2, 3]</code>, the Dataset will automatically convert the alternatives to start with <code>0</code>.</p>
+</div>
+<h4 id="split-the-dataset">Split the dataset<a class="headerlink" href="#split-the-dataset" title="Permanent link">&para;</a></h4>
+<p>Then, split the dataset into training and validation datasets, <code>frac=</code> is the percentage of the data that is assigned to the training dataset. The rest of the data is assigned to the validation dataset. If <code>frac=</code> is not given as an argument, both training and validation dataset uses the same total number of samples.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>  <span class="c1"># splits 80% of the data into the training dataset and 20% into the validation dataset</span>
+</code></pre></div>
+<p>You should get an output showing the number of training and validation samples in the dataset:</p>
+<pre class="codehilite"><code class="language-bash">[INFO] n_train_samples:3986 n_valid_samples:997
+</code></pre>
+
+<h2 id="defining-taste-parameters">Defining taste parameters<a class="headerlink" href="#defining-taste-parameters" title="Permanent link">&para;</a></h2>
+<p>Define the taste parameters using the <code>Beta</code> object from the <code>pycmtensor.expressions</code> module:</p>
+<div class="highlight"><pre><span></span><code>from pycmtensor.expressions import Beta
+
+# Beta parameters
+asc_walk = Beta(&quot;asc_walk&quot;, 0.0, None, None, 1)
+asc_cycle = Beta(&quot;asc_cycle&quot;, 0.0, None, None, 0)
+asc_pt = Beta(&quot;asc_pt&quot;, 0.0, None, None, 0)
+asc_drive = Beta(&quot;asc_drive&quot;, 0.0, None, None, 0)
+b_cost = Beta(&quot;b_cost&quot;, 0.0, None, None, 0)
+b_time = Beta(&quot;b_time&quot;, 0.0, None, None, 0)
+b_purpose = Beta(&quot;b_purpose&quot;, 0.0, None, None, 0)
+b_licence = Beta(&quot;b_licence&quot;, 0.0, None, None, 0)
+</code></pre></div>
+<p>The <code>Beta</code> object takes the following argument:</p>
+<ul>
+<li><code>name</code>: Name of the taste parameter (required)</li>
+<li><code>value</code>: The initial starting value. Defaults to <code>0.</code></li>
+<li><code>lb</code> and <code>ub</code>: lower and upper bound. Defaults to <code>None</code></li>
+<li><code>status</code>: <code>1</code> if the parameter should <em>not</em> be estimated. Defaults to <code>0</code>.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a <code>Beta</code> variable is not used in the model, a warning will be shown in stdout. E.g.</p>
+<pre class="codehilite"><code class="language-bash">[WARNING] b_purpose not in any utility functions
+</code></pre>
+
+</div>
+<h2 id="specifying-utility-equations">Specifying utility equations<a class="headerlink" href="#specifying-utility-equations" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">U_walk</span> <span class="o">=</span> <span class="n">asc_walk</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_walking&quot;</span><span class="p">]</span>
+<span class="n">U_cycle</span> <span class="o">=</span> <span class="n">asc_cycle</span> <span class="o">+</span> <span class="n">b_time</span>  <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_cycling&quot;</span><span class="p">]</span>
+<span class="n">U_pt</span> <span class="o">=</span> <span class="n">asc_pt</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_rail&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_bus&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_int&quot;</span><span class="p">])</span> \
+       <span class="o">+</span> <span class="n">b_cost</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_transit&quot;</span><span class="p">]</span>
+<span class="n">U_drive</span> <span class="o">=</span> <span class="n">asc_drive</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_driving&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">b_licence</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;driving_license&quot;</span><span class="p">]</span> \
+          <span class="o">+</span> <span class="n">b_cost</span> <span class="o">*</span> <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_driving_fuel&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_driving_ccharge&quot;</span><span class="p">])</span>
+
+<span class="c1"># vectorize the utility function</span>
+<span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="n">U_walk</span><span class="p">,</span> <span class="n">U_cycle</span><span class="p">,</span> <span class="n">U_pt</span><span class="p">,</span> <span class="n">U_drive</span><span class="p">]</span>
+</code></pre></div>
+<h2 id="specifying-the-model">Specifying the model<a class="headerlink" href="#specifying-the-model" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">mymodel</span> <span class="o">=</span> <span class="n">pycmtensor</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="nb">locals</span><span class="p">(),</span> <span class="n">U</span><span class="p">)</span>
+</code></pre></div>
+<p>Output:</p>
+<pre class="codehilite"><code class="language-bash">[WARNING] b_purpose not in any utility functions
+[INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, cost_driving_ccharge]
+[INFO] Build time = 00:00:09
+</code></pre>
+
+<p>The <code>MNL</code> object takes the following argument:</p>
+<ul>
+<li><code>ds</code></li>
+<li><code>params</code></li>
+<li><code>utility</code></li>
+<li><code>av</code></li>
+<li><code>**kwargs</code>: Optional keyword arguments for modifying the model configuration settings. See <a href="../../user_guide/configuration/">configuration</a> for details.</li>
+</ul>
+<p>We use <code>locals()</code> as a shortcut for collecting the <code>Beta</code> objects for the argument <code>params=</code>.</p>
+<h2 id="estimating-the-model">Estimating the model<a class="headerlink" href="#estimating-the-model" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pycmtensor.models</span> <span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span> <span class="nn">pycmtensor.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">pycmtensor.scheduler</span> <span class="kn">import</span> <span class="n">ConstantLR</span>
+
+<span class="n">train</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">mymodel</span><span class="p">,</span> 
+    <span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> 
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span>  <span class="c1"># optional</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">base_learning_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># optional</span>
+    <span class="n">lr_scheduler</span><span class="o">=</span><span class="n">ConstantLR</span><span class="p">,</span>  <span class="c1"># optional</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Output:</p>
+<pre class="codehilite"><code class="language-bash">[INFO] Start (n=3986, Step=0, LL=-5525.77, Error=80.34%)
+[INFO] Train (Step=0, LL=-9008.61, Error=80.34%, gnorm=2.44949e+00, 0/2000)
+[INFO] Train (Step=16, LL=-3798.26, Error=39.12%, gnorm=4.46640e-01, 16/2000)
+[INFO] Train (Step=54, LL=-3487.97, Error=35.21%, gnorm=6.80979e-02, 54/2000)
+[INFO] Train (Step=87, LL=-3471.01, Error=35.01%, gnorm=9.93509e-03, 87/2000)
+[INFO] Train (Step=130, LL=-3470.29, Error=34.70%, gnorm=1.92617e-03, 130/2000)
+[INFO] Train (Step=168, LL=-3470.28, Error=34.70%, gnorm=3.22536e-04, 168/2000)
+[INFO] Train (Step=189, LL=-3470.28, Error=34.70%, gnorm=8.74120e-05, 189/2000)
+[INFO] Model converged (t=0.492)
+[INFO] Best results obtained at Step 185: LL=-3470.28, Error=34.70%, gnorm=2.16078e-04
+</code></pre>
+
+<h2 id="printing-statistical-test-results">Printing statistical test results<a class="headerlink" href="#printing-statistical-test-results" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">beta_statistics</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">model_statistics</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">benchmark</span><span class="p">())</span>
+</code></pre></div>
+<p>Ouput:</p>
+<pre class="codehilite"><code class="language-bash">              value   std err     t-test p-value rob. std err rob. t-test rob. p-value
+asc_cycle -3.853007  0.117872 -32.688157     0.0     0.120295  -32.029671          0.0
+asc_drive -2.060414  0.099048 -20.802183     0.0     0.102918  -20.019995          0.0
+asc_pt    -1.305677  0.076151 -17.145988     0.0     0.079729  -16.376401          0.0
+asc_walk        0.0         -          -       -            -           -            -
+b_cost    -0.135635  0.012788 -10.606487     0.0      0.01269  -10.688684          0.0
+b_licence  1.420747  0.079905  17.780484     0.0     0.084526   16.808497          0.0
+b_time    -4.947477  0.183329 -26.986865     0.0     0.192431  -25.710378          0.0
+
+                                         value
+Number of training samples used         3986.0
+Number of validation samples used        997.0
+Null. log likelihood              -5525.769323
+Final log likelihood              -3470.282749
+Accuracy                                65.30%
+Likelihood ratio test              4110.973149
+Rho square                            0.371982
+Rho square bar                        0.370715
+Akaike Information Criterion       6954.565498
+Bayesian Information Criterion     6998.599302
+Final gradient norm                2.16078e-04
+
+                            value
+Seed                        42069
+Model build time         00:00:09
+Model train time         00:00:00
+iterations per sec  384.15 iter/s
+</code></pre>
+
+<h2 id="prediction-and-validation">Prediction and validation<a class="headerlink" href="#prediction-and-validation" title="Permanent link">&para;</a></h2>
+<h1 id="putting-it-all-together">Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permanent link">&para;</a></h1>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pycmtensor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">pycmtensor.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">pycmtensor.expressions</span> <span class="kn">import</span> <span class="n">Beta</span>
+
+<span class="n">lpmc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;lpmc.dat&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">lpmc</span> <span class="o">=</span> <span class="n">lpmc</span><span class="p">[</span><span class="n">lpmc</span><span class="p">[</span><span class="s2">&quot;travel_year&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">2015</span><span class="p">]</span>  <span class="c1"># select only the 2015 data to use</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">lpmc</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;travel_mode&quot;</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span> 
+
+<span class="c1"># Beta parameters</span>
+<span class="n">asc_walk</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;asc_walk&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">asc_cycle</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;asc_cycle&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">asc_pt</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;asc_pt&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">asc_drive</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;asc_drive&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">b_cost</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;b_cost&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">b_time</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;b_time&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">b_licence</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;b_licence&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">U_walk</span> <span class="o">=</span> <span class="n">asc_walk</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_walking&quot;</span><span class="p">]</span>
+<span class="n">U_cycle</span> <span class="o">=</span> <span class="n">asc_cycle</span> <span class="o">+</span> <span class="n">b_time</span>  <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_cycling&quot;</span><span class="p">]</span>
+<span class="n">U_pt</span> <span class="o">=</span> <span class="n">asc_pt</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_rail&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_bus&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_pt_int&quot;</span><span class="p">])</span> \
+       <span class="o">+</span> <span class="n">b_cost</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_transit&quot;</span><span class="p">]</span>
+<span class="n">U_drive</span> <span class="o">=</span> <span class="n">asc_drive</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_driving&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">b_licence</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;driving_license&quot;</span><span class="p">]</span> \
+          <span class="o">+</span> <span class="n">b_cost</span> <span class="o">*</span> <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_driving_fuel&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cost_driving_ccharge&quot;</span><span class="p">])</span>
+
+<span class="c1"># vectorize the utility function</span>
+<span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="n">U_walk</span><span class="p">,</span> <span class="n">U_cycle</span><span class="p">,</span> <span class="n">U_pt</span><span class="p">,</span> <span class="n">U_drive</span><span class="p">]</span>
+
+<span class="n">mymodel</span> <span class="o">=</span> <span class="n">pycmtensor</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="nb">locals</span><span class="p">(),</span> <span class="n">U</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">pycmtensor.models</span> <span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span> <span class="nn">pycmtensor.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">pycmtensor.scheduler</span> <span class="kn">import</span> <span class="n">ConstantLR</span>
+
+<span class="n">train</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">mymodel</span><span class="p">,</span> 
+    <span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> 
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span>  <span class="c1"># optional</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">base_learning_rate</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>  <span class="c1"># optional </span>
+    <span class="n">max_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># optional</span>
+    <span class="n">lr_scheduler</span><span class="o">=</span><span class="n">ConstantLR</span><span class="p">,</span>  <span class="c1"># optional</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">beta_statistics</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">model_statistics</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">benchmark</span><span class="p">())</span>
+</code></pre></div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

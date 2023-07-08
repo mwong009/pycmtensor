@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Introduction - PyCMTensor - Documentation</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
+        <link href="../css/extra.css" rel="stylesheet">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">PyCMTensor - Documentation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Introduction</a>
+</li>
+                                    
+<li>
+    <a href="installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="troubleshooting/" class="dropdown-item">Troubleshooting & tips</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../examples/" class="nav-link">Examples</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../user_guide/" class="dropdown-item">User guide</a>
+</li>
+                                    
+<li>
+    <a href="../user_guide/configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Developer guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../developer_guide/" class="dropdown-item">Developer guide</a>
+</li>
+                                    
+<li>
+    <a href="../developer_guide/api/" class="dropdown-item">API reference</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../about/contributing/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="../about/release_notes/" class="dropdown-item">Release notes</a>
+</li>
+                                    
+<li>
+    <a href="../about/licence/" class="dropdown-item">Licence</a>
+</li>
+                                    
+<li>
+    <a href="../about/citation/" class="dropdown-item">Citation</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="installation/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#introduction" class="nav-link">Introduction</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#why-pycmtensor" class="nav-link">Why PyCMTensor?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#project-goals" class="nav-link">Project goals</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#key-features-and-differences" class="nav-link">Key features and differences</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#roadmap" class="nav-link">Roadmap</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="why-pycmtensor">Why PyCMTensor?<a class="headerlink" href="#why-pycmtensor" title="Permanent link">&para;</a></h2>
+<p>Writing mathematical operations and evaluating models involving choice based utility 
+expressions can be difficult and time-consuming, especially with alternative specific 
+utilities of different dimensionalities are involved or when specifying neural networks 
+within utility specification. Typically, Python deep learning libraries such as 
+TensorFlow, Torch, Keras, or Scikit-learn express entire datasets as products of 
+n-dimensional arrays, without regards to the number of variables used or specification 
+of independent taste coefficients in each part of the output choice probability 
+equation. These libraries also do not expose the underlying operations that define the 
+inputs of a random utility equation, making it inconvenient for hypothesis testing or 
+running statistical tests without cumbersome modification or ad hoc calculations. </p>
+<p>Although these advanced Python deep learning libraries can be used to evaluate choice 
+models, they are not explicitly intended to be used for estimating choice models, 
+especially more advanced versions such as mixed logit. These deep learning models are first and foremost for model prediction, and not choice model estimation where clear interpretation of utility coefficients are needed.</p>
+<h3 id="what-can-pycmtensor-do">What can PyCMTensor do?<a class="headerlink" href="#what-can-pycmtensor-do" title="Permanent link">&para;</a></h3>
+<p>Currently, PyCMTensor can be used to fully specify Multinomial Logit and Mixed Logit models, estimate and generate statistical tests, using optimized tensor operations via Aesara tensor libraries.</p>
+<h2 id="project-goals">Project goals<a class="headerlink" href="#project-goals" title="Permanent link">&para;</a></h2>
+<div class="admonition">
+<p>The goal of PyCMTensor is to combine the easy-to-interpet choice modelling syntaxes and 
+expressions (e.g. Biogeme) while also implementing some of the tensor-based operations 
+and computational speed-up of a deep learning library through Aesara. PyCMTensor 
+focuses on specifying utility expressions, and making it easy to define a deep neural 
+network inside a choice model such as TasteNet or ResLogit model specifications. The 
+distinction of PyCMTensor from other deep learning libraries is that it focuses on 
+econometric modelling and statistical testing, rather than focusing purely on models 
+for prediction.</p>
+</div>
+<p>The higher level goals of this project are:</p>
+<ul>
+<li>provide tools to implement "hybrid" deep learning based discrete choice model</li>
+<li>facilitating development of deep learning tool for domain experts and researchers who are already familiar with discrete choice modelling with Biogeme</li>
+<li>Using the library to demonstrate innovative deep learning methods applied to econometric modelling</li>
+<li>make utility specification and prototyping at the meta-level more logical and consistent with choice modelling equations</li>
+<li>increase computational efficiency of estimating large scale choice models with machine learning techniques</li>
+<li>provide a platform for researchers with similar interests to contribute to an ecosystem for estimating advanced discrete choice models.</li>
+</ul>
+<h2 id="key-features-and-differences">Key features and differences<a class="headerlink" href="#key-features-and-differences" title="Permanent link">&para;</a></h2>
+<p>Main features:</p>
+<ul>
+<li>Utility specification syntax writing in Python.</li>
+<li>Perform statistical tests and  generate var-covar matrices for taste parameters. </li>
+<li>Fast execution of model estimation including of simulation based methods, e.g. Mixed Logit models.</li>
+<li>Model estimation with 1<sup>st</sup> order (Stochastic GD) or 2<sup>nd</sup> order methods (BFGS).</li>
+<li>Specifying neural nets with weight and bias parameters inside a utility function. TODO</li>
+</ul>
+<p>While other choice modelling estimation software are available, e.g. ..., PyCMTensor strives to fully implement deep learning based methods written in the same syntax format as Biogeme. Different software programs may occasionally vary in their behaviour and estimation results. The following are some of the key differences between PyCMTensor and other choice modelling estimation packages:</p>
+<h2 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h2>
+<p>PyCMTensor is a work in progress, there are several proposed feature implementations that needs to be done and there are still some code maintenance, documentation writing, and testing to be performed. </p>
+<p>The following are proposed major feature implementations:</p>
+<ul>
+<li>Implementation of TasteNet and ResLogit hybrid deep learning choice models</li>
+<li>Optimization algorithms:<ul>
+<li>Stochastic Newton Method (SNM)</li>
+<li>Momentum-based BFGS</li>
+</ul>
+</li>
+<li>Variational inference estimation</li>
+</ul>
+<p>If you are interested in contributing to the development of PyCMTensor, please contact me.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
