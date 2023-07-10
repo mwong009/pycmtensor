@@ -31,6 +31,7 @@ pandas = "^1.4.1"
 scipy = "^1.7.1"
 watermark = "^2.3.1"
 
+
 [tool.poetry.group.test]
 optional = true
 
@@ -46,14 +47,16 @@ black = "^23.3.0"
 isort = "^5.9.1"
 pre-commit = "^3.3.3"
 commitizen = "^3.3.0"
+ipykernel = "^6.24.0"
 
 [tool.poetry.group.doc]
 optional = true
 
 [tool.poetry.group.doc.dependencies]
 mkdocs = "^1.4.3"
-mkdocs-bootswatch = "^1.1"
+mkdocs-material = "^9.1.18"
 pymdown-extensions = "^10.0.1"
+mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

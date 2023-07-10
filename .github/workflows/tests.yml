@@ -72,7 +72,7 @@ jobs:
     - name: Install package dependencies
       run: |
         pip install poetry
-        poetry install
+        poetry install --with test
         poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
 
     - name: Show contents of .aesararc
