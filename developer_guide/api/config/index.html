@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../__init__/">
       
       
         <link rel="next" href="../dataset/">
@@ -527,6 +527,20 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../__init__/" class="md-nav__link">
+        __init__.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -829,6 +843,7 @@
 
 <h1 id="configpy">config.py<a class="headerlink" href="#configpy" title="Permanent link">&para;</a></h1>
 <hr />
+<p>See <a href="../../../user_guide/configuration/">configuration</a> for a list of available configuration settings.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -869,7 +884,7 @@
   <div class="doc doc-contents ">
 
   
-      <p>Config class object</p>
+      <p>Config class object that holds configuration settings</p>
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -884,15 +899,27 @@
         <tr>
           <td><code>descriptions</code></td>
           <td>
+                <code>dict</code>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>descriptive documentation of each configuration setting</p>
             </div>
           </td>
         </tr>
     </tbody>
   </table>
+      <div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To display a current list of configuration settings, invoke <code>print(pycmtensor.config)</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pycmtensor</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pycmtensor</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code>PyCMTensor<span class="w"> </span>configuration
+...
+</code></pre></div></p>
+</div>
 
 
 
@@ -920,7 +947,69 @@
 
   <div class="doc doc-contents ">
   
-      <p>Add a new parameter to Config</p>
+      <p>Method to add a new or update a setting in the configuration</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the setting</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>value</code></td>
+          <td>
+                <code>any</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>value given to the setting</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a string text describing the function of the setting</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>To set the value of the random seed to 100
+<div class="highlight"><pre><span></span><code><span class="n">pycmtensor</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
 
   </div>
 

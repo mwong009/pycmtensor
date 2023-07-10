@@ -529,6 +529,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../__init__/" class="md-nav__link">
+        __init__.py
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../config/" class="md-nav__link">
         config.py
       </a>
@@ -924,7 +938,7 @@
 
 
   
-      <p>Base PyCMTensor Dataset class object.</p>
+      <p>Base PyCMTensor Dataset class object</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -944,7 +958,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the pandas dataframe object to load</p>
             </div>
           </td>
           <td>
@@ -958,7 +972,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the name of the choice variable</p>
             </div>
           </td>
           <td>
@@ -985,29 +999,30 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>total number of rows in the dataset</p>
             </div>
           </td>
         </tr>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code>list</code>
+                <code>list[<span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>a list of (input) <code>TensorVariable</code> objects to
+build the tensor expression from</p>
             </div>
           </td>
         </tr>
         <tr>
           <td><code>y</code></td>
           <td>
-                <code>TensorVariable</code>
+                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the output (choice) <code>TensorVariable</code> object</p>
             </div>
           </td>
         </tr>
@@ -1018,7 +1033,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>a dictionary of <code>float</code> values to store the scaling factor used for each variable</p>
             </div>
           </td>
         </tr>
@@ -1029,7 +1044,18 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the name of the choice variable</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ds</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a dictionary of <code>np.ndarray</code> to store the values of each variable</p>
             </div>
           </td>
         </tr>
@@ -1040,7 +1066,8 @@
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the factor used to split the dataset into training and
+validation datasets</p>
             </div>
           </td>
         </tr>
@@ -1094,13 +1121,15 @@
 <details class="example" open>
   <summary>Example</summary>
   <p>Example initalization of a pandas dataset:</p>
-<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span>
-    <span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;datafile.csv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
-    <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;mode&quot;</span><span class="p">,</span>
-    <span class="n">alts</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;car&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s2">&quot;bus&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="s2">&quot;train&quot;</span><span class="p">}</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;datafile.csv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;mode&quot;</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 </code></pre></div>
+<p>Attributes can be access by invoking:
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">choice</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Output:
+<div class="highlight"><pre><span></span><code><span class="s1">&#39;car&#39;</span>
+</code></pre></div></p>
 </details>
 
   
@@ -1127,7 +1156,61 @@
 
   <div class="doc doc-contents ">
   
-      <p>TODO</p>
+      <p>Method for dropping <code>variables</code> from the dataset</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of variables from the dataset to drop</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>KeyError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>raises an error if any item in <code>variables</code> is not found in the dataset or item is the choice variable</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Choice variable cannot be explicity dropped.</p>
+</div>
 
   </div>
 
@@ -1145,7 +1228,7 @@
 
   <div class="doc doc-contents ">
   
-      <p>Multiply values of the variable by factor 1/factor.</p>
+      <p>Multiply values of the <code>variable</code> by factor 1/factor.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>

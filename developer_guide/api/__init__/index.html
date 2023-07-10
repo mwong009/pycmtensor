@@ -9,17 +9,17 @@
       
       
       
-        <link rel="prev" href="../functions/">
+        <link rel="prev" href="../">
       
       
-        <link rel="next" href="../../../about/contributing/">
+        <link rel="next" href="../config/">
       
       <link rel="icon" href="../../../assets/img/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
-        <title>models/MNL.py - PyCMTensor - Documentation</title>
+        <title>__init__.py - PyCMTensor - Documentation</title>
       
     
     
@@ -112,7 +112,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#modelsmnlpy" class="md-skip">
+        <a href="#__init__py" class="md-skip">
           Skip to content
         </a>
       
@@ -147,7 +147,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              models/MNL.py
+              __init__.py
             
           </span>
         </div>
@@ -527,11 +527,72 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../__init__/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          __init__.py
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         __init__.py
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pycmtensor" class="md-nav__link">
+    pycmtensor
+  </a>
+  
+    <nav class="md-nav" aria-label="pycmtensor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.about" class="md-nav__link">
+    about()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    config
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -583,65 +644,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          models/MNL.py
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../models.mnl/" class="md-nav__link">
         models/MNL.py
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL" class="md-nav__link">
-    MNL
-  </a>
-  
-    <nav class="md-nav" aria-label="MNL">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL.MNL" class="md-nav__link">
-    MNL
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -778,22 +785,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL" class="md-nav__link">
-    MNL
+  <a href="#pycmtensor" class="md-nav__link">
+    pycmtensor
   </a>
   
-    <nav class="md-nav" aria-label="MNL">
+    <nav class="md-nav" aria-label="pycmtensor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL.MNL" class="md-nav__link">
-    MNL
+  <a href="#pycmtensor.about" class="md-nav__link">
+    about()
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    config
+  </a>
   
 </li>
       
@@ -815,7 +829,7 @@
   
 
 
-<h1 id="modelsmnlpy">models.MNL.py<a class="headerlink" href="#modelsmnlpy" title="Permanent link">&para;</a></h1>
+<h1 id="__init__py">__init__.py<a class="headerlink" href="#__init__py" title="Permanent link">&para;</a></h1>
 <hr />
 
 
@@ -823,13 +837,15 @@
 
 
 
-<h2 id="pycmtensor.models.MNL" class="doc doc-heading">
-          <code>pycmtensor.models.MNL</code>
+<h2 id="pycmtensor" class="doc doc-heading">
+          <code>pycmtensor</code>
 
 
-<a href="#pycmtensor.models.MNL" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#pycmtensor" class="headerlink" title="Permanent link">&para;</a></h2>
 
   <div class="doc doc-contents first">
+  
+      <p>Top-level package for PyCMTensor.</p>
 
   
 
@@ -842,126 +858,20 @@
 
 
 
-<div class="doc doc-object doc-class">
+
+<div class="doc doc-object doc-function">
 
 
 
-<h3 id="pycmtensor.models.MNL.MNL" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<h3 id="pycmtensor.about" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">about</span><span class="p">()</span></code>
 
-<a href="#pycmtensor.models.MNL.MNL" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.about" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="pycmtensor.models.basic.BaseModel">BaseModel</span></code></p>
-
-
   
-      <p>Defines a Multinomial Logit model</p>
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>db</code></td>
-          <td>
-                <code><span title="pycmtensor.pycmtensor">pycmtensor</span>.<span title="pycmtensor.pycmtensor.Data">Data</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the database object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>params</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>dictionary of name:parameter pair</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>utility</code></td>
-          <td>
-                <code>list or TensorVariable</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the vector of utility functions</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>av</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>list of availability conditions. If <code>None</code>, all
-availability is set to 1</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>**kwargs</code></td>
-          <td>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>keyword arguments. Possible options are
-<code>optimizer</code> set the optimizer to use. see
-<img alt="🇵🇾" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f1f5-1f1fe.png" title=":py:" />mod:<code>pycmtensor.optimizer</code> for available options.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
+      <p>Returns a <code>watermark.watermark</code> of various system information for debugging</p>
 
   </div>
 
@@ -969,12 +879,12 @@ availability is set to 1</p>
 
 
 
-
   </div>
 
   </div>
 
-</div>
+</div><h2 id="config"><code>config</code><a class="headerlink" href="#config" title="Permanent link">&para;</a></h2>
+<p>Instance of the <a href="../config/#pycmtensor.config"><code>Config</code></a> class</p>
 
 
 
