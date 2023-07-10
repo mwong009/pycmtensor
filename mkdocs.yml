@@ -15,6 +15,7 @@ nav:
     - Developer guide: developer_guide/index.md
     - API reference: 
       - API reference: developer_guide/api/index.md
+      - __init__.py: developer_guide/api/__init__.md
       - config.py: developer_guide/api/config.md
       - dataset.py: developer_guide/api/dataset.md
       - functions.py: developer_guide/api/functions.md
@@ -67,6 +68,8 @@ plugins:
             show_source: false 
             merge_init_into_class: true
             show_symbol_type_heading: true
+            separate_signature: false
+            group_by_category: true
 
 markdown_extensions:
   - admonition

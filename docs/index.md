@@ -38,7 +38,7 @@ Some basic working code examples
 ## Developer guide
 
 * [**Developer guide**](developer_guide/index.md) - Guide for developers
-* [**API reference**](developer_guide/api.md)
+* [**API reference**](developer_guide/api/index.md)
 
 ## About
 
