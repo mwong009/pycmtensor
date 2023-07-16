@@ -258,6 +258,13 @@ class Expressions:
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
+    # def is_dataarray(self, other):
+    #     if isinstance(other, xr.DataArray):
+    #         if hasattr(other, "x"):
+    #             return other.x
+    #         return other.y
+    #     return other
+
 
 class Param(Expressions):
     def __init__(self, name: str, value=None):
