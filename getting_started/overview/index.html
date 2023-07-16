@@ -638,7 +638,7 @@
   
     <li class="md-nav__item">
       <a href="../../developer_guide/api/__init__/" class="md-nav__link">
-        __init__.py
+        __init__
       </a>
     </li>
   
@@ -652,7 +652,7 @@
   
     <li class="md-nav__item">
       <a href="../../developer_guide/api/config/" class="md-nav__link">
-        config.py
+        config
       </a>
     </li>
   
@@ -666,7 +666,7 @@
   
     <li class="md-nav__item">
       <a href="../../developer_guide/api/dataset/" class="md-nav__link">
-        dataset.py
+        dataset
       </a>
     </li>
   
@@ -680,7 +680,48 @@
   
     <li class="md-nav__item">
       <a href="../../developer_guide/api/functions/" class="md-nav__link">
-        functions.py
+        functions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
+          models
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_6">
+          <span class="md-nav__icon md-icon"></span>
+          models
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer_guide/api/models/basic/" class="md-nav__link">
+        basic
       </a>
     </li>
   
@@ -693,9 +734,16 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer_guide/api/models.mnl/" class="md-nav__link">
-        models/MNL.py
+      <a href="../../developer_guide/api/models/MNL/" class="md-nav__link">
+        MNL
       </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -993,7 +1041,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p><code>pycmtensor.Beta</code> follows the same syntax as in <a href="">Biogeme</a>'s <code>biogeme.expressions.Beta</code> for familiarity sake. However, <code>pycmtensor.Beta</code> uses <code>aesara.tensor</code> variables to define the mathematical ops. Both are not interchangable.</p>
+<p><code>pycmtensor.expressions.Beta</code> follows the same syntax as in <a href="">Biogeme</a> <code>biogeme.expressions.Beta</code> for familiarity sake. However, <code>pycmtensor.expressions.Beta</code> uses <code>aesara.tensor</code> variables to define the mathematical ops. Currently they are not interchangable.</p>
 </div>
 <h2 id="specifying-utility-equations">Specifying utility equations<a class="headerlink" href="#specifying-utility-equations" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="n">U_walk</span>  <span class="o">=</span> <span class="n">asc_walk</span> <span class="o">+</span> <span class="n">b_time</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;dur_walking&quot;</span><span class="p">]</span>
@@ -1006,27 +1054,32 @@
 <span class="c1"># vectorize the utility function</span>
 <span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="n">U_walk</span><span class="p">,</span> <span class="n">U_cycle</span><span class="p">,</span> <span class="n">U_pt</span><span class="p">,</span> <span class="n">U_drive</span><span class="p">]</span>
 </code></pre></div>
+<p>We define data variables as an item from the <code>Dataset</code> object. For instance, the variable <code>"dur_walking"</code> from the LPMC dataset can be expressed as such: <code>ds["dur_walking"]</code>. Furthermore, composite variables or interactions can also be specified using standard mathematical operators, for example, adding <code>"dur_pt_rail"</code> and <code>"dur_pt_bus"</code> can be expressed as <code>ds["dur_pt_rail"] + ds["dur_pt_bus"]</code>.</p>
+<p>Finally, we vectorize the utility functions by putting them into a <code>list()</code>. The index of the utility in the list corresponds to the (zero-adjusted) indexing of the choice variable.</p>
+<p>(Advanced, optional) We can also define the utlity functions as a 2-D <code>tensorVariable</code> object instead of a list. </p>
 <h2 id="specifying-the-model">Specifying the model<a class="headerlink" href="#specifying-the-model" title="Permanent link">&para;</a></h2>
+<p>To specify the model, we create a model object from a model in the <code>pycmtensor.models</code> module.</p>
 <div class="highlight"><pre><span></span><code><span class="n">mymodel</span> <span class="o">=</span> <span class="n">pycmtensor</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">utility</span><span class="o">=</span><span class="n">U</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
-<p>Output:</p>
-<pre class="codehilite"><code class="language-bash">[WARNING] b_purpose not in any utility functions
-[INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, cost_driving_ccharge]
-[INFO] Build time = 00:00:09
-</code></pre>
-
 <p>The <code>MNL</code> object takes the following argument:</p>
 <ul>
 <li><code>ds</code>: The dataset object</li>
-<li><code>params</code>: the list (or dict) of declared parameter objects</li>
-<li><code>utility</code>: The (list of) utilities to be estimated*</li>
-<li><code>av</code>: The availability conditions as a list with the same index as <code>utility</code>. See <a href="">here</a> for details on specifying availability conditions. Defaults to <code>None</code></li>
+<li><code>params</code>: the list (or dict) of declared parameter objects*</li>
+<li><code>utility</code>: The list of utilities to be estimated</li>
+<li><code>av</code>: The availability conditions as a list with the same index as <code>utility</code>. See <a href="">here</a> for an example on specifying availability conditions. Defaults to <code>None</code></li>
 <li><code>**kwargs</code>: Optional keyword arguments for modifying the model configuration settings. See <a href="../../user_guide/configuration/">configuration</a> in the user guide for details on possible options</li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>*: We use <code>locals()</code> as a shortcut for collecting the <code>Beta</code> objects from the Python <a href="https://docs.python.org/3/library/functions.html#locals">local environment</a> for the argument <code>params=</code>.</p>
+<p>*: We use <code>locals()</code> as a shortcut for collecting and fitering the <code>Beta</code> objects from the Python <a href="https://docs.python.org/3/library/functions.html#locals">local environment</a> for the argument <code>params=</code>.</p>
 </div>
+<p>Output:</p>
+<pre class="codehilite"><code class="language-bash">[INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, 
+dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, 
+cost_driving_ccharge]
+[INFO] Build time = 00:00:09
+</code></pre>
+
 <h2 id="estimating-the-model">Estimating the model<a class="headerlink" href="#estimating-the-model" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pycmtensor.models</span> <span class="kn">import</span> <span class="n">train</span>
 <span class="kn">from</span> <span class="nn">pycmtensor.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
@@ -1043,13 +1096,14 @@
     <span class="n">lr_scheduler</span><span class="o">=</span><span class="n">ConstantLR</span><span class="p">,</span>  <span class="c1"># optional</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>The function <code>train()</code> estimates the model until convergence specified by the gradient norm between two complete passes of the entire training dataset. In order to limit repeated calculation, we store the <span class="arithmatex">\(\beta\)</span> of the previous epoch and roughly calculate the gradient using: <span class="arithmatex">\(\nabla_\beta = \beta_t - \beta_{t-1}\)</span>. The estimation is terminated either when the <code>max_steps</code> is reached or when the gradient norm <span class="arithmatex">\(||\nabla_\beta||_{_2}\)</span> is less than the <code>convergence_threshold</code> value.</p>
+<p>The function <code>train()</code> estimates the model until convergence specified by the gradient norm between two complete passes of the entire training dataset. In order to limit repeated calculation, we store the <span class="arithmatex">\(\beta\)</span> of the previous epoch and approximate the gradient step using: <span class="arithmatex">\(\nabla_\beta = \beta_t - \beta_{t-1}\)</span>. The estimation is terminated either when the <code>max_steps</code> is reached or when the gradient norm <span class="arithmatex">\(||\nabla_\beta||_{_2}\)</span> is less than the <code>convergence_threshold</code> value (set as <code>0.0001</code> in this example).</p>
 <p>The <code>train()</code> function takes the following required arguments:</p>
 <ul>
 <li><code>model</code>: The model object. <code>MNL</code> in the example above</li>
 <li><code>ds</code>: The dataset object</li>
+<li><code>**kwargs</code>: Optional keyword arguments for modifying the model configuration settings. See <a href="../user_guide/configuration">configuration</a> in the user guide for details on possible options</li>
 </ul>
-<p>The other arguments are optional, and they can be set when calling the <code>train()</code> function. These optional arguments are the 'hyperparameters' of the model that modifies the training procedure. For a list of possible hyperparameter options, explanations, and default values, see <a href="../../user_guide/configuration/">configuration</a> in the user guide.</p>
+<p>The other arguments <code>**kwargs</code> are optional, and they can be set when calling the <code>train()</code> function or during model specification. These optional arguments are the so-called <em>hyperparameters</em> of the model that modifies the training procedure.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A <code>step</code> is one full pass of the training dataset. An <code>iteration</code> is one model update operation, usually it is every mini-batch (when <code>batch_size != 0</code>).</p>
@@ -1080,10 +1134,21 @@
 </code></pre>
 
 <h2 id="printing-statistical-test-results">Printing statistical test results<a class="headerlink" href="#printing-statistical-test-results" title="Permanent link">&para;</a></h2>
+<p>The results are stored in the <code>Results</code> class object of th <code>MNL</code> model. The following are function calls to display the statistical results of the model estimation:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">beta_statistics</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">model_statistics</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">benchmark</span><span class="p">())</span>
 </code></pre></div>
+<p><code>beta_statistics()</code> show the estimated values of the model coefficients, standard errors, t-test, and p-values, including the robust measures.</p>
+<p>The standard errors are calculated using the diagonals of the square root of the variance-covariance matrix (the inverse of the negative Hessian matrix):</p>
+<div class="arithmatex">\[
+ std. error = diag.\Big(\sqrt{-H^{-1}}\Big)
+\]</div>
+<p>The robust standard errors are calculated using the 'sandwich method', where the variance-covariance matrix is as follows:</p>
+<div class="arithmatex">\[
+covar = (-H^{-1})(\nabla\cdot\nabla^\top)(-H^{-1})
+\]</div>
+<p>The rest of the results are self-explanatory.</p>
 <p>Ouput:</p>
 <pre class="codehilite"><code class="language-bash">              value   std err     t-test p-value rob. std err rob. t-test rob. p-value
 asc_cycle -3.853007  0.117872 -32.688157     0.0     0.120295  -32.029671          0.0

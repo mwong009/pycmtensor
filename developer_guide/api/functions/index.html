@@ -12,14 +12,14 @@
         <link rel="prev" href="../dataset/">
       
       
-        <link rel="next" href="../models.mnl/">
+        <link rel="next" href="../models/basic/">
       
       <link rel="icon" href="../../../assets/img/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
-        <title>functions.py - PyCMTensor - Documentation</title>
+        <title>functions - PyCMTensor - Documentation</title>
       
     
     
@@ -147,7 +147,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              functions.py
+              functions
             
           </span>
         </div>
@@ -530,7 +530,7 @@
   
     <li class="md-nav__item">
       <a href="../__init__/" class="md-nav__link">
-        __init__.py
+        __init__
       </a>
     </li>
   
@@ -544,7 +544,7 @@
   
     <li class="md-nav__item">
       <a href="../config/" class="md-nav__link">
-        config.py
+        config
       </a>
     </li>
   
@@ -558,7 +558,7 @@
   
     <li class="md-nav__item">
       <a href="../dataset/" class="md-nav__link">
-        dataset.py
+        dataset
       </a>
     </li>
   
@@ -581,12 +581,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          functions.py
+          functions
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        functions.py
+        functions
       </a>
       
         
@@ -701,10 +701,58 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
+          models
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_6">
+          <span class="md-nav__icon md-icon"></span>
+          models
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../models.mnl/" class="md-nav__link">
-        models/MNL.py
+      <a href="../models/basic/" class="md-nav__link">
+        basic
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/MNL/" class="md-nav__link">
+        MNL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1169,7 +1217,7 @@ value results in faster changing moving average.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Symbolic representation of the 1<sup>st</sup> order gradient vector given the neg. log likelihood.</p>
+      <p>Symbolic representation of the 1<sup>st</sup> order gradient vector given the cost.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1189,7 +1237,7 @@ value results in faster changing moving average.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the neg loglikelihood to compute the gradients over</p>
+              <p>the cost function to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -1228,7 +1276,7 @@ value results in faster changing moving average.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the gradient vector</p>
+              <p>the gradient vector of the cost function wrt to the params</p>
             </div>
           </td>
         </tr>
@@ -1807,7 +1855,7 @@ availabilities.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Symbolic representation of the 2<sup>nd</sup> order Hessian matrix given the neg. log likelihood.</p>
+      <p>Symbolic representation of the 2<sup>nd</sup> order Hessian matrix given cost.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1827,7 +1875,7 @@ availabilities.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the neg loglikelihood to compute the gradients over</p>
+              <p>the cost function to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -1866,7 +1914,7 @@ availabilities.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the Hessian matrix</p>
+              <p>the Hessian matrix of the cost function wrt to the params</p>
             </div>
           </td>
         </tr>
