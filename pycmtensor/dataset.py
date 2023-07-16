@@ -2,7 +2,6 @@
 # converts pandas dataframe into an xarray dataset
 
 import aesara.tensor as aet
-import pandas as pd
 
 from pycmtensor import config
 
@@ -12,21 +11,23 @@ __all__ = ["Dataset"]
 
 
 class Dataset:
-    def __init__(self, df: pd.DataFrame, choice: str):
-        """Base PyCMTensor Dataset class object.
+    def __init__(self, df, choice):
+        """Base PyCMTensor Dataset class object
 
         Args:
-            df (pandas.DataFrame):
-            choice (str):
+            df (pandas.DataFrame): the pandas dataframe object to load
+            choice (str): the name of the choice variable
 
         Attributes:
-            n (int):
-            x (list):
-            y (TensorVariable):
-            scale (dict):
-            choice (str):
-            ds (dict)
-            split_frac (float):
+            n (int): total number of rows in the dataset
+            x (list[TensorVariable]): a list of (input) `TensorVariable` objects to
+                build the tensor expression from
+            y (TensorVariable): the output (choice) `TensorVariable` object
+            scale (dict): a dictionary of `float` values to store the scaling factor used for each variable
+            choice (str): the name of the choice variable
+            ds (dict): a dictionary of `np.ndarray` to store the values of each variable
+            split_frac (float): the factor used to split the dataset into training and
+                validation datasets
             train_index (list):
             valid_index (list):
             n_train (int):
@@ -36,12 +37,18 @@ class Dataset:
             Example initalization of a pandas dataset:
 
             ```python
-            ds = Dataset(
-                df=pd.read_csv("datafile.csv", sep=","),
-                choice="mode",
-                alts={0: "car", 1:"bus", 2:"train"}
-            )
+            ds = Dataset(df=pd.read_csv("datafile.csv", sep=","), choice="mode")
             ds.split(frac=0.8)
+            ```
+
+            Attributes can be access by invoking:
+            ```python
+            print(ds.choice)
+            ```
+
+            Output:
+            ```bash
+            'car'
             ```
 
         """
@@ -104,8 +111,18 @@ class Dataset:
         n = round(self.n * self.split_frac)
         return self.index[n:]
 
-    def drop(self, variables: list):
-        """TODO"""
+    def drop(self, variables):
+        """Method for dropping `variables` from the dataset
+
+        Args:
+            variables (list): list of variables from the dataset to drop
+
+        Raises:
+            KeyError: raises an error if any item in `variables` is not found in the dataset or item is the choice variable
+
+        !!! Warning
+            Choice variable cannot be explicity dropped.
+        """
         for variable in variables:
             if (variable in self.ds) and (variable != self.choice):
                 i = [x.name for x in self.x].index(variable)
@@ -117,7 +134,7 @@ class Dataset:
                 raise KeyError
 
     def scale_variable(self, variable, factor):
-        """Multiply values of the variable by factor 1/factor.
+        """Multiply values of the `variable` by factor 1/factor.
 
         Args:
             variable (str): the name of the variable or a list of variable names
