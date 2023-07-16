@@ -1,1 +1,2 @@
-from .MNL import MNL
+from pycmtensor.models.basic import train
+from pycmtensor.models.MNL import MNL
