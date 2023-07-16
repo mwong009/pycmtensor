@@ -1,7 +1,7 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "1.3.2"
+__version__ = "1.4.0"
 
 import aesara
 from aesara.tensor.sharedvar import TensorSharedVariable as TensorSharedVariable

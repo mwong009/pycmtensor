@@ -1,7 +1,9 @@
-## Unreleased
+## v1.4.0 (2023-07-16)
 
 ### Feat
 
+- **optimizers.py**: added new BFGS algorithm
+- **dataset.py**: moved dataset initialization to dataset.py
 - **pycmtensor.py**: Implemented early stopping on coefficient convergence in training loop
 - **functions.py**: logit method now takes uneven dimensioned-utilities
 - **expression.py**: Added RandomDraws expression for sampling in mixed logit
@@ -10,9 +12,13 @@
 
 ### Fix
 
+- **results.py**: fixed instance when params are not Betas
+- **expressions.py**: include RandomDraws as an option in expression evaluations
+- Update tests workflow file conda packages
+- **pycmtensor.py**: Added missing configuration for stepLR `drop_every`
 - **tests.yml**: Update tests workflow file conda packages
-- **optimizers.py**: Fixed name typo in __all__
-- Corrected calculation of hessian and bhhh matrices
+- **optimizers.py**: Fixed name typo in `__all__`
+- **results.py**: Corrected calculation of hessian and bhhh matrices
 - **scheduler.py**: Moved class function calls to parent class
 - **statistics.py**: Fixed rob varcovar calculation error
 - **MNL.py**: Moved aesara function to parent class
@@ -23,7 +29,10 @@
 
 ### Refactor
 
-- removed unused code
+- **pycmtensor.py**: temporarily removed pycmtensor.py
+- **MNL.py**: replaced function constructors from pycmtensor.py as a function call inside the model Class object
+- **basic.py**: moved model functionality to from pycmtensor.py to models/basic.py
+- **utils.py**: Removed unused code
 
 ## v1.3.2 (2023-06-23)
 
