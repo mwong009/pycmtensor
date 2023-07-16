@@ -15,11 +15,13 @@ nav:
     - Developer guide: developer_guide/index.md
     - API reference: 
       - API reference: developer_guide/api/index.md
-      - __init__.py: developer_guide/api/__init__.md
-      - config.py: developer_guide/api/config.md
-      - dataset.py: developer_guide/api/dataset.md
-      - functions.py: developer_guide/api/functions.md
-      - models/MNL.py: developer_guide/api/models.mnl.md
+      - __init__: developer_guide/api/__init__.md
+      - config: developer_guide/api/config.md
+      - dataset: developer_guide/api/dataset.md
+      - functions: developer_guide/api/functions.md
+      - models: 
+        - basic: developer_guide/api/models/basic.md
+        - MNL: developer_guide/api/models/MNL.md
   - About:
     - Contributing: about/contributing.md
     - Release notes: about/release_notes.md

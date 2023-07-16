@@ -22,6 +22,14 @@ In addition, you will need:
     - Openblas, default when Numpy is installed with pip, alternatively, with conda `blas` package
 
 
+## Installation steps
+
+1. [Install conda dependencies](#install-conda-dependencies)
+2. [Install PyCMTensor](#install-pycmtensor-using-pip)
+3. [Validate installation](#checking-your-installation)
+
+
+
 ## Install conda dependencies
 
 Install [Miniconda](https://conda.io/miniconda.html). Select the appropriate package for your operating system.
@@ -50,7 +58,7 @@ Install the conda dependencies:
     :::bash
     conda install -c conda-forge mkl-service gcc_linux-64 gxx_linux-64 blas aesara -y
 
-## Download PyCMTensor using pip
+## Install PyCMTensor using pip
 
 Once the conda packages have been installed, install the rest of the packages using `pip`, type:
 

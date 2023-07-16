@@ -90,7 +90,7 @@ The `Beta` object takes the following argument:
     ```
 
 !!! info
-    `pycmtensor.Beta` follows the same syntax as in [Biogeme]()'s `biogeme.expressions.Beta` for familiarity sake. However, `pycmtensor.Beta` uses `aesara.tensor` variables to define the mathematical ops. Both are not interchangable.
+    `pycmtensor.expressions.Beta` follows the same syntax as in [Biogeme]() `biogeme.expressions.Beta` for familiarity sake. However, `pycmtensor.expressions.Beta` uses `aesara.tensor` variables to define the mathematical ops. Currently they are not interchangable.
 
 
 ## Specifying utility equations
@@ -107,30 +107,41 @@ U_drive = asc_drive + b_time * ds["dur_driving"] + b_licence * ds["driving_licen
 U = [U_walk, U_cycle, U_pt, U_drive]
 ```
 
+We define data variables as an item from the `Dataset` object. For instance, the variable `"dur_walking"` from the LPMC dataset can be expressed as such: `ds["dur_walking"]`. Furthermore, composite variables or interactions can also be specified using standard mathematical operators, for example, adding `"dur_pt_rail"` and `"dur_pt_bus"` can be expressed as `ds["dur_pt_rail"] + ds["dur_pt_bus"]`.
+
+Finally, we vectorize the utility functions by putting them into a `list()`. The index of the utility in the list corresponds to the (zero-adjusted) indexing of the choice variable.
+
+(Advanced, optional) We can also define the utlity functions as a 2-D `tensorVariable` object instead of a list. 
+
 ## Specifying the model
+
+To specify the model, we create a model object from a model in the `pycmtensor.models` module.
 
 ```python
 mymodel = pycmtensor.models.MNL(ds=ds, params=locals(), utility=U, av=None)
 ```
 
-Output:
-
-    :::bash 
-    [WARNING] b_purpose not in any utility functions
-    [INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, cost_driving_ccharge]
-    [INFO] Build time = 00:00:09
-    
-
 The `MNL` object takes the following argument:
 
 - `ds`: The dataset object
-- `params`: the list (or dict) of declared parameter objects
-- `utility`: The (list of) utilities to be estimated*
-- `av`: The availability conditions as a list with the same index as `utility`. See [here]() for details on specifying availability conditions. Defaults to `None`
+- `params`: the list (or dict) of declared parameter objects*
+- `utility`: The list of utilities to be estimated
+- `av`: The availability conditions as a list with the same index as `utility`. See [here]() for an example on specifying availability conditions. Defaults to `None`
 - `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration.md) in the user guide for details on possible options
 
 !!! tip
-    *: We use `locals()` as a shortcut for collecting the `Beta` objects from the Python [local environment](https://docs.python.org/3/library/functions.html#locals) for the argument `params=`.
+    *: We use `locals()` as a shortcut for collecting and fitering the `Beta` objects from the Python [local environment](https://docs.python.org/3/library/functions.html#locals) for the argument `params=`.
+
+Output:
+
+    :::bash 
+    [INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, 
+    dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, 
+    cost_driving_ccharge]
+    [INFO] Build time = 00:00:09
+    
+
+
 
 ## Estimating the model
 
@@ -151,14 +162,15 @@ train(
 )
 ```
 
-The function `train()` estimates the model until convergence specified by the gradient norm between two complete passes of the entire training dataset. In order to limit repeated calculation, we store the $\beta$ of the previous epoch and roughly calculate the gradient using: $\nabla_\beta = \beta_t - \beta_{t-1}$. The estimation is terminated either when the `max_steps` is reached or when the gradient norm $||\nabla_\beta||_{_2}$ is less than the `convergence_threshold` value.
+The function `train()` estimates the model until convergence specified by the gradient norm between two complete passes of the entire training dataset. In order to limit repeated calculation, we store the $\beta$ of the previous epoch and approximate the gradient step using: $\nabla_\beta = \beta_t - \beta_{t-1}$. The estimation is terminated either when the `max_steps` is reached or when the gradient norm $||\nabla_\beta||_{_2}$ is less than the `convergence_threshold` value (set as `0.0001` in this example).
 
 The `train()` function takes the following required arguments:
 
 - `model`: The model object. `MNL` in the example above
 - `ds`: The dataset object
+- `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration) in the user guide for details on possible options
 
-The other arguments are optional, and they can be set when calling the `train()` function. These optional arguments are the 'hyperparameters' of the model that modifies the training procedure. For a list of possible hyperparameter options, explanations, and default values, see [configuration](../user_guide/configuration.md) in the user guide.
+The other arguments `**kwargs` are optional, and they can be set when calling the `train()` function or during model specification. These optional arguments are the so-called *hyperparameters* of the model that modifies the training procedure.
 
 !!! note
     A `step` is one full pass of the training dataset. An `iteration` is one model update operation, usually it is every mini-batch (when `batch_size != 0`).
@@ -194,11 +206,29 @@ Output:
 
 ## Printing statistical test results
 
+The results are stored in the `Results` class object of th `MNL` model. The following are function calls to display the statistical results of the model estimation:
+
 ```python
 print(mymodel.results.beta_statistics())
 print(mymodel.results.model_statistics())
 print(mymodel.results.benchmark())
 ```
+
+`beta_statistics()` show the estimated values of the model coefficients, standard errors, t-test, and p-values, including the robust measures.
+
+The standard errors are calculated using the diagonals of the square root of the variance-covariance matrix (the inverse of the negative Hessian matrix):
+
+$$
+ std. error = diag.\Big(\sqrt{-H^{-1}}\Big)
+$$
+
+The robust standard errors are calculated using the 'sandwich method', where the variance-covariance matrix is as follows:
+
+$$
+covar = (-H^{-1})(\nabla\cdot\nabla^\top)(-H^{-1})
+$$
+
+The rest of the results are self-explanatory.
 
 Ouput:
 

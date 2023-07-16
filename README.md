@@ -1,4 +1,4 @@
-![PyCMTensor](docs/img/logo.jpg)
+![PyCMTensor](docs/assets/img/logo.jpg)
 
 [![Licence](https://img.shields.io/badge/Licence-MIT-blue)](about/licence.md)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor) 
