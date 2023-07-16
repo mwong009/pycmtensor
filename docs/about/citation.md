@@ -7,7 +7,7 @@ To cite this software package:
 	:::bash
 	@misc{wongpycmtensor,
 		author       = {Melvin Wong},
-		title        = {PyCMTensor: Tensor-based choice modelling estimation package},
+		title        = {PyCMTensor: Tensor-based choice modelling estimation Python package},
 		year         = 2023,
 		publisher    = {Zenodo},
 		version      = {v1.3.2},

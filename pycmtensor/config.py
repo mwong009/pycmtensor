@@ -8,11 +8,31 @@ __all__ = ["Config"]
 
 
 class Config:
+    """Config class object that holds configuration settings
+
+    Attributes:
+        descriptions (dict): descriptive documentation of each configuration setting
+
+    !!! tip
+        To display a current list of configuration settings, invoke `print(pycmtensor.config)`.
+
+        ```python
+        import pycmtensor
+        print(pycmtensor.config)
+        ```
+
+        Output:
+        ```bash
+        PyCMTensor configuration
+        ...
+        ```
+    """
+
     def __init__(self):
         self.descriptions = {}
 
     def __repr__(self):
-        msg = "Model parameters\n"
+        msg = "PyCMTensor configuration\n"
         for key, val in self.__dict__.items():
             if key != "descriptions":
                 msg += f"{key}\n"
@@ -25,8 +45,20 @@ class Config:
 
         return msg
 
-    def add(self, name, value, description=None):
-        """Add a new parameter to Config"""
+    def add(self, name, value: any, description=None):
+        """Method to add a new or update a setting in the configuration
+
+        Args:
+            name (str): name of the setting
+            value: value given to the setting
+            description (str): a string text describing the function of the setting
+
+        !!! example
+            To set the value of the random seed to 100
+            ```python
+            pycmtensor.config.add('seed', 100)
+            ```
+        """
 
         if name in self.__dict__:
             # check same instance as existing parameter

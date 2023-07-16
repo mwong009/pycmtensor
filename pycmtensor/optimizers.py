@@ -2,12 +2,19 @@
 """PyCMTensor optimizers module"""
 import aesara
 import aesara.tensor as aet
+import aesara.tensor.nlinalg as nlinalg
+import numpy as np
 from aesara import shared
+from aesara.ifelse import ifelse
 from aesara.tensor.sharedvar import TensorSharedVariable
+from numpy import nan_to_num as nan2num
+
+from pycmtensor.expressions import Beta
 
 FLOATX = aesara.config.floatX
 
 __all__ = [
+    "BFGS",
     "Adam",
     "Nadam",
     "Adamax",
@@ -497,5 +504,81 @@ class SGD(Optimizer):
         for param, grad in zip(params, grads):
             p_t = param - lr * grad
             updates.append((param, p_t))
+
+        return updates
+
+
+class BFGS(Optimizer):
+    def __init__(self, params: list, config=None, **kwargs):
+        """An optimizer that implements the stochastic gradient algorithm
+
+        Args:
+            params (list): a list of ``TensorSharedVariable``
+        """
+        super().__init__(name="BFGS")
+        if config is not None:
+            if hasattr(config, "BFGS_warmup"):
+                self.warmup = config.BFGS_warmup
+            else:
+                raise KeyError
+
+        self._t = aesara.shared(1.0)
+        self._y = [
+            shared(aet.zeros_like(p()).eval())
+            for p in params
+            if ((p.status != 1) and (isinstance(p, Beta)))
+        ]
+        self._s = [
+            shared(p().eval())
+            for p in params
+            if ((p.status != 1) and (isinstance(p, Beta)))
+        ]
+        self._accu = [
+            shared(aet.zeros_like(p()).eval())
+            for p in params
+            if ((p.status != 1) and (isinstance(p, Beta)))
+        ]
+        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
+
+        self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
+
+    def update(self, cost, params: list, lr: float = 0.001):
+        T = self.warmup
+        params = [p() for p in params if p.status != 1]
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+        for n, (param, grad, s, y) in enumerate(zip(params, grads, self._s, self._y)):
+            B = ifelse(
+                aet.lt(self._t, 2 * T),
+                then_branch=grad,
+                else_branch=aet.sum(self._H0[n, :] * grad),
+            )
+            # a_t = a + aet.sqr(grad)
+            # p_t = param - lr / aet.sqrt(a_t + self.epsilon) * B
+            # updates.append((a, a_t))
+            p_t = param - lr * B
+            updates.append((param, p_t))
+
+            s_new = param - s
+            updates.append((s, s_new))
+
+            y_new = grad - y
+            updates.append((y, y_new))
+
+        s_t = aet.atleast_2d(self._s, left=False)
+        y_t = aet.atleast_2d(self._y, left=False)
+        rho_t = 1 / (s_t.T @ y_t)
+        li = self.I - rho_t * (s_t @ y_t.T)
+        ri = self.I - rho_t * (y_t @ s_t.T)
+        h_res = rho_t * (s_t @ s_t.T)
+        H_new = ifelse(
+            aet.ge(self._t, T) * aet.eq(self._t % T, 0),
+            then_branch=li @ self._H0 @ ri + h_res,
+            else_branch=self._H0,
+        )
+        updates.append((self._H0, H_new))
+
+        updates.append((self._t, self._t + 1))
 
         return updates

@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
-from .statistics import *
+from pycmtensor.expressions import Beta
+from pycmtensor.statistics import *
 
 __all__ = ["Results"]
 
@@ -22,7 +23,6 @@ class Results:
         self.seed = None
 
         self.null_loglikelihood = -np.inf
-        self.init_loglikelihood = -np.inf
         self.best_loglikelihood = -np.inf
         self.best_valid_error = 1.0
         self.best_step = 0
@@ -30,6 +30,7 @@ class Results:
         self.gnorm = None
         self.hessian_matrix = None
         self.bhhh_matrix = None
+        self.params = None
         self.betas = None
         self.weights = None
 
@@ -66,7 +67,7 @@ class Results:
         stats.loc["Seed"] = self.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
-        stats.loc["iterations per sec"] = f"{self.iterations_per_sec}/s"
+        stats.loc["iterations per sec"] = f"{self.iterations_per_sec} iter/s"
         return stats
 
     def model_statistics(self):
@@ -74,7 +75,7 @@ class Results:
         stats = pd.DataFrame(columns=["value"]).astype("object")
         stats.loc["Number of training samples used"] = int(self.n_train)
         stats.loc["Number of validation samples used"] = int(self.n_valid)
-        stats.loc["Init. log likelihood"] = self.init_loglikelihood
+        stats.loc["Null. log likelihood"] = self.null_loglikelihood
         stats.loc["Final log likelihood"] = self.best_loglikelihood
         stats.loc["Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
         stats.loc["Likelihood ratio test"] = self.loglikelihood_ratio_test()
@@ -82,13 +83,13 @@ class Results:
         stats.loc["Rho square bar"] = self.rho_square_bar()
         stats.loc["Akaike Information Criterion"] = self.AIC()
         stats.loc["Bayesian Information Criterion"] = self.BIC()
-        stats.loc["Final gradient norm"] = self.gnorm
+        stats.loc["Final gradient norm"] = f"{self.gnorm:.5e}"
         return stats
 
     def beta_statistics(self):
         """Returns a pandas DataFrame of the model beta statistics"""
         n = len(self.hessian_matrix)
-        betas = self.betas
+        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
         bh = self.bhhh_matrix.sum(axis=0)
 
@@ -115,7 +116,7 @@ class Results:
 
     def model_correlation_matrix(self):
         """Returns a pandas DataFrame of the model correlation matrix"""
-        betas = self.betas
+        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
 
         mat = pd.DataFrame(
@@ -128,7 +129,7 @@ class Results:
 
     def model_robust_correlation_matrix(self):
         """Returns a pandas DataFrame of the model (robust) correlation matrix"""
-        betas = self.betas
+        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
         bh = self.bhhh_matrix.sum(axis=0)
 

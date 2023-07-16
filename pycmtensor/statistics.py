@@ -24,7 +24,7 @@ def variance_covariance(h):
 
 
 def rob_variance_covariance(h, bh):
-    """Returns the rob. var-covar matrix given the Cramer-Rao bound (``h``) and the BHHH
+    """Returns the rob. var-covar matrix given the Hessian (``h``) and the BHHH
     matrix (``bh``)
     """
     cr = variance_covariance(h)

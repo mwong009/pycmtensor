@@ -13,14 +13,65 @@ nav:
     - Configuration: user_guide/configuration.md
   - Developer guide:
     - Developer guide: developer_guide/index.md
-    - API reference: developer_guide/api.md
+    - API reference: 
+      - API reference: developer_guide/api/index.md
+      - __init__: developer_guide/api/__init__.md
+      - config: developer_guide/api/config.md
+      - dataset: developer_guide/api/dataset.md
+      - functions: developer_guide/api/functions.md
+      - models: 
+        - basic: developer_guide/api/models/basic.md
+        - MNL: developer_guide/api/models/MNL.md
   - About:
     - Contributing: about/contributing.md
     - Release notes: about/release_notes.md
     - Licence: about/licence.md
     - Citation: about/citation.md
 
-theme: flatly
+theme:
+  name: material
+  palette:
+    primary: teal
+    accent: teal
+    scheme: default
+  favicon: assets/img/favicon.ico
+  icon:
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+  features:
+    - content.code.copy
+    - navigation.top
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mwong009/pycmtensor
+
+repo_url: https://github.com/mwong009/pycmtensor
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            show_source: false 
+            merge_init_into_class: true
+            show_symbol_type_heading: true
+            separate_signature: false
+            group_by_category: true
 
 markdown_extensions:
   - admonition
@@ -29,7 +80,8 @@ markdown_extensions:
       guess_lang: False
       linenums: False
       use_pygments: False
-  - pymdownx.arithmatex
+  - pymdownx.arithmatex:
+      generic: True
   - pymdownx.b64
   - pymdownx.betterem
   - pymdownx.blocks.admonition
@@ -61,4 +113,9 @@ markdown_extensions:
       permalink: True
 
 extra_css:
-  - css/extra.css
+  - assets/css/extra.css
+
+extra_javascript:
+  - assets/js/extra.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

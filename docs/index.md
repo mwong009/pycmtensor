@@ -1,4 +1,4 @@
-![PyCMTensor](img/logo.jpg)
+![PyCMTensor](assets/img/logo.jpg)
 
 [![Licence](https://img.shields.io/badge/Licence-MIT-blue)](about/licence.md)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor) 
@@ -7,7 +7,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/pycmtensor?period=month&units=international_system&left_color=grey&right_color=orange&left_text=downloads/month)](https://pepy.tech/project/pycmtensor) 
 [![DOI](https://zenodo.org/badge/460802394.svg)](https://zenodo.org/badge/latestdoi/460802394)
 
-Tensor-based choice modelling estimation package
+Tensor-based choice modelling estimation Python package
 
 # Welcome
 
@@ -38,7 +38,7 @@ Some basic working code examples
 ## Developer guide
 
 * [**Developer guide**](developer_guide/index.md) - Guide for developers
-* [**API reference**](developer_guide/api.md)
+* [**API reference**](developer_guide/api/index.md)
 
 ## About
 

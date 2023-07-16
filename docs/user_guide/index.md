@@ -6,7 +6,7 @@
 
 ## Calling variables and selecting data
 
-## Mathematical operations
+## Mathematical operations 
 
 ## Working with generic and alternative specific variables
 
