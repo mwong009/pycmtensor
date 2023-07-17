@@ -2,12 +2,9 @@
 """PyCMTensor optimizers module"""
 import aesara
 import aesara.tensor as aet
-import aesara.tensor.nlinalg as nlinalg
-import numpy as np
 from aesara import shared
 from aesara.ifelse import ifelse
 from aesara.tensor.sharedvar import TensorSharedVariable
-from numpy import nan_to_num as nan2num
 
 from pycmtensor.expressions import Beta
 
