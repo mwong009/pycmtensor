@@ -987,6 +987,17 @@
 
   
       <p>Base PyCMTensor Dataset class object</p>
+<p>This class stores the data in an array format, and a symbolic tensor reference
+variable object. To call the tensor variable, we invoke the label of the
+variable as an item in the Dataset class, like so:
+<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;choice&quot;</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;label_of_variable&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<p>To call the data array, we use the <code>train_dataset()</code> or <code>valid_dataset()</code>
+method. See method reference for info about the arguments. For example:
+<div class="highlight"><pre><span></span><code><span class="c1"># to get the data array for variable &quot;time&quot;</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+</code></pre></div></p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1058,8 +1069,8 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a list of (input) <code>TensorVariable</code> objects to
-build the tensor expression from</p>
+              <p>the full list of (input) <code>TensorVariable</code> objects
+to build the tensor expression from</p>
             </div>
           </td>
         </tr>
@@ -1081,7 +1092,8 @@ build the tensor expression from</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a dictionary of <code>float</code> values to store the scaling factor used for each variable</p>
+              <p>a dictionary of <code>float</code> values to store the scaling factor
+used for each variable</p>
             </div>
           </td>
         </tr>
@@ -1103,7 +1115,8 @@ build the tensor expression from</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a dictionary of <code>np.ndarray</code> to store the values of each variable</p>
+              <p>a dictionary of <code>numpy.ndarray</code> to store the values of each
+variable</p>
             </div>
           </td>
         </tr>
@@ -1126,7 +1139,8 @@ validation datasets</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the list of values of the indices of the training
+dataset</p>
             </div>
           </td>
         </tr>
@@ -1137,7 +1151,8 @@ validation datasets</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the list of values of the indices of the validation
+dataset</p>
             </div>
           </td>
         </tr>
@@ -1148,7 +1163,7 @@ validation datasets</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the size of the training dataset</p>
             </div>
           </td>
         </tr>
@@ -1159,7 +1174,7 @@ validation datasets</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>the size of the validation dataset</p>
             </div>
           </td>
         </tr>
@@ -1276,7 +1291,7 @@ validation datasets</p>
 
   <div class="doc doc-contents ">
   
-      <p>Multiply values of the <code>variable</code> by factor 1/factor.</p>
+      <p>Multiply values of the <code>variable</code> by <span class="arithmatex">\(1/\textrm{factor}\)</span>.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1336,8 +1351,41 @@ validation datasets</p>
 
   <div class="doc doc-contents ">
   
-      <p>TODO</p>
+      <p>Method to split dataset into training and validation subsets</p>
 
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>frac</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the fraction to split the dataset into the training set. The training set will be indexed from <code>0</code> to <code>frac</code> <span class="arithmatex">\(\times\)</span> <code>Dataset.n</code>. The validation dataset will be from the last index of the training set to the last row of the dataset.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The actual splitting of the dataset is done during the training procedure,
+or when invoking the <code>train_dataset()</code> or <code>valid_dataset()</code> methods</p>
+</details>
   </div>
 
 </div>
@@ -1354,7 +1402,116 @@ validation datasets</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return a slice of the training dataset with the sequence matching the list of variables</p>
+      <p>Returns a slice of the (or the full) training data array with the sequence
+matching the list of variables.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[list, str, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a tensor, label, or list of
+tensors or list of labels</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the start of the slice of the data array. If <code>None</code> is given,
+returns the full data array.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>batch_size</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>length of the slice. If <code>None</code> is given, returns the
+index from <code>index</code> to <code>N</code> where <code>N</code> is the length of the array.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>shift</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the offset of the slice between <code>0</code> and <code>batch_size</code>. If
+<code>None</code> is given, <code>shift=0</code>.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a list of array object(s) corresponding to the input variables</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>How to retrieve data array from Dataset:
+<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;choice&quot;</span><span class="p">)</span>
+
+<span class="c1"># index &quot;age&quot; and &quot;location&quot; data arrays</span>
+<span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">([</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]])</span>
+
+<span class="c1"># similar result</span>
+<span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">([</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">])</span>
+</code></pre></div></p>
+</div>
 
   </div>
 
@@ -1372,7 +1529,104 @@ validation datasets</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return a slice of the valid dataset with the sequence matching the list of variables</p>
+      <p>Returns a slice of the (or the full) validation data array with the sequence
+matching the list of variables.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[list, str, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a tensor, label, or list of
+tensors or list of labels</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the start of the slice of the data array. If <code>None</code> is given,
+returns the full data array.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>batch_size</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>length of the slice. If <code>None</code> is given, returns the
+index from <code>index</code> to <code>N</code> where <code>N</code> is the length of the array.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>shift</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the offset of the slice between <code>0</code> and <code>batch_size</code>. If
+<code>None</code> is given, <code>shift=0</code>.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a list of array object(s) corresponding to the input variables</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
