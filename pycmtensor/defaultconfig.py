@@ -1,4 +1,4 @@
-# config.py
+# defaultconfig.py
 """PyCMTensor config module"""
 import configparser
 import multiprocessing
