@@ -30,7 +30,7 @@ jobs:
     - name: Python Poetry Action
       uses: abatilo/actions-poetry@v2
       with:
-        poetry-version: ${{ matrix.python-version }}
+        poetry-version: ${{ matrix.poetry-version }}
     
     - name: Publish to PyPI
       run: |
