@@ -107,13 +107,24 @@ class Dataset:
         return self.ds
 
     def __getitem__(self, key):
-        if key in [var.name for var in self.x]:
-            i = [x.name for x in self.x].index(key)
-            return self.x[i]
-        if key == self.y.name:
-            return self.y
+        if isinstance(key, (list, tuple)):
+            return self._make_tensor(key)
         else:
-            raise KeyError
+            if key in [var.name for var in self.x]:
+                i = [x.name for x in self.x].index(key)
+                return self.x[i]
+            if key == self.y.name:
+                return self.y
+            else:
+                raise KeyError
+
+    def _make_tensor(self, keys):
+        # if tensor inputs are list of strings, convert them to tensors
+        if all(isinstance(k, str) for k in keys):
+            keys = [self[k] for k in keys]
+        else:
+            raise TypeError(f"Multiple types found in {keys}.")
+        return aet.as_tensor_variable(keys)
 
     @property
     def n_train(self) -> int:
@@ -137,7 +148,7 @@ class Dataset:
         """Method for dropping `variables` from the dataset
 
         Args:
-            variables (list): list of variables from the dataset to drop
+            variables (list[str]): list of `str` variables from the dataset to drop
 
         Raises:
             KeyError: raises an error if any item in `variables` is not found in the dataset or item is the choice variable
@@ -150,6 +161,7 @@ class Dataset:
                 i = [x.name for x in self.x].index(variable)
                 del self.x[i]
                 del self.scale[variable]
+                del self.ds[variable]
                 debug(f"Dropped input variable '{variable}' from dataset")
 
             else:
@@ -191,7 +203,7 @@ class Dataset:
             pass
         # if tensor inputs are list of strings, convert them to tensors
         elif all(isinstance(t, str) for t in tensors):
-            tensors = [self[t.name] for t in tensors]
+            tensors = [self[t] for t in tensors]
         else:
             raise TypeError(f"Multiple types found in {tensors}.")
 
