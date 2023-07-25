@@ -4,14 +4,12 @@ import aesara
 import aesara.tensor as aet
 from aesara import shared
 from aesara.ifelse import ifelse
-from aesara.tensor.sharedvar import TensorSharedVariable
 
 from pycmtensor.expressions import Beta
 
 FLOATX = aesara.config.floatX
 
 __all__ = [
-    "BFGS",
     "Adam",
     "Nadam",
     "Adamax",
@@ -21,6 +19,7 @@ __all__ = [
     "NAG",
     "AdaGrad",
     "SGD",
+    "BFGS",
 ]
 
 
@@ -33,7 +32,7 @@ class Optimizer:
 
         """
         self.name = name
-        self._epsilon = epsilon
+        self._epsilon = shared(epsilon, name="epsilion")
 
     @property
     def epsilon(self):
@@ -42,26 +41,53 @@ class Optimizer:
     def __repr__(self):
         return f"{self.name}"
 
-
-class Adam(Optimizer):
-    def __init__(self, params: list, b1: float = 0.9, b2: float = 0.999, **kwargs):
-        """An optimizer that implments the Adam algorithm [#]_
+    def update(self, cost, params, lr):
+        """Update parameters for aesara function calls
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
-            b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to ``0.9``
-            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to ``0.999``
+            cost (TensorVariable): a scalar element for the expression of the cost
+                function where the derivatives are calculated
+            params (list[TensorSharedVariable]): parameters of the model
+            lr (Union[float, TensorSharedVariable]): the learning rate
 
-        .. [#] Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
+        Returns:
+            (list): a list of `(param, param_new)` tuple pairs
+        """
+        pass
+
+
+class Adam(Optimizer):
+    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+        """An optimizer that implments the Adam algorithm[^1]
+
+        Args:
+            params (list[TensorSharedVariable]): parameters of the model
+            b1 (float, optional): exponential decay rate for the 1st moment estimates.
+                Defaults to `0.9`
+            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
+                Defaults to `0.999`
+
+        Attributes:
+            t (TensorSharedVariable): time step
+            m_prev (list[TensorSharedVariable]): previous time step momentum
+            v_prev (list[TensorSharedVariable]): previous time step velocity
+
+        [^1]: Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
         """
         super().__init__(name="Adam")
-        self.b1 = b1
-        self.b2 = b2
-        self._t = aesara.shared(1.0)
-        self._m = [shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1]
-        self._v = [shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1]
+        self.b1 = aesara.shared(b1, name="b1")
+        self.b2 = aesara.shared(b2, name="b2")
+        self._t = aesara.shared(1.0, name="t")
+        self._m = [
+            shared(aet.zeros_like(p()).eval(), name=f"m_{p().name}")
+            for p in params
+            if p.status != 1
+        ]
+        self._v = [
+            shared(aet.zeros_like(p()).eval(), name=f"v_{p().name}")
+            for p in params
+            if p.status != 1
+        ]
 
     @property
     def t(self):
@@ -75,18 +101,7 @@ class Adam(Optimizer):
     def v_prev(self):
         return self._v
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost
-                function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): learning rate. Defaults to 0.001
-
-        Returns:
-            list: a list of tuples of ``(p, p_t), (m, m_t), (v, v_t), (t, t_new)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -113,33 +128,27 @@ class Adam(Optimizer):
 
 
 class Nadam(Adam):
-    def __init__(self, params: list, b1: float = 0.99, b2: float = 0.999, **kwargs):
-        """An optimizer that implements the Nesterov Adam algorithm [#]_
+    def __init__(self, params, b1=0.99, b2=0.999, **kwargs):
+        """An optimizer that implements the Nesterov Adam algorithm[^1]
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to ``0.9``
+                Defaults to `0.9`
             b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to ``0.999``
+                Defaults to `0.999`
 
-        .. [#] Dozat, T., 2016. Incorporating nesterov momentum into adam.(2016). Dostupné z: http://cs229.stanford.edu/proj2015/054_report.pdf.
+        Attributes:
+            t (TensorSharedVariable): time step
+            m_prev (list[TensorSharedVariable]): previous time step momentum
+            v_prev (list[TensorSharedVariable]): previous time step velocity
+
+        [^1]: Dozat, T., 2016. Incorporating nesterov momentum into adam.(2016). Dostupné z: http://cs229.stanford.edu/proj2015/054_report.pdf.
         """
         super().__init__(params, b1, b2)
         self.name = "Nadam"
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost
-                function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): learning rate. Defaults to 0.001
-
-        Returns:
-            list: a list of tuples of ``(p, p_t), (m, m_t), (v, v_t), (t, t_new)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -171,33 +180,28 @@ class Nadam(Adam):
 
 
 class Adamax(Adam):
-    def __init__(self, params: list, b1: float = 0.9, b2: float = 0.999, **kwargs):
-        """An optimizer that implements the Adamax algorithm [#]_. It is a variant of
+    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+        """An optimizer that implements the Adamax algorithm[^1]. It is a variant of
         the Adam algorithm
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to ``0.9``
+                Defaults to `0.9`
             b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to ``0.999``
+                Defaults to `0.999`
 
-        .. [#] Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
+        Attributes:
+            t (TensorSharedVariable): time step
+            m_prev (list[TensorSharedVariable]): previous time step momentum
+            v_prev (list[TensorSharedVariable]): previous time step velocity
+
+        [^1]: Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
         """
         super().__init__(params, b1, b2)
         self.name = "Adamax"
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): learning rate. Defaults to ``0.001``
-
-        Returns:
-            list: a list of tuples of ``(p, p_t), (m, m_t), (v, v_t), (t, t_new)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -221,8 +225,8 @@ class Adamax(Adam):
 
 
 class Adadelta(Optimizer):
-    def __init__(self, params: list, rho: float = 0.95, **kwargs):
-        """An optimizer that implements the Adadelta algorithm [#]_
+    def __init__(self, params, rho=0.95, **kwargs):
+        """An optimizer that implements the Adadelta algorithm[^1]
 
         Adadelta is a stochastic gradient descent method that is based on adaptive
         learning rate per dimension to address two drawbacks:
@@ -231,11 +235,15 @@ class Adadelta(Optimizer):
         - The need for a manually selected global learning rate
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             rho (float, optional): the decay rate for learning rate.
-                Defaults to ``0.95``
+                Defaults to `0.95`
 
-        .. [#] Zeiler, 2012. ADADELTA: An Adaptive Learning Rate Method. http://arxiv.org/abs/1212.5701
+        Attributes:
+            accumulator (list[TensorSharedVariable]): gradient accumulator
+            delta (list[TensorSharedVariable]): adaptive difference between gradients
+
+        [^1]: Zeiler, 2012. ADADELTA: An Adaptive Learning Rate Method. http://arxiv.org/abs/1212.5701
         """
         super().__init__(name="Adadelta")
         self.rho = rho
@@ -254,22 +262,7 @@ class Adadelta(Optimizer):
     def delta(self):
         return self._delta
 
-    def update(self, cost, params: list, lr: float = 1.0):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): learning rate. Defaults to ``1.0``
-
-        Returns:
-            list: a list of tuples of ``(param, param_new), (a, a_t), (d, d_t)``
-
-        .. Note::
-
-            Since the Adadelta algorithm uses an adaptive learning rate, the
-            learning rate is set to ``1.0``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -289,18 +282,21 @@ class Adadelta(Optimizer):
 
 
 class RMSProp(Optimizer):
-    def __init__(self, params: list, rho: float = 0.9, **kwargs):
-        """An optimizer that implements the RMSprop algorithm [#]_
+    def __init__(self, params, rho=0.9, **kwargs):
+        """An optimizer that implements the RMSprop algorithm[^1]
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             rho (float, optional): discounting factor for the history/coming gradient.
-                Defaults to ``0.9``
+                Defaults to `0.9`
 
-        .. [#] Hinton, 2012. rmsprop: Divide the gradient by a running average of its recent magnitude. http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
+        Attributes:
+            accumulator (TensorVariable): gradient accumulator
+
+        [^1]: Hinton, 2012. rmsprop: Divide the gradient by a running average of its recent magnitude. http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
         """
         super().__init__(name="RMSProp")
-        self.rho = rho
+        self.rho = shared(rho)
         self._accu = [
             shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
         ]
@@ -309,17 +305,7 @@ class RMSProp(Optimizer):
     def accumulator(self):
         return self._accu
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): learning rate. Defaults to ``0.001``
-
-        Returns:
-            list: a list of tuples of ``(param, param_new), (a, a_t)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -336,35 +322,28 @@ class RMSProp(Optimizer):
 
 
 class Momentum(Optimizer):
-    def __init__(self, params: list, mu: float = 0.9, **kwargs):
-        """An optimizer that implements the Momentum algorithm [#]_
+    def __init__(self, params, mu=0.9, **kwargs):
+        """An optimizer that implements the Momentum algorithm[^1]
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             mu (float, optional): acceleration factor in the relevant direction
-                and dampens oscillations. Defaults to ``0.9``
+                and dampens oscillations. Defaults to `0.9`
 
-        .. [#] Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
+        Attributes:
+            velocity (list[TensorSharedVariable]): momentum velocity
+
+        [^1]: Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
         """
         super().__init__(name="Momentum")
-        self.mu = mu
+        self.mu = shared(mu)
         self._v = [shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1]
 
     @property
     def velocity(self):
         return self._v
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): the learning rate. Defaults to ``0.001``
-
-        Returns:
-            list: a list of tuples of ``(param, param_new), (v, v_t)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -380,35 +359,29 @@ class Momentum(Optimizer):
 
 
 class NAG(Momentum):
-    def __init__(self, params: list, mu: float = 0.99, **kwargs):
-        """An optimizer that implements the Nestrov Accelerated Gradient algorithm [#]_
+    def __init__(self, params, mu=0.99, **kwargs):
+        """An optimizer that implements the Nestrov Accelerated Gradient algorithm[^1]
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
             mu (float, optional): acceleration factor in the relevant direction
-                and dampens oscillations. Defaults to ``0.9``
+                and dampens oscillations. Defaults to `0.9`
 
-        .. [#] Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
+        Attributes:
+            t (TensorSharedVariable): momentum time step
+            velocity (list[TensorSharedVariable]): momentum velocity
+
+        [^1]: Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
         """
         super().__init__(params, mu)
         self.name = "NAG"
-        self._t = aesara.shared(0.0)
+        self._t = shared(0.0)
 
     @property
     def t(self):
         return self._t
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): the learning rate. Defaults to ``0.001``
-
-        Returns:
-            list: a list of tuples of ``(param, param_new), (v, v_t)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -428,17 +401,20 @@ class NAG(Momentum):
 
 
 class AdaGrad(Optimizer):
-    def __init__(self, params: list, **kwargs):
-        """An optimizer that implements the Adagrad algorithm [#]_
+    def __init__(self, params, **kwargs):
+        """An optimizer that implements the Adagrad algorithm[^1]
 
         Adagrad is an optimizer with parameter-specific learning rates, which are
         adapted relative to how frequently a parameter gets updated during training.
         The more updates a parameter receives, the smaller the updates.
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
 
-        .. [#] Duchi et al., 2011. Adaptive Subgradient Methods for Online Learning and Stochastic Optimization. https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
+        Attributes:
+            accumulator (list[TensorSharedVariable]): gradient accumulators
+
+        [^1]: Duchi et al., 2011. Adaptive Subgradient Methods for Online Learning and Stochastic Optimization. https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
         """
         super().__init__(name="AdaGrad")
         self._accu = [
@@ -449,17 +425,7 @@ class AdaGrad(Optimizer):
     def accumulator(self):
         return self._accu
 
-    def update(self, cost, params: list, lr: float = 1.0):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): the learning rate. Defaults to ``1.0``
-
-        Returns:
-            list: a list of tuples of ``(param, param_new), (accu, accu_t)``
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -475,25 +441,15 @@ class AdaGrad(Optimizer):
 
 
 class SGD(Optimizer):
-    def __init__(self, params: list, **kwargs):
+    def __init__(self, params, **kwargs):
         """An optimizer that implements the stochastic gradient algorithm
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
         """
         super().__init__(name="SGD")
 
-    def update(self, cost, params: list, lr: float = 0.001):
-        """Caller to the optimizer class to generate a list of updates
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost function where the derivatives are calculated
-            params (list): a list of ``TensorSharedVariable``
-            lr (float, optional): the learning rate. Defaults to ``0.001``
-
-        Returns:
-            list: a list of ``(param, param_new)`` tuples
-        """
+    def update(self, cost, params, lr):
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -506,11 +462,12 @@ class SGD(Optimizer):
 
 
 class BFGS(Optimizer):
-    def __init__(self, params: list, config=None, **kwargs):
+    def __init__(self, params, config=None, **kwargs):
         """An optimizer that implements the stochastic gradient algorithm
 
         Args:
-            params (list): a list of ``TensorSharedVariable``
+            params (list[TensorSharedVariable]): parameters of the model
+            config (pycmtensor.config): pycmtensor config object
         """
         super().__init__(name="BFGS")
         if config is not None:
@@ -539,7 +496,7 @@ class BFGS(Optimizer):
 
         self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
-    def update(self, cost, params: list, lr: float = 0.001):
+    def update(self, cost, params, lr):
         T = self.warmup
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -551,9 +508,7 @@ class BFGS(Optimizer):
                 then_branch=grad,
                 else_branch=aet.sum(self._H0[n, :] * grad),
             )
-            # a_t = a + aet.sqr(grad)
-            # p_t = param - lr / aet.sqrt(a_t + self.epsilon) * B
-            # updates.append((a, a_t))
+
             p_t = param - lr * B
             updates.append((param, p_t))
 
