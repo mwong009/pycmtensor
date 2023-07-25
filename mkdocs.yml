@@ -22,6 +22,7 @@ nav:
       - models: 
         - basic: developer_guide/api/models/basic.md
         - MNL: developer_guide/api/models/MNL.md
+      - optimizers: developer_guide/api/optimizers.md
   - About:
     - Contributing: about/contributing.md
     - Release notes: about/release_notes.md
@@ -80,6 +81,7 @@ markdown_extensions:
       guess_lang: False
       linenums: False
       use_pygments: False
+  - footnotes
   - pymdownx.arithmatex:
       generic: True
   - pymdownx.b64
