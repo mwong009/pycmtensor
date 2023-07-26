@@ -1,13 +1,14 @@
-# config.py
+# defaultconfig.py
 
 ---
 
 See [configuration](../../user_guide/configuration.md) for a list of available configuration settings.
 
-::: pycmtensor.config
+::: pycmtensor.defaultconfig
 	handler: python
-    options:
-	  show_source: false 
+	options:
+	  show_root_heading: false
+	  show_root_toc_entry: false
 	  heading_level: 2
 	  members:
-	    - Config
+		- Config

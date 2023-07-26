@@ -10,7 +10,7 @@ from watermark import watermark
 
 import pycmtensor.optimizers
 import pycmtensor.scheduler
-from pycmtensor.config import config
+from pycmtensor.defaultconfig import config
 
 # aesara configs
 

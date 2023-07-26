@@ -8,7 +8,7 @@ from aesara.tensor.random.utils import RandomStream
 from aesara.tensor.sharedvar import TensorSharedVariable
 from aesara.tensor.var import TensorVariable
 
-from .logger import debug
+from pycmtensor.logger import debug
 
 __all__ = ["FLOATX", "Param", "Beta", "Sigma", "Bias", "Weight"]
 FLOATX = aesara.config.floatX
@@ -41,6 +41,12 @@ class ExpressionParser:
             "}",
             "=",
             "-1",
+            "0",
+            "1",
+            "*",
+            "-",
+            "+",
+            "/",
             "AdvancedSubtensor",
             "Reshape",
             "Abs",
@@ -71,8 +77,9 @@ class ExpressionParser:
             "ScalarFromTensor",
         ]:
             stdout = str.replace(stdout, s, " ")
-        symbols = [s for s in str.split(stdout, " ") if len(s) > 1]
+        symbols = [s for s in str.split(stdout, " ") if len(s) > 0]
         symbols = list(set(symbols))
+        print(symbols)
         return symbols
 
 
@@ -258,23 +265,22 @@ class Expressions:
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
-    # def is_dataarray(self, other):
-    #     if isinstance(other, xr.DataArray):
-    #         if hasattr(other, "x"):
-    #             return other.x
-    #         return other.y
-    #     return other
-
 
 class Param(Expressions):
-    def __init__(self, name: str, value=None):
+    def __init__(self, name: str, value=None, lb=None, ub=None, status=0):
         """Constructor for model param object"""
         self._name = name
+        self._status = status
         if value is not None:
             if not isinstance(value, np.ndarray):
                 value = np.asarray(value)
             self.shared_var = aesara.shared(value, name=name, borrow=True)
             self._init_value = value
+
+        if all([lb, ub]) and not (lb <= ub):
+            raise ValueError(f"ub must be greater than lb. ub={ub}, lb={lb}")
+        self.ub = ub
+        self.lb = lb
 
     @property
     def name(self):
@@ -284,6 +290,10 @@ class Param(Expressions):
     @property
     def init_value(self):
         return self._init_value
+
+    @property
+    def status(self):
+        return self._status
 
     @property
     def shape(self):
@@ -316,31 +326,13 @@ class Beta(Param):
             ub (float): upperbound value. Defaults to ``None``
             status (int): whether to estimate (0) this Beta expression or not (1).
         """
-        Param.__init__(self, name)
-        self.lb = lb
-        self.ub = ub
-        self._status = status
+        Param.__init__(self, name, lb=lb, ub=ub, status=status)
 
         self._init_value = np.asarray(value, dtype=FLOATX)
         self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
 
-    @property
-    def status(self):
-        return self._status
-
     def __repr__(self):
         return f"Beta({self.name}, {self.get_value()})"
-
-
-class Sigma(Beta):
-    def __init__(self, name, value=1.0, ub=None, status=0, dist="NORMAL"):
-        super().__init__(name, value, 0, ub, status)
-        self._dist = dist
-        self.srng = RandomStream(seed=42069)
-
-    @property
-    def dist(self):
-        return self._dist
 
 
 class RandomDraws(Expressions):
@@ -349,7 +341,7 @@ class RandomDraws(Expressions):
     def __init__(self, name: str, draw_type: str, n_draws: int):
         self._name = name
         self.n_draws = n_draws
-        srng = RandomStream(seed=234)
+        srng = RandomStream()
         draw_type = draw_type.lower()
         if draw_type == "normal":
             rv_n = srng.normal(0, 1, size=(n_draws, 1))
@@ -357,7 +349,7 @@ class RandomDraws(Expressions):
             rv_n = srng.lognormal(0, 1, size=(n_draws, 1))
         else:
             rv_n = getattr(srng, draw_type.lower())(size=(n_draws, 1))
-        self.shared_var = rv_n
+        self.shared_var = aesara.shared(rv_n.eval(), name=self.name)
 
     @property
     def name(self):
@@ -375,89 +367,133 @@ class RandomDraws(Expressions):
 
 
 class Bias(Param):
-    def __init__(self, name: str, size: tuple, init_value=None):
-        Param.__init__(self, name)
-        if not ((len(size) == 1) and isinstance(size, (list, tuple))):
-            raise ValueError(f"Invalid size argument or type")
-        if init_value is None:
-            init_value = np.zeros(size, dtype=FLOATX)
+    def __init__(self, name, size, value=None):
+        """Class object for neural net bias vector
 
-        self._init_value = init_value
+        Args:
+            name (str): name of the parameter
+            size (Union[tuple,list]): size of the array
+            value (numpy.ndarray): initial values of the parameter, if `None` given,
+                defaults to `0`
+        """
+        Param.__init__(self, name, lb=None, ub=None)
+
+        if len(size) != 1:
+            raise ValueError(f"Invalid dimensions")
+
+        if value is None:
+            value = np.zeros(size, dtype=FLOATX)
+
+        if value.shape != size:
+            raise ValueError(f"init_value argument is not a valid array of size {size}")
+
+        self._init_type = "bias"
+        self._init_value = value
         self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
 
     def __repr__(self):
         return f"Bias({self.name}, {self.shape})"
 
+    @property
+    def init_type(self):
+        return self._init_type
+
+    @property
+    def T(self):
+        return self.shared_var.T
+
+    def __radd__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            pad_left = True
+            if other.shape[-1] != self().shape[0]:
+                pad_left = False
+
+            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            return b + other
+
+        else:
+            super().__add__(other)
+
+    def __add__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            pad_left = True
+            if other.shape[-1] != self().shape[0]:
+                pad_left = False
+
+            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            return b + other
+
+        else:
+            super().__add__(other)
+
 
 class Weight(Param):
-    def __init__(
-        self, name: str, size: tuple, init_type=None, init_value=None, rng=None
-    ):
-        """Class object for Neural Network weights
+    def __init__(self, name, size, value=None, init_type=None):
+        """Class object for neural net weight matrix
 
         Args:
             name (str): name of the parameter
-            size (tuple, list): array size of the parameter
+            size (Union[tuple,list]): size of the array
+            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-1.0, 1.0, size)`
             init_type (str): initialization type, see notes
-            init_value (numpy.ndarray, optional): initial values of the parameter
-            rng (numpy.random.Generator, optional): random number generator
 
         Note:
             Initialization types are one of the following:
 
-            * 'zeros': a 2-D array of zeros
+            * `"zeros"`: a 2-D array of zeros
 
-            * 'he': initialization method for neural networks that takes into account
-              the non-linearity of activation functions, e.g. ReLU or Softplus [#]_
+            * `"he"`: initialization method for neural networks that takes into account
+              the non-linearity of activation functions, e.g. ReLU or Softplus [^1]
 
-            * 'glorot': initialization method that maintains the variance for
-              symmetric activation functions, e.g. sigm, tanh [#]_
+            * `"glorot"`: initialization method that maintains the variance for
+              symmetric activation functions, e.g. sigm, tanh [^2]
 
-            .. [#] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
-            .. [#] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
+            [^1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
+            [^2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
 
-        .. hint::
-            Initialization of Weights:
+        !!! example
+            Specifying a weight array:
 
-            .. code-block:: python
+            ```python
+            code
+            ```
 
-               w = expressions.Weight(name="w_1", size=(3, 10), init_type="he")
         """
-        Param.__init__(self, name)
+        Param.__init__(self, name, lb=None, ub=None)
 
-        if rng is None:
-            rng = np.random.default_rng()
-        self.rng = rng
+        # dimension of weight must be 2
+        if len(size) != 2:
+            raise ValueError(f"Invalid dimensions")
 
-        if not ((len(size) == 2) and isinstance(size, (list, tuple))):
-            raise ValueError(f"Invalid size argument or type")
+        rng = np.random.default_rng()
         n_in, n_out = size
 
-        if init_value is None:
-            if init_type is None:
-                debug(f"using default initialization for {name}")
-                init_value = self.rng.uniform(-1.0, 1.0, size=size)
-            elif init_type == "zeros":
-                init_value = np.zeros(size, dtype=FLOATX)
+        if value is None:
+            if init_type == "zeros":
+                value = np.zeros(size, dtype=FLOATX)
             elif init_type == "he":
-                init_value = self.rng.normal(0, 1, size=size) * np.sqrt(2 / n_in)
+                value = rng.normal(0, 1, size=size) * np.sqrt(2 / n_in)
             elif init_type == "glorot":
-                init_value = self.rng.uniform(-1, 1, size) * np.sqrt(6 / (n_in + n_out))
+                scale = np.sqrt(6 / (n_in + n_out))
+                value = rng.uniform(-1, 1, size) * scale
             else:
-                debug(
-                    f"init_type {name} not implemented. Options: 'zeros', 'he' or 'glorot'"
-                )
+                debug(f"Using default initialization")
+                value = rng.uniform(-0.1, 0.1, size=size)
 
-        if not init_value.shape == size:
+        if value.shape != size:
             raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_type = init_type
-        self._init_value = init_value
+        self._init_value = value
         self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
 
     @property
     def init_type(self):
         return self._init_type
+
+    @property
+    def T(self):
+        return self.shared_var.T
 
     def __repr__(self):
         return f"Weight({self.name}, {self.shape})"
