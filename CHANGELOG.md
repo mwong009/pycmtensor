@@ -1,3 +1,20 @@
+## v1.5.0 (2023-07-26)
+
+### Feat
+
+- **dataset.py**: use `as_tensor_variable` to construct tensor vector from dataset[[item1, item2,...]]
+- **dataset.py**: added list(`str`) as tensor arguments for `train_dataset()` and `valid_dataset()`
+
+### Fix
+
+- **expressions.py**: clip lower and upper bounds when updating `Betas`
+- **expressions.py**: fixed `Weights` and `Bias` mathematical operations
+- **config.py**: renamed config.py to defaultconfig.py to avoid name conflicts
+
+### Refactor
+
+- **optimizers.py**: removed unused imports
+
 ## v1.4.0 (2023-07-16)
 
 ### Feat
