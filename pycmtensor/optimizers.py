@@ -102,13 +102,16 @@ class Adam(Optimizer):
         return self._v
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
 
         t_new = self.t + 1.0
-        for m, v, param, grad in zip(self.m_prev, self.v_prev, params, grads):
+        for m, v, param, grad, b in zip(
+            self.m_prev, self.v_prev, params, grads, bounds
+        ):
             m_t = self.b1 * m + (1.0 - self.b1) * grad
             m_t_hat = m_t / (1.0 - aet.pow(self.b1, self.t))
 
@@ -117,6 +120,7 @@ class Adam(Optimizer):
 
             g_t = lr * m_t_hat / (aet.sqrt(v_t_hat) + self.epsilon)
             p_t = param - g_t
+            p_t = clip(p_t, *b)
 
             updates.append((m, m_t))
             updates.append((v, v_t))
@@ -149,6 +153,7 @@ class Nadam(Adam):
         self.name = "Nadam"
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -157,7 +162,9 @@ class Nadam(Adam):
         t_new = self.t + 1.0
         b1 = self.b1 * (1 - 0.5 * aet.pow(0.96, self.t / 250))
         b1_t = self.b1 * (1 - 0.5 * aet.pow(0.96, t_new / 250))
-        for m, v, param, grad in zip(self.m_prev, self.v_prev, params, grads):
+        for m, v, param, grad, b in zip(
+            self.m_prev, self.v_prev, params, grads, bounds
+        ):
             g_t = grad / (1.0 - aet.pow(self.b1, self.t))
 
             m_t = self.b1 * m + (1.0 - self.b1) * grad
@@ -169,6 +176,7 @@ class Nadam(Adam):
             m_t_hat = (1 - b1) * g_t + b1_t * m_t_hat
             g_t_hat = lr * m_t_hat / (aet.sqrt(v_t_hat) + self.epsilon)
             p_t = param - g_t_hat
+            p_t = clip(p_t, *b)
 
             updates.append((m, m_t))
             updates.append((v, v_t))
@@ -202,6 +210,7 @@ class Adamax(Adam):
         self.name = "Adamax"
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -210,11 +219,15 @@ class Adamax(Adam):
         t_new = self.t + 1.0
         a_t = lr / (1.0 - aet.pow(self.b1, self.t))
 
-        for m, v, param, grad in zip(self.m_prev, self.v_prev, params, grads):
+        for m, v, param, grad, b in zip(
+            self.m_prev, self.v_prev, params, grads, bounds
+        ):
             m_t = self.b1 * m + (1.0 - self.b1) * grad
             v_t = aet.maximum(self.b2 * v, aet.abs(grad))
             g_t = a_t * m_t / (v_t + self.epsilon)
             p_t = param - g_t
+            p_t = clip(p_t, *b)
+
             updates.append((m, m_t))
             updates.append((v, v_t))
             updates.append((param, p_t))
@@ -263,17 +276,22 @@ class Adadelta(Optimizer):
         return self._delta
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for accu, d, param, grad in zip(self.accumulator, self.delta, params, grads):
+        for accu, d, param, grad, b in zip(
+            self.accumulator, self.delta, params, grads, bounds
+        ):
             # update accumulator
             accu_t = self.rho * accu + (1.0 - self.rho) * grad**2
             # compute parameter update, using previous delta
             g_t = grad * aet.sqrt(d + self.epsilon) / aet.sqrt(accu_t + self.epsilon)
-            p_t = param - lr * g_t
             d_t = self.rho * d + (1.0 - self.rho) * g_t**2
+            p_t = param - lr * g_t
+            p_t = clip(p_t, *b)
+
             updates.append((param, p_t))
             updates.append((accu, accu_t))
             updates.append((d, d_t))
@@ -306,14 +324,16 @@ class RMSProp(Optimizer):
         return self._accu
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for accu, param, grad in zip(self.accumulator, params, grads):
+        for accu, param, grad, b in zip(self.accumulator, params, grads, bounds):
             accu_t = self.rho * accu + (1.0 - self.rho) * aet.sqr(grad)
             g_t = lr / aet.sqrt(accu_t + self.epsilon) * grad
             p_t = param - g_t
+            p_t = clip(p_t, *b)
 
             updates.append((accu, accu_t))
             updates.append((param, p_t))
@@ -344,13 +364,15 @@ class Momentum(Optimizer):
         return self._v
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for v, param, grad in zip(self.velocity, params, grads):
+        for v, param, grad, b in zip(self.velocity, params, grads, bounds):
             v_t = self.mu * v + grad
             p_t = param - lr * v_t
+            p_t = clip(p_t, *b)
 
             updates.append((v, v_t))
             updates.append((param, p_t))
@@ -382,6 +404,7 @@ class NAG(Momentum):
         return self._t
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
@@ -389,10 +412,11 @@ class NAG(Momentum):
         t_new = self.t + 1.0
         mu = self.mu * (1 - 0.5 * aet.pow(0.96, self.t / 250))
         mu_t = self.mu * (1 - 0.5 * aet.pow(0.96, t_new / 250))
-        for v, param, grad in zip(self.velocity, params, grads):
+        for v, param, grad, b in zip(self.velocity, params, grads, bounds):
             v_t = mu * v + grad
             v_t_hat = grad + mu_t * v_t
             p_t = param - lr * v_t_hat
+            p_t = clip(p_t, *b)
 
             updates.append((v, v_t))
             updates.append((param, p_t))
@@ -426,14 +450,16 @@ class AdaGrad(Optimizer):
         return self._accu
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for param, grad, accu in zip(params, grads, self.accumulator):
+        for param, grad, accu, b in zip(params, grads, self.accumulator, bounds):
             accu_t = accu + aet.sqr(grad)
             g_t = lr / aet.sqrt(accu_t + self.epsilon) * grad
             p_t = param - g_t
+            p_t = clip(p_t, *b)
             updates.append((accu, accu_t))
             updates.append((param, p_t))
 
@@ -450,12 +476,15 @@ class SGD(Optimizer):
         super().__init__(name="SGD")
 
     def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for param, grad in zip(params, grads):
+        for param, grad, b in zip(params, grads, bounds):
             p_t = param - lr * grad
+            p_t = clip(p_t, *b)
+
             updates.append((param, p_t))
 
         return updates
@@ -472,7 +501,7 @@ class BFGS(Optimizer):
         super().__init__(name="BFGS")
         if config is not None:
             if hasattr(config, "BFGS_warmup"):
-                self.warmup = config.BFGS_warmup
+                self.warmup = aesara.shared(config.BFGS_warmup)
             else:
                 raise KeyError
 
@@ -498,11 +527,14 @@ class BFGS(Optimizer):
 
     def update(self, cost, params, lr):
         T = self.warmup
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for n, (param, grad, s, y) in enumerate(zip(params, grads, self._s, self._y)):
+        for n, (param, grad, s, y, b) in enumerate(
+            zip(params, grads, self._s, self._y, bounds)
+        ):
             B = ifelse(
                 aet.lt(self._t, 2 * T),
                 then_branch=grad,
@@ -510,6 +542,7 @@ class BFGS(Optimizer):
             )
 
             p_t = param - lr * B
+            p_t = clip(p_t, *b)
             updates.append((param, p_t))
 
             s_new = param - s
@@ -534,3 +567,14 @@ class BFGS(Optimizer):
         updates.append((self._t, self._t + 1))
 
         return updates
+
+
+def clip(param, min, max):
+    if any([min, max]):
+        if min is None:
+            min = -9999.0
+        if max is None:
+            max = 9999.0
+        return aet.clip(param, min, max)
+    else:
+        return param
