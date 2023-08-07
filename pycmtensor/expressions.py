@@ -258,7 +258,7 @@ class TensorExpressions:
             )
 
 
-class Param(Expressions):
+class Param(TensorExpressions):
     def __init__(self, name: str, value=None, lb=None, ub=None, status=0):
         """Constructor for model param object"""
         self._name = name
@@ -301,6 +301,9 @@ class Param(Expressions):
     def get_value(self):
         """Returns the numpy representation of the parameter value"""
         return self.shared_var.get_value()
+
+    def set_value(self, value):
+        self.shared_var.set_value(value)
 
     def reset_value(self):
         """Resets the value of the shared variable to the initial value"""
