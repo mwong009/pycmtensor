@@ -1,14 +1,15 @@
 from collections import OrderedDict
 from time import perf_counter
-from typing import Union
 
 import numpy as np
 
-from pycmtensor import config
+import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.results import Results
 from pycmtensor.utils import time_format
+
+config = defaultconfig.config
 
 
 class BaseModel(object):
@@ -17,24 +18,22 @@ class BaseModel(object):
 
         Attributes:
             name (str): name of the model
-            config (Config): pycmtensor config object
-            rng (Generator): random number generator
-            params (list): list of model parameters (betas & weights)
+            config (pycmtensor.Config): pycmtensor config object
+            rng (numpy.random.Generator): random number generator
+            params (list): list of model parameters (`betas` & `weights`)
             betas (list): list of model scalar betas
+            sigmas (list): list of model scalar sigmas
             weights (list): list of model weight matrices
+            biases (list): list of model vector biases
             updates (list): list of (param, update) tuples
-            inputs (list): list of TensorVariables
-            outputs (TensorVariable): symbolic reference to the output TensorVariable
             learning_rate (TensorVariable): symbolic reference to the learning rate
             results (Results): stores the results of the model estimation
         """
-        self.name = "BaseModel"
         self.config = config
         self.rng = np.random.default_rng(config.seed)
-        self.params = []  # keep track of all the Params
-        self.betas = []  # keep track of the Betas
-        self.weights = []  # keep track of the Weights
-        self.updates = []  # keep track of the updates
+        self.weights = []
+        self.biases = []
+        self.betas = []
         self.results = Results()
 
         for key, value in kwargs.items():
@@ -43,27 +42,36 @@ class BaseModel(object):
         debug(f"Building model...")
 
     @property
-    def n_params(self) -> int:
+    def n_params(self):
         """Return the total number of estimated parameters"""
-        return self.n_betas + self.n_weights
+        return self.n_betas + self.n_weights + self.n_biases
 
     @property
-    def n_betas(self) -> int:
+    def n_betas(self):
         """Return the number of estimated Betas"""
         return len(self.betas)
 
     @property
-    def n_weights(self) -> int:
+    def n_weights(self):
         """Return the total number of estimated Weight parameters"""
-        return sum([w.size for w in self.get_weights()])
+        return np.sum([np.prod(w.shape) for w in self.weights])
 
-    def get_weights(self) -> list:
-        """Returns a list of Weight values"""
-        return [w.get_value() for w in self.weights]
+    @property
+    def n_biases(self):
+        """Return the total number of estimated Weight parameters"""
+        return np.sum([np.prod(b.shape) for b in self.biases])
 
-    def get_betas(self) -> list:
-        """Returns a list of Beta values"""
-        return [beta.get_value() for beta in self.betas]
+    def get_weights(self):
+        """Returns a dict of Weight values"""
+        return {w.name: w.get_value() for w in self.weights}
+
+    def get_biases(self):
+        """Returns a dict of Weight values"""
+        return {b.name: b.get_value() for b in self.biases}
+
+    def get_betas(self):
+        """Returns a dict of Beta values"""
+        return {beta.name: beta.get_value() for beta in self.betas}
 
     def reset_values(self):
         """Resets Model parameters to their initial value"""
@@ -71,12 +79,12 @@ class BaseModel(object):
             p.reset_value()
 
 
-def extract_params(cost, variables: Union[dict, list]):
+def extract_params(cost, variables):
     """Extracts Param objects from variables
 
     Args:
-        cost (TensorVariable): the cost function to look for Param objects
-        variables: dictionary or list of local variables from the current program
+        cost (TensorVariable): function to evaluate
+        variables (Union[dict, list]): list of variables from the current program
     """
     params = []
     symbols = ExpressionParser().parse(cost)
@@ -100,7 +108,17 @@ def extract_params(cost, variables: Union[dict, list]):
     return params
 
 
-def drop_unused_variables(cost, params: Param, variables: dict) -> list:
+def drop_unused_variables(cost, params, variables):
+    """Internal method to remove ununsed tensors
+
+    Args:
+        cost (TensorVariable): function to evaluate
+        params (Param): param objects
+        variables (dict): list of array variables from the dataset
+
+    Returns:
+        (list): a list of param names which are not used in the model
+    """
     symbols = ExpressionParser().parse(cost)
     param_names = [p.name for p in params]
     symbols = [s for s in symbols if s not in param_names]
