@@ -1,3 +1,45 @@
+## v1.6.0 (2023-08-07)
+
+### Feat
+
+- **optimizers.py**: include new optimizer RProp
+- **functions.py**: speed up computation and compilation by using static indexing in `log_likelihood` function
+- **functions.py**: add `relu()` function (source taken from Theano 0.7.1)
+- **basic.py**: new function include_params_for_convergence
+
+### Fix
+
+- **__init__.py**: fix init circular imports
+- **statistics.py**: update t_test and varcovar matrix calculations for vector parameters
+- **layers.py**: various fixes to neural net layers
+- **optimizers.py**: fix SQNBFGS algorithm
+- **functions.py**: include output as params for 1st and 2nd order derivatives
+- **expressions.py**: fix base class inheritence and use `config.seed` for seed value
+- **expressions.py**: include `self` in overloaded operators if `other` instance is of similar type as `self`
+- **basic.py**: fix incorrect saved params in `train()`
+
+### Refactor
+
+- **results.py**: updates results calculations for beta vectors
+- **expressions.py**: add set_value in `Param` base class
+
+## v1.5.0 (2023-07-26)
+
+### Feat
+
+- **dataset.py**: use `as_tensor_variable` to construct tensor vector from dataset[[item1, item2,...]]
+- **dataset.py**: added list(`str`) as tensor arguments for `train_dataset()` and `valid_dataset()`
+
+### Fix
+
+- **expressions.py**: clip lower and upper bounds when updating `Betas`
+- **expressions.py**: fixed `Weights` and `Bias` mathematical operations
+- **config.py**: renamed config.py to defaultconfig.py to avoid name conflicts
+
+### Refactor
+
+- **optimizers.py**: removed unused imports
+
 ## v1.4.0 (2023-07-16)
 
 ### Feat
