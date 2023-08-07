@@ -22,7 +22,7 @@ class Dataset:
         variable as an item in the Dataset class, like so:
         ```python
         ds = Dataset(df=df, choice="choice")
-        return ds["label_of_variable"]
+        return ds["label_of_variable"]  -> TensorVariable
         ```
 
         To call the data array, we use the `train_dataset()` or `valid_dataset()`

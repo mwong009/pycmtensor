@@ -1,17 +1,10 @@
 # functions.py
 """PyCMTensor functions module"""
-from ctypes import util
-from typing import Union
-
-import aesara
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
-from aesara.tensor.sharedvar import TensorSharedVariable
-from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta, Expressions, Param
-from pycmtensor.logger import error, log
+from pycmtensor.expressions import Beta, Param
 
 __all__ = [
     "exp_mov_average",
@@ -27,15 +20,37 @@ __all__ = [
 ]
 
 
-def exp_mov_average(
-    batch_avg: TensorVariable, moving_avg: TensorVariable, alpha: float = 0.1
-):
+def relu(x, alpha=0.0):
+    """Compute the element-wise rectified linear activation function.
+
+    Source taken from Theano 0.7.1
+
+    Args:
+        x (TensorVariable): symbolic tensor
+        alpha (Union[float, TensorSharedVariable]): Slope for negative input, usually
+            between 0 and 1. The default value of 0 will lead to the standard
+            rectifier, 1 will lead to a linear activation function, and any value in
+            between will give a leaky rectifier. A shared variable (broadcastable against `x`) will result in a parameterized rectifier with learnable slope
+            (s).
+
+    Returns:
+        (TensorVariable): Elementwise rectifier applied to `x`.
+    """
+    if alpha == 0.0:
+        return 0.5 * (x + aet.abs(x))
+    else:
+        f1 = 0.5 * (1 + alpha)
+        f2 = 0.5 * (1 - alpha)
+        return f1 * x + f2 * aet.abs(x)
+
+
+def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     """Calculates the exponential moving average (EMA) of a new minibatch
 
     Args:
-        batch_avg: the new batch value of the mean
-        moving_avg: the moving value of the accumulated mean
-        alpha: the moving average factor of the batch mean
+        batch_avg (TensorVariable): mean batch value
+        moving_avg (TensorVariable): accumulated mean
+        alpha (float): moving average factor of the batch mean
 
     Returns:
         (TensorVariable): the new moving average
@@ -57,15 +72,12 @@ def exp_mov_average(
     return ema
 
 
-def logit(
-    utility: Union[list, tuple, TensorVariable],
-    avail: Union[list, tuple, TensorVariable] = None,
-):
+def logit(utility, avail=None):
     """Computes the Logit function, with availability conditions.
 
     Args:
-        utility: list of M utility equations
-        avail: list of M availability conditions,
+        utility (Union[list, tuple, TensorVariable]): utility equations
+        avail (Union[list, tuple, TensorVariable]): availability conditions,
             if no availability conditions are provided, defaults to `1` for all
             availabilities.
 
@@ -75,23 +87,22 @@ def logit(
     Note:
         The 0-th dimension is the numbering of alternatives, the N-th dimension is the size of the input (# rows).
     """
-
     if isinstance(utility, (list, tuple)):
         if (avail != None) and (len(utility) != len(avail)):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
+
         _utility = utility
         for n, u in enumerate(_utility):
-            # convert u to vector representation if u is a scalar
-            if not isinstance(u, TensorVariable):
+            # convert u to tensor representation if u is an expression
+            if isinstance(u, Param):
                 utility[n] = aet.as_tensor_variable(u())
 
         # get maximum ndim from set of utlity equations
         max_ndim = max([u.ndim for u in utility])
-        _utility = utility
 
         # pad tensors to the left to have the same number of dimensions
-        utility = [aet.atleast_Nd(u, n=max_ndim) for u in _utility]
+        utility = [aet.atleast_Nd(u, n=max_ndim) for u in utility]
 
         # broadcast tensors across each other before stacking
         utility = aet.broadcast_arrays(*utility)
@@ -100,9 +111,10 @@ def logit(
         U = aet.stack(utility)
 
     # use the utility inputs as is if given as a TensorVariable
-    elif isinstance(utility, TensorVariable):
-        U = utility
     else:
+        U = utility
+
+    if U is None:
         raise NotImplementedError(
             f"utility {utility} has to be a list, tuple or TensorVariable instance"
         )
@@ -127,21 +139,26 @@ def logit(
     return prob
 
 
-def log_likelihood(prob: TensorVariable, y: TensorVariable):
+def log_likelihood(prob, y, index=None):
     """Symbolic representation of the log likelihood cost function.
 
     Args:
-        prob: a `TensorVariable` matrix describing the choice probabilites
-        y: a `TensorVariable` referencing the choice variable
+        prob (TensorVariable): choice probabilites tensor
+        y (TensorVariable): choice variable tensor
+        index (TensorVariable): index tensor, if `None`, dynamically get the same of the
+            `y` tensor
 
     Returns:
-        (TensorVariable): a symbolic representation of the log likelihood with `ndim=0`.
+        (TensorVariable): a symbolic tensor of the log likelihood
 
     Note:
         The 0-th dimension is the numbering of alternatives, the N-th dimension is the size of the input (# rows).
     """
-    # calculate the log probabilitiy of axis 0
-    logprob = aet.log(prob)[y, ..., aet.arange(y.shape[0])]
+    # calculate the log probabilitiy over axis 0
+    if not index is None:
+        logprob = aet.log(prob)[y, ..., index]
+    else:
+        logprob = aet.log(prob)[y, ..., aet.arange(y.shape[0])]
 
     # take the average over all other non choice, non-n axes
     while logprob.ndim > 1:
@@ -150,12 +167,12 @@ def log_likelihood(prob: TensorVariable, y: TensorVariable):
     return aet.sum(logprob)
 
 
-def rmse(y_hat: TensorVariable, y: TensorVariable):
+def rmse(y_hat, y):
     """Computes the root mean squared error (RMSE) between pairs of observations
 
     Args:
-        y_hat: model estimated values
-        y: ground truth values
+        y_hat (TensorVariable): model estimated values
+        y (TensorVariable): ground truth values
 
     Returns:
         (TensorVariable): symbolic scalar representation of the rmse
@@ -174,12 +191,12 @@ def rmse(y_hat: TensorVariable, y: TensorVariable):
     return aet.sqrt(aet.mean(aet.sqr(y_hat - y)))
 
 
-def mae(y_hat: TensorVariable, y: TensorVariable):
+def mae(y_hat, y):
     """Computes the mean absolute error (MAE) between pairs of observations
 
     Args:
-        y_hat: model estimated values
-        y : ground truth values
+        y_hat (TensorVariable): model estimated values
+        y (TensorVariable): ground truth values
 
     Returns:
         (TensorVariable): symbolic scalar representation of the mean absolute error
@@ -197,12 +214,12 @@ def mae(y_hat: TensorVariable, y: TensorVariable):
     return aet.mean(aet.abs(y_hat - y))
 
 
-def kl_divergence(p: TensorVariable, q: TensorVariable):
+def kl_divergence(p, q):
     """Computes the KL divergence loss between discrete distributions `p` and `q`.
 
     Args:
-        p: model output probabilities
-        q: ground truth probabilities
+        p (TensorVariable): model output probabilities
+        q (TensorVariable): ground truth probabilities
 
     Returns:
         (TensorVariable): a symbolic representation of the KL loss 
@@ -285,12 +302,12 @@ def kl_multivar_norm(m0, v0, m1, v1, epsilon=1e-6):
     return kld
 
 
-def errors(prob: TensorVariable, y: TensorVariable):
+def errors(prob, y):
     """Symbolic representation of the discrete prediction as a percentage error.
 
     Args:
-        prob: matrix describing the choice probabilites
-        y: the `TensorVariable` referencing the choice column
+        prob (TensorVariable): choice probabilites tensor
+        y (TensorVariable): choice variable tensor
 
     Returns:
         (TensorVariable): the mean prediction error over `y`
@@ -303,12 +320,12 @@ def errors(prob: TensorVariable, y: TensorVariable):
         raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
-def second_order_derivative(cost: TensorVariable, params: list[Beta]):
+def second_order_derivative(cost, params):
     """Symbolic representation of the 2nd order Hessian matrix given cost.
 
     Args:
-        cost: the cost function to compute the gradients over
-        params: list of params to compute the gradients over
+        cost (TensorVariable): function to compute the gradients over
+        params (List[Beta]): params to compute the gradients over
 
     Returns:
         (TensorVariable): the Hessian matrix of the cost function wrt to the params
@@ -318,23 +335,34 @@ def second_order_derivative(cost: TensorVariable, params: list[Beta]):
     """
     if not isinstance(params, list):
         raise TypeError(f"params is not list instance. type(params)={type(params)}")
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+    wrt_params = []
+    for p in params:
+        if isinstance(p, Beta):
+            param = p()
+            if hasattr(p, "output"):
+                param.name = p.name
+            wrt_params.append(param)
+
+    grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
+    grads = [aet.sum(g) for g in grads]
     mat = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
+        grad2 = aet.grad(grads[i], wrt_params, disconnected_inputs="ignore")
+        grad2 = [aet.sum(g) for g in grad2]
         mat = aet.set_subtensor(
             x=mat[i, :],
-            y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
+            y=grad2,
         )
     return mat
 
 
-def first_order_derivative(cost: TensorVariable, params: list[Beta]):
+def first_order_derivative(cost, params):
     """Symbolic representation of the 1st order gradient vector given the cost.
 
     Args:
-        cost: the cost function to compute the gradients over
-        params: list of params to compute the gradients over
+        cost (TensorVariable): function to compute the gradients over
+        params (List[Beta]): params to compute the gradients over
 
     Returns:
         (TensorVariable): the gradient vector of the cost function wrt to the params
@@ -342,12 +370,17 @@ def first_order_derivative(cost: TensorVariable, params: list[Beta]):
     Note:
         Parameters with `status=1` are ignored.
     """
-    if not isinstance(params, (dict, list)):
-        raise TypeError(
-            f"params is not list or dict instance. type(params)={type(params)}"
-        )
-    if isinstance(params, dict):
-        params = list(params.values())
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
+    if not isinstance(params, list):
+        raise TypeError(f"params is not list instance. type(params)={type(params)}")
+
+    wrt_params = []
+    for p in params:
+        if isinstance(p, Beta):
+            param = p()
+            if hasattr(p, "output"):
+                param.name = p.name
+            wrt_params.append(param)
+
+    grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
+    grads = [aet.sum(g) for g in grads]
     return aet.as_tensor_variable(grads)

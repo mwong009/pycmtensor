@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
+import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta
 from pycmtensor.statistics import *
 
@@ -30,9 +31,7 @@ class Results:
         self.gnorm = None
         self.hessian_matrix = None
         self.bhhh_matrix = None
-        self.params = None
         self.betas = None
-        self.weights = None
 
         self.performance_graph = None
         self.lr_history_graph = None
@@ -89,39 +88,37 @@ class Results:
     def beta_statistics(self):
         """Returns a pandas DataFrame of the model beta statistics"""
         n = len(self.hessian_matrix)
-        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
         bh = self.bhhh_matrix.sum(axis=0)
 
         stats = pd.DataFrame(
-            index=[b.name for b in betas if (b.status != 1)], columns=["value"]
-        )
-        stats["std err"] = stderror(h, betas)
-        stats["t-test"] = t_test(stats["std err"], betas)
-        stats["p-value"] = p_value(stats["std err"], betas)
-
-        stats["rob. std err"] = rob_stderror(h, bh, betas)
-        stats["rob. t-test"] = t_test(stats["rob. std err"], betas)
-        stats["rob. p-value"] = p_value(stats["rob. std err"], betas)
-        stats.drop("value", axis=1, inplace=True)
-
-        df = pd.DataFrame(
-            data=[b().eval() for b in betas],
-            index=[b.name for b in betas],
+            index=self.betas,
+            data=[value.mean() for _, value in self.betas.items()],
             columns=["value"],
         )
-        stats = pd.concat([df, stats], axis=1).sort_index().fillna("-").astype("O")
 
+        stats["std err"] = stderror(h, self.betas)
+        stats["t-test"] = t_test(stats["std err"], self.betas)
+        stats["p-value"] = p_value(stats["std err"], self.betas)
+
+        stats["rob. std err"] = rob_stderror(h, bh, self.betas)
+        stats["rob. t-test"] = t_test(stats["rob. std err"], self.betas)
+        stats["rob. p-value"] = p_value(stats["rob. std err"], self.betas)
+
+        for key, value in self.betas.items():
+            if value.shape != ():
+                stats.at[key + " (sd)", "value"] = value.std()
+
+        stats = stats.sort_index().fillna("-").astype("O")
         return stats
 
     def model_correlation_matrix(self):
         """Returns a pandas DataFrame of the model correlation matrix"""
-        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
 
         mat = pd.DataFrame(
-            columns=[b.name for b in betas if (b.status != 1)],
-            index=[b.name for b in betas if (b.status != 1)],
+            columns=self.betas,
+            index=self.betas,
             data=correlation_matrix(h),
         )
 
@@ -129,13 +126,12 @@ class Results:
 
     def model_robust_correlation_matrix(self):
         """Returns a pandas DataFrame of the model (robust) correlation matrix"""
-        betas = [p for p in self.params if isinstance(p, Beta)]
         h = self.hessian_matrix.sum(axis=0)
         bh = self.bhhh_matrix.sum(axis=0)
 
         mat = pd.DataFrame(
-            columns=[b.name for b in betas if (b.status != 1)],
-            index=[b.name for b in betas if (b.status != 1)],
+            columns=self.betas,
+            index=self.betas,
             data=rob_correlation_matrix(h, bh),
         )
 

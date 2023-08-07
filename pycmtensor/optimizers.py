@@ -5,7 +5,9 @@ import aesara.tensor as aet
 from aesara import shared
 from aesara.ifelse import ifelse
 
-from pycmtensor.expressions import Beta
+import pycmtensor.defaultconfig as defaultconfig
+
+config = defaultconfig.config
 
 FLOATX = aesara.config.floatX
 
@@ -15,11 +17,12 @@ __all__ = [
     "Adamax",
     "Adadelta",
     "RMSProp",
+    "RProp",
     "Momentum",
     "NAG",
     "AdaGrad",
     "SGD",
-    "BFGS",
+    "SQNBFGS",
 ]
 
 
@@ -299,6 +302,56 @@ class Adadelta(Optimizer):
         return updates
 
 
+class RProp(Optimizer):
+    def __init__(self, params, inc=1.05, dec=0.5, bounds=[1e-6, 50.0], **kwargs):
+        """An optimizer that implements the Rprop algorithm[^1]
+
+        Args:
+            params (list[TensorSharedVariable]): parameters of the model
+            inc (float, optional): increment step if same gradient direction
+            dec (float, optional): decrement step if different gradient direction
+            bounds (List[float]): min and maximum bounds for increment step
+
+        Attributes:
+            factor (List[TensorVariable]): learning rate factor multiplier (init=1.)
+            ghat (List[TensorVariable]): previous step gradients
+
+        [^1]: Igel, C., & Hüsken, M. (2003). Empirical evaluation of the improved Rprop learning algorithms. Neurocomputing, 50, 105-123.
+        """
+        super().__init__(name="RProp")
+        self.inc = inc
+        self.dec = dec
+        self.bounds = bounds
+
+        self._ghat = [
+            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+        ]
+        self._factor = [
+            shared(aet.ones_like(p()).eval()) for p in params if p.status != 1
+        ]
+
+    def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
+        params = [p() for p in params if p.status != 1]
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+        for param, grad, gh, f in zip(params, grads, self._ghat, self._factor):
+            if aet.gt(grad * gh, 0.0):
+                f_new = aet.clip(f * self.inc, *self.bounds)
+            elif aet.lt(grad * gh, 0.0):
+                f_new = aet.clip(f * self.dec, *self.bounds)
+            else:
+                f_new = f
+            p_t = param - lr * f_new * grad
+
+            updates.append((gh, grad))
+            updates.append((param, p_t))
+            updates.append((f, f_new))
+
+        return updates
+
+
 class RMSProp(Optimizer):
     def __init__(self, params, rho=0.9, **kwargs):
         """An optimizer that implements the RMSprop algorithm[^1]
@@ -490,39 +543,34 @@ class SGD(Optimizer):
         return updates
 
 
-class BFGS(Optimizer):
+class SQNBFGS(Optimizer):
     def __init__(self, params, config=None, **kwargs):
-        """An optimizer that implements the stochastic gradient algorithm
+        """A L-BFGS optimizer implementing the adaptive stochastic Quasi-Newton (SQN) based approach [^1]
 
         Args:
             params (list[TensorSharedVariable]): parameters of the model
             config (pycmtensor.config): pycmtensor config object
+
+        [^1]: Byrd, R. H., Hansen, S. L., Nocedal, J., & Singer, Y. (2016). A stochastic quasi-Newton method for large-scale optimization. SIAM Journal on Optimization, 26(2), 1008-1031.
         """
         super().__init__(name="BFGS")
         if config is not None:
-            if hasattr(config, "BFGS_warmup"):
-                self.warmup = aesara.shared(config.BFGS_warmup)
-            else:
-                raise KeyError
+            self.warmup = config.BFGS_warmup
+        else:
+            self.warmup = 20
 
         self._t = aesara.shared(1.0)
         self._y = [
-            shared(aet.zeros_like(p()).eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
-        ]
-        self._s = [
-            shared(p().eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
+            shared(aet.zeros_like(p()).eval()) for p in params if (p.status != 1)
         ]
         self._accu = [
-            shared(aet.zeros_like(p()).eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
+            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
         ]
-        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
+        self._s = [shared(p().eval()) for p in params if (p.status != 1)]
+        self._yhat = [shared(p().eval()) for p in params if (p.status != 1)]
+
+        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
         self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
     def update(self, cost, params, lr):
@@ -532,36 +580,48 @@ class BFGS(Optimizer):
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for n, (param, grad, s, y, b) in enumerate(
-            zip(params, grads, self._s, self._y, bounds)
+        for n, (param, grad, s, y, yh, a, b) in enumerate(
+            zip(params, grads, self._s, self._y, self._yhat, self._accu, bounds)
         ):
+            # perform warm up for a few runs
             B = ifelse(
                 aet.lt(self._t, 2 * T),
                 then_branch=grad,
-                else_branch=aet.sum(self._H0[n, :] * grad),
+                else_branch=aet.sum(self._H0[n, n] * grad),
             )
+            # B = aet.sum(self._H0[n, n] * grad)
 
-            p_t = param - lr * B
+            a_t = a + aet.sqr(B)
+            updates.append((a, a_t))
+
+            p_t = param - lr / aet.sqrt(a_t + self.epsilon) * B
             p_t = clip(p_t, *b)
             updates.append((param, p_t))
 
-            s_new = param - s
+            s_new = p_t - param
             updates.append((s, s_new))
 
-            y_new = grad - y
+            yh_t = grad
+            updates.append((yh, yh_t))
+
+            y_new = grad - yh
             updates.append((y, y_new))
 
+        # BFGS update algorithm
         s_t = aet.atleast_2d(self._s, left=False)
         y_t = aet.atleast_2d(self._y, left=False)
         rho_t = 1 / (s_t.T @ y_t)
         li = self.I - rho_t * (s_t @ y_t.T)
         ri = self.I - rho_t * (y_t @ s_t.T)
         h_res = rho_t * (s_t @ s_t.T)
+
+        # update hessian only every T steps to save computational time
         H_new = ifelse(
             aet.ge(self._t, T) * aet.eq(self._t % T, 0),
             then_branch=li @ self._H0 @ ri + h_res,
             else_branch=self._H0,
         )
+        # H_new = li @ self._H0 @ ri + h_res
         updates.append((self._H0, H_new))
 
         updates.append((self._t, self._t + 1))
@@ -570,7 +630,7 @@ class BFGS(Optimizer):
 
 
 def clip(param, min, max):
-    if any([min, max]):
+    if any([min, max]) and (config.beta_clipping):
         if min is None:
             min = -9999.0
         if max is None:

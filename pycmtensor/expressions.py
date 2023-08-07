@@ -79,11 +79,10 @@ class ExpressionParser:
             stdout = str.replace(stdout, s, " ")
         symbols = [s for s in str.split(stdout, " ") if len(s) > 0]
         symbols = list(set(symbols))
-        print(symbols)
         return symbols
 
 
-class Expressions:
+class TensorExpressions:
     """Base class for expression objects"""
 
     def __init__(self):
@@ -92,7 +91,7 @@ class Expressions:
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() + other
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return self() + other()
         else:
             raise NotImplementedError(
@@ -102,7 +101,7 @@ class Expressions:
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other + self()
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return other() + self()
         else:
             raise NotImplementedError(
@@ -112,7 +111,7 @@ class Expressions:
     def __sub__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() - other
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return self() - other()
         else:
             raise NotImplementedError(
@@ -122,7 +121,7 @@ class Expressions:
     def __rsub__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other - self()
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return other() - self()
         else:
             raise NotImplementedError(
@@ -135,7 +134,7 @@ class Expressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -148,7 +147,7 @@ class Expressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -158,7 +157,7 @@ class Expressions:
     def __div__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() / other
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return self() / other()
         else:
             raise NotImplementedError(
@@ -168,7 +167,7 @@ class Expressions:
     def __rdiv__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other / self()
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return other() / self()
         else:
             raise NotImplementedError(
@@ -176,19 +175,12 @@ class Expressions:
             )
 
     def __neg__(self):
-        if isinstance(self, (TensorVariable, TensorSharedVariable)):
-            return -self
-        elif isinstance(self, Beta):
-            return -self()
-        else:
-            raise NotImplementedError(
-                f"{self} must be a TensorVariable or TensorShared Variable object"
-            )
+        return -self()
 
     def __pow__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.pow(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.pow(self(), other())
         else:
             raise NotImplementedError(
@@ -198,7 +190,7 @@ class Expressions:
     def __rpow__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.pow(other, self())
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.pow(other(), self())
         else:
             raise NotImplementedError(
@@ -208,7 +200,7 @@ class Expressions:
     def __lt__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.lt(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.lt(self(), other())
         else:
             raise NotImplementedError(
@@ -218,7 +210,7 @@ class Expressions:
     def __le__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.le(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.le(self(), other())
         else:
             raise NotImplementedError(
@@ -228,7 +220,7 @@ class Expressions:
     def __gt__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.gt(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.gt(self(), other())
         else:
             raise NotImplementedError(
@@ -238,7 +230,7 @@ class Expressions:
     def __ge__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.ge(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.ge(self(), other())
         else:
             raise NotImplementedError(
@@ -248,7 +240,7 @@ class Expressions:
     def __eq__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.eq(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.eq(self(), other())
         else:
             raise NotImplementedError(
@@ -258,7 +250,7 @@ class Expressions:
     def __ne__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.neq(self(), other)
-        elif isinstance(other, (Beta, RandomDraws)):
+        elif isinstance(other, self):
             return aet.neq(self(), other())
         else:
             raise NotImplementedError(
@@ -266,7 +258,7 @@ class Expressions:
             )
 
 
-class Param(Expressions):
+class Param(TensorExpressions):
     def __init__(self, name: str, value=None, lb=None, ub=None, status=0):
         """Constructor for model param object"""
         self._name = name
@@ -310,6 +302,9 @@ class Param(Expressions):
         """Returns the numpy representation of the parameter value"""
         return self.shared_var.get_value()
 
+    def set_value(self, value):
+        self.shared_var.set_value(value)
+
     def reset_value(self):
         """Resets the value of the shared variable to the initial value"""
         self.shared_var.set_value(self.init_value)
@@ -335,7 +330,7 @@ class Beta(Param):
         return f"Beta({self.name}, {self.get_value()})"
 
 
-class RandomDraws(Expressions):
+class RandomDraws(TensorExpressions):
     """Constructor for model random draws"""
 
     def __init__(self, name: str, draw_type: str, n_draws: int):
@@ -434,7 +429,7 @@ class Weight(Param):
         Args:
             name (str): name of the parameter
             size (Union[tuple,list]): size of the array
-            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-1.0, 1.0, size)`
+            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-0.1, 0.1, size)`
             init_type (str): initialization type, see notes
 
         Note:
@@ -459,13 +454,15 @@ class Weight(Param):
             ```
 
         """
+        from pycmtensor import config
+
         Param.__init__(self, name, lb=None, ub=None)
 
         # dimension of weight must be 2
         if len(size) != 2:
             raise ValueError(f"Invalid dimensions")
 
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(seed=config.seed)
         n_in, n_out = size
 
         if value is None:
@@ -477,7 +474,7 @@ class Weight(Param):
                 scale = np.sqrt(6 / (n_in + n_out))
                 value = rng.uniform(-1, 1, size) * scale
             else:
-                debug(f"Using default initialization")
+                debug(f"Weight {self.name} using default initialization U(-0.1, 0.1)")
                 value = rng.uniform(-0.1, 0.1, size=size)
 
         if value.shape != size:

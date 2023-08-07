@@ -4,13 +4,13 @@ __author__ = """Melvin Wong"""
 __version__ = "1.5.0"
 
 import aesara
-from aesara.tensor.sharedvar import TensorSharedVariable as TensorSharedVariable
-from aesara.tensor.var import TensorVariable as TensorVariable
 from watermark import watermark
 
-import pycmtensor.optimizers
-import pycmtensor.scheduler
-from pycmtensor.defaultconfig import config
+import pycmtensor.defaultconfig as defaultconfig
+import pycmtensor.optimizers as optimizers
+import pycmtensor.scheduler as scheduler
+
+config = defaultconfig.config
 
 # aesara configs
 
@@ -56,13 +56,13 @@ config.add(
 )
 config.add(
     "optimizer",
-    pycmtensor.optimizers.Adam,
+    optimizers.Adam,
     "Optimization algorithm to use for model estimation",
 )
 
 config.add(
     "lr_scheduler",
-    pycmtensor.scheduler.ConstantLR,
+    scheduler.ConstantLR,
     "Learning rate scheduler to use for model estimation",
 )
 config.add("lr_ExpRangeCLR_gamma", 0.5, "Gamma parameter for `ExpRangeCLR`")
@@ -75,6 +75,7 @@ config.add(
     10,
     "Discards this number of hessian matrix updates when running the `BFGS` algorithm",
 )
+config.add("beta_clipping", True, "Enables or disables Beta value clipping")
 
 
 def about():

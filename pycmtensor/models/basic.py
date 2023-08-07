@@ -1,14 +1,15 @@
 from collections import OrderedDict
 from time import perf_counter
-from typing import Union
 
 import numpy as np
 
-from pycmtensor import config
+import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.results import Results
 from pycmtensor.utils import time_format
+
+config = defaultconfig.config
 
 
 class BaseModel(object):
@@ -17,24 +18,22 @@ class BaseModel(object):
 
         Attributes:
             name (str): name of the model
-            config (Config): pycmtensor config object
-            rng (Generator): random number generator
-            params (list): list of model parameters (betas & weights)
+            config (pycmtensor.Config): pycmtensor config object
+            rng (numpy.random.Generator): random number generator
+            params (list): list of model parameters (`betas` & `weights`)
             betas (list): list of model scalar betas
+            sigmas (list): list of model scalar sigmas
             weights (list): list of model weight matrices
+            biases (list): list of model vector biases
             updates (list): list of (param, update) tuples
-            inputs (list): list of TensorVariables
-            outputs (TensorVariable): symbolic reference to the output TensorVariable
             learning_rate (TensorVariable): symbolic reference to the learning rate
             results (Results): stores the results of the model estimation
         """
-        self.name = "BaseModel"
         self.config = config
         self.rng = np.random.default_rng(config.seed)
-        self.params = []  # keep track of all the Params
-        self.betas = []  # keep track of the Betas
-        self.weights = []  # keep track of the Weights
-        self.updates = []  # keep track of the updates
+        self.weights = []
+        self.biases = []
+        self.betas = []
         self.results = Results()
 
         for key, value in kwargs.items():
@@ -43,40 +42,57 @@ class BaseModel(object):
         debug(f"Building model...")
 
     @property
-    def n_params(self) -> int:
+    def n_params(self):
         """Return the total number of estimated parameters"""
-        return self.n_betas + self.n_weights
+        return self.n_betas + self.n_weights + self.n_biases
 
     @property
-    def n_betas(self) -> int:
+    def n_betas(self):
         """Return the number of estimated Betas"""
         return len(self.betas)
 
     @property
-    def n_weights(self) -> int:
+    def n_weights(self):
         """Return the total number of estimated Weight parameters"""
-        return sum([w.size for w in self.get_weights()])
+        return np.sum([np.prod(w.shape) for w in self.weights])
 
-    def get_weights(self) -> list:
-        """Returns a list of Weight values"""
-        return [w.get_value() for w in self.weights]
+    @property
+    def n_biases(self):
+        """Return the total number of estimated Weight parameters"""
+        return np.sum([np.prod(b.shape) for b in self.biases])
 
-    def get_betas(self) -> list:
-        """Returns a list of Beta values"""
-        return [beta.get_value() for beta in self.betas]
+    def get_weights(self):
+        """Returns a dict of Weight values"""
+        return {w.name: w.get_value() for w in self.weights}
+
+    def get_biases(self):
+        """Returns a dict of Weight values"""
+        return {b.name: b.get_value() for b in self.biases}
+
+    def get_betas(self):
+        """Returns a dict of Beta values"""
+        return {beta.name: beta.get_value() for beta in self.betas}
 
     def reset_values(self):
         """Resets Model parameters to their initial value"""
         for p in self.params:
             p.reset_value()
 
+    def include_params_for_convergence(self, **kwargs):
+        """Returns a Ordered dict of parameters values to check for convergence
 
-def extract_params(cost, variables: Union[dict, list]):
+        Returns:
+            (OrderedDict): ordered dictionary of parameter values
+        """
+        return OrderedDict()
+
+
+def extract_params(cost, variables):
     """Extracts Param objects from variables
 
     Args:
-        cost (TensorVariable): the cost function to look for Param objects
-        variables: dictionary or list of local variables from the current program
+        cost (TensorVariable): function to evaluate
+        variables (Union[dict, list]): list of variables from the current program
     """
     params = []
     symbols = ExpressionParser().parse(cost)
@@ -100,7 +116,17 @@ def extract_params(cost, variables: Union[dict, list]):
     return params
 
 
-def drop_unused_variables(cost, params: Param, variables: dict) -> list:
+def drop_unused_variables(cost, params, variables):
+    """Internal method to remove ununsed tensors
+
+    Args:
+        cost (TensorVariable): function to evaluate
+        params (Param): param objects
+        variables (dict): list of array variables from the dataset
+
+    Returns:
+        (list): a list of param names which are not used in the model
+    """
     symbols = ExpressionParser().parse(cost)
     param_names = [p.name for p in params]
     symbols = [s for s in symbols if s not in param_names]
@@ -151,47 +177,63 @@ def train(model, ds, **kwargs):
 
     performance_graph = OrderedDict()
 
-    x_and_y = model.x + [model.y]
-    train_data = ds.train_dataset(x_and_y)
-    valid_data = ds.valid_dataset(x_and_y)
-    log_likelihood = model.log_likelihood_fn(*train_data)
+    x_y = model.x + [model.y]
+    train_data = ds.train_dataset(x_y)
+    valid_data = ds.valid_dataset(x_y)
+
+    t_index = np.arange(len(train_data[-1]))
+    log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     error = model.prediction_error_fn(*valid_data)
 
     model.results.null_loglikelihood = log_likelihood
     model.results.best_loglikelihood = log_likelihood
     model.results.best_valid_error = error
-    model.results.params = model.params
+    model.results.best_step = 0
+    model.results.gnorm = np.nan
     model.results.n_train = n_train
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
     model.results.seed = model.config.seed
+
+    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
+
+    model.results.betas = OrderedDict(
+        {p.name: p.get_value() for p in model.params if isinstance(p, Beta)}
+    )
+    model.results.params = OrderedDict({p.name: p.get_value() for p in model.params})
+
+    p = model.include_params_for_convergence(train_data, t_index)
+    params_prev.extend(list(p.values()))
+    model.results.betas.update(p)
+
+    batch_data = []
+    for batch in range(n_train_batches):
+        batch_data.append(ds.train_dataset(x_y, batch, batch_size, shift))
 
     start_time = perf_counter()
     info(
         f"Start (n={n_train}, Step={step}, LL={model.results.null_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%)"
     )
 
-    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
-
-    batch_data = []
-    for batch in range(n_train_batches):
-        batch_data.append(ds.train_dataset(x_and_y, batch, batch_size, shift))
-
     while (step < max_steps) and (not done_looping):
         learning_rate = lr_scheduler(step)  # get learning rate at this step
 
         for i in range(n_train_batches):
-            model.cost_updates_fn(*batch_data[i], learning_rate)  # update model
+            index = np.arange(len(batch_data[i][-1]))
+            model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
 
             if iteration % validation_freq == 0:
-                log_likelihood = model.log_likelihood_fn(*train_data)
+                log_likelihood = model.log_likelihood_fn(*train_data, t_index)
                 performance_graph[step] = {"log likelihood": log_likelihood}
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
-                diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
-                gnorm = np.sqrt(np.sum(np.square(diff)))
+                p = model.include_params_for_convergence(train_data, t_index)
+                params.extend(list(p.values()))
 
+                diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
                 params_prev = params
+
+                gnorm = np.sqrt(np.sum(np.square(diff)))
 
                 if gnorm < (gnorm_tol / 5.0):
                     gnorm_tol = gnorm
@@ -215,8 +257,15 @@ def train(model, ds, **kwargs):
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
-                    model.results.params = model.params
                     model.results.gnorm = gnorm
+
+                    for p in model.params:
+                        model.results.params[p.name] = p.get_value()
+                        if isinstance(p, Beta):
+                            model.results.betas[p.name] = p.get_value()
+
+                    p = model.include_params_for_convergence(train_data, t_index)
+                    model.results.betas.update(p)
 
                 if gnorm < convergence_threshold:
                     converged = True
@@ -251,16 +300,17 @@ def train(model, ds, **kwargs):
 
     model.results.lr_history_graph = lr_scheduler.history
     model.results.performance_graph = performance_graph
-    model.params = model.results.params
 
-    betas = [param for param in model.params if isinstance(param, Beta)]
-    n_betas = len([b for b in betas if (b.status != 1)])
+    for p in model.params:
+        p.set_value(model.results.params[p.name])
+
+    n_betas = len(model.results.betas)
     gradient_vector = np.zeros((n_train, n_betas))
     hessian = np.zeros((n_train, n_betas, n_betas))
     for n in range(n_train):
         data = [[d[n]] for d in train_data]
-        gradient_vector[n, :] = model.gradient_vector_fn(*data)
-        hessian[n, :, :] = model.hessian_fn(*data)
+        gradient_vector[n, :] = model.gradient_vector_fn(*data, np.array([0]))
+        hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
 
     bhhh = gradient_vector[:, :, None] * gradient_vector[:, None, :]
 
