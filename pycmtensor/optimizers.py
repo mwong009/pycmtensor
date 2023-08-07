@@ -5,7 +5,9 @@ import aesara.tensor as aet
 from aesara import shared
 from aesara.ifelse import ifelse
 
-from pycmtensor.expressions import Beta
+import pycmtensor.defaultconfig as defaultconfig
+
+config = defaultconfig.config
 
 FLOATX = aesara.config.floatX
 
@@ -15,11 +17,12 @@ __all__ = [
     "Adamax",
     "Adadelta",
     "RMSProp",
+    "RProp",
     "Momentum",
     "NAG",
     "AdaGrad",
     "SGD",
-    "BFGS",
+    "SQNBFGS",
 ]
 
 
