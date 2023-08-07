@@ -490,39 +490,34 @@ class SGD(Optimizer):
         return updates
 
 
-class BFGS(Optimizer):
+class SQNBFGS(Optimizer):
     def __init__(self, params, config=None, **kwargs):
-        """An optimizer that implements the stochastic gradient algorithm
+        """A L-BFGS optimizer implementing the adaptive stochastic Quasi-Newton (SQN) based approach [^1]
 
         Args:
             params (list[TensorSharedVariable]): parameters of the model
             config (pycmtensor.config): pycmtensor config object
+
+        [^1]: Byrd, R. H., Hansen, S. L., Nocedal, J., & Singer, Y. (2016). A stochastic quasi-Newton method for large-scale optimization. SIAM Journal on Optimization, 26(2), 1008-1031.
         """
         super().__init__(name="BFGS")
         if config is not None:
-            if hasattr(config, "BFGS_warmup"):
-                self.warmup = aesara.shared(config.BFGS_warmup)
-            else:
-                raise KeyError
+            self.warmup = config.BFGS_warmup
+        else:
+            self.warmup = 20
 
         self._t = aesara.shared(1.0)
         self._y = [
-            shared(aet.zeros_like(p()).eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
-        ]
-        self._s = [
-            shared(p().eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
+            shared(aet.zeros_like(p()).eval()) for p in params if (p.status != 1)
         ]
         self._accu = [
-            shared(aet.zeros_like(p()).eval())
-            for p in params
-            if ((p.status != 1) and (isinstance(p, Beta)))
+            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
         ]
-        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
+        self._s = [shared(p().eval()) for p in params if (p.status != 1)]
+        self._yhat = [shared(p().eval()) for p in params if (p.status != 1)]
+
+        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
         self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
     def update(self, cost, params, lr):
@@ -532,36 +527,48 @@ class BFGS(Optimizer):
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
 
         updates = []
-        for n, (param, grad, s, y, b) in enumerate(
-            zip(params, grads, self._s, self._y, bounds)
+        for n, (param, grad, s, y, yh, a, b) in enumerate(
+            zip(params, grads, self._s, self._y, self._yhat, self._accu, bounds)
         ):
+            # perform warm up for a few runs
             B = ifelse(
                 aet.lt(self._t, 2 * T),
                 then_branch=grad,
-                else_branch=aet.sum(self._H0[n, :] * grad),
+                else_branch=aet.sum(self._H0[n, n] * grad),
             )
+            # B = aet.sum(self._H0[n, n] * grad)
 
-            p_t = param - lr * B
+            a_t = a + aet.sqr(B)
+            updates.append((a, a_t))
+
+            p_t = param - lr / aet.sqrt(a_t + self.epsilon) * B
             p_t = clip(p_t, *b)
             updates.append((param, p_t))
 
-            s_new = param - s
+            s_new = p_t - param
             updates.append((s, s_new))
 
-            y_new = grad - y
+            yh_t = grad
+            updates.append((yh, yh_t))
+
+            y_new = grad - yh
             updates.append((y, y_new))
 
+        # BFGS update algorithm
         s_t = aet.atleast_2d(self._s, left=False)
         y_t = aet.atleast_2d(self._y, left=False)
         rho_t = 1 / (s_t.T @ y_t)
         li = self.I - rho_t * (s_t @ y_t.T)
         ri = self.I - rho_t * (y_t @ s_t.T)
         h_res = rho_t * (s_t @ s_t.T)
+
+        # update hessian only every T steps to save computational time
         H_new = ifelse(
             aet.ge(self._t, T) * aet.eq(self._t % T, 0),
             then_branch=li @ self._H0 @ ri + h_res,
             else_branch=self._H0,
         )
+        # H_new = li @ self._H0 @ ri + h_res
         updates.append((self._H0, H_new))
 
         updates.append((self._t, self._t + 1))
@@ -570,7 +577,7 @@ class BFGS(Optimizer):
 
 
 def clip(param, min, max):
-    if any([min, max]):
+    if any([min, max]) and (config.beta_clipping):
         if min is None:
             min = -9999.0
         if max is None:
