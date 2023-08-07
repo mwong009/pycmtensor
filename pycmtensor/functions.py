@@ -1,17 +1,10 @@
 # functions.py
 """PyCMTensor functions module"""
-from ctypes import util
-from typing import Union
-
-import aesara
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
-from aesara.tensor.sharedvar import TensorSharedVariable
-from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta, Expressions, Param
-from pycmtensor.logger import error, log
+from pycmtensor.expressions import Beta, Param
 
 __all__ = [
     "exp_mov_average",
@@ -79,15 +72,12 @@ def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     return ema
 
 
-def logit(
-    utility: Union[list, tuple, TensorVariable],
-    avail: Union[list, tuple, TensorVariable] = None,
-):
+def logit(utility, avail=None):
     """Computes the Logit function, with availability conditions.
 
     Args:
-        utility: list of M utility equations
-        avail: list of M availability conditions,
+        utility (Union[list, tuple, TensorVariable]): utility equations
+        avail (Union[list, tuple, TensorVariable]): availability conditions,
             if no availability conditions are provided, defaults to `1` for all
             availabilities.
 
@@ -97,23 +87,22 @@ def logit(
     Note:
         The 0-th dimension is the numbering of alternatives, the N-th dimension is the size of the input (# rows).
     """
-
     if isinstance(utility, (list, tuple)):
         if (avail != None) and (len(utility) != len(avail)):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
+
         _utility = utility
         for n, u in enumerate(_utility):
-            # convert u to vector representation if u is a scalar
-            if not isinstance(u, TensorVariable):
+            # convert u to tensor representation if u is an expression
+            if isinstance(u, Param):
                 utility[n] = aet.as_tensor_variable(u())
 
         # get maximum ndim from set of utlity equations
         max_ndim = max([u.ndim for u in utility])
-        _utility = utility
 
         # pad tensors to the left to have the same number of dimensions
-        utility = [aet.atleast_Nd(u, n=max_ndim) for u in _utility]
+        utility = [aet.atleast_Nd(u, n=max_ndim) for u in utility]
 
         # broadcast tensors across each other before stacking
         utility = aet.broadcast_arrays(*utility)
@@ -122,9 +111,10 @@ def logit(
         U = aet.stack(utility)
 
     # use the utility inputs as is if given as a TensorVariable
-    elif isinstance(utility, TensorVariable):
-        U = utility
     else:
+        U = utility
+
+    if U is None:
         raise NotImplementedError(
             f"utility {utility} has to be a list, tuple or TensorVariable instance"
         )
@@ -177,12 +167,12 @@ def log_likelihood(prob, y, index=None):
     return aet.sum(logprob)
 
 
-def rmse(y_hat: TensorVariable, y: TensorVariable):
+def rmse(y_hat, y):
     """Computes the root mean squared error (RMSE) between pairs of observations
 
     Args:
-        y_hat: model estimated values
-        y: ground truth values
+        y_hat (TensorVariable): model estimated values
+        y (TensorVariable): ground truth values
 
     Returns:
         (TensorVariable): symbolic scalar representation of the rmse
@@ -201,12 +191,12 @@ def rmse(y_hat: TensorVariable, y: TensorVariable):
     return aet.sqrt(aet.mean(aet.sqr(y_hat - y)))
 
 
-def mae(y_hat: TensorVariable, y: TensorVariable):
+def mae(y_hat, y):
     """Computes the mean absolute error (MAE) between pairs of observations
 
     Args:
-        y_hat: model estimated values
-        y : ground truth values
+        y_hat (TensorVariable): model estimated values
+        y (TensorVariable): ground truth values
 
     Returns:
         (TensorVariable): symbolic scalar representation of the mean absolute error
@@ -224,12 +214,12 @@ def mae(y_hat: TensorVariable, y: TensorVariable):
     return aet.mean(aet.abs(y_hat - y))
 
 
-def kl_divergence(p: TensorVariable, q: TensorVariable):
+def kl_divergence(p, q):
     """Computes the KL divergence loss between discrete distributions `p` and `q`.
 
     Args:
-        p: model output probabilities
-        q: ground truth probabilities
+        p (TensorVariable): model output probabilities
+        q (TensorVariable): ground truth probabilities
 
     Returns:
         (TensorVariable): a symbolic representation of the KL loss 
@@ -312,12 +302,12 @@ def kl_multivar_norm(m0, v0, m1, v1, epsilon=1e-6):
     return kld
 
 
-def errors(prob: TensorVariable, y: TensorVariable):
+def errors(prob, y):
     """Symbolic representation of the discrete prediction as a percentage error.
 
     Args:
-        prob: matrix describing the choice probabilites
-        y: the `TensorVariable` referencing the choice column
+        prob (TensorVariable): choice probabilites tensor
+        y (TensorVariable): choice variable tensor
 
     Returns:
         (TensorVariable): the mean prediction error over `y`
