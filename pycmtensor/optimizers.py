@@ -299,6 +299,56 @@ class Adadelta(Optimizer):
         return updates
 
 
+class RProp(Optimizer):
+    def __init__(self, params, inc=1.05, dec=0.5, bounds=[1e-6, 50.0], **kwargs):
+        """An optimizer that implements the Rprop algorithm[^1]
+
+        Args:
+            params (list[TensorSharedVariable]): parameters of the model
+            inc (float, optional): increment step if same gradient direction
+            dec (float, optional): decrement step if different gradient direction
+            bounds (List[float]): min and maximum bounds for increment step
+
+        Attributes:
+            factor (List[TensorVariable]): learning rate factor multiplier (init=1.)
+            ghat (List[TensorVariable]): previous step gradients
+
+        [^1]: Igel, C., & Hüsken, M. (2003). Empirical evaluation of the improved Rprop learning algorithms. Neurocomputing, 50, 105-123.
+        """
+        super().__init__(name="RProp")
+        self.inc = inc
+        self.dec = dec
+        self.bounds = bounds
+
+        self._ghat = [
+            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+        ]
+        self._factor = [
+            shared(aet.ones_like(p()).eval()) for p in params if p.status != 1
+        ]
+
+    def update(self, cost, params, lr):
+        bounds = [(p.lb, p.ub) for p in params if p.status != 1]
+        params = [p() for p in params if p.status != 1]
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+        for param, grad, gh, f in zip(params, grads, self._ghat, self._factor):
+            if aet.gt(grad * gh, 0.0):
+                f_new = aet.clip(f * self.inc, *self.bounds)
+            elif aet.lt(grad * gh, 0.0):
+                f_new = aet.clip(f * self.dec, *self.bounds)
+            else:
+                f_new = f
+            p_t = param - lr * f_new * grad
+
+            updates.append((gh, grad))
+            updates.append((param, p_t))
+            updates.append((f, f_new))
+
+        return updates
+
+
 class RMSProp(Optimizer):
     def __init__(self, params, rho=0.9, **kwargs):
         """An optimizer that implements the RMSprop algorithm[^1]
