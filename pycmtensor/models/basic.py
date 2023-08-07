@@ -78,6 +78,14 @@ class BaseModel(object):
         for p in self.params:
             p.reset_value()
 
+    def include_params_for_convergence(self, **kwargs):
+        """Returns a Ordered dict of parameters values to check for convergence
+
+        Returns:
+            (OrderedDict): ordered dictionary of parameter values
+        """
+        return OrderedDict()
+
 
 def extract_params(cost, variables):
     """Extracts Param objects from variables
@@ -194,7 +202,9 @@ def train(model, ds, **kwargs):
     )
     model.results.params = OrderedDict({p.name: p.get_value() for p in model.params})
 
-    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
+    p = model.include_params_for_convergence(train_data, t_index)
+    params_prev.extend(list(p.values()))
+    model.results.betas.update(p)
 
     batch_data = []
     for batch in range(n_train_batches):
@@ -217,7 +227,12 @@ def train(model, ds, **kwargs):
                 performance_graph[step] = {"log likelihood": log_likelihood}
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
+                p = model.include_params_for_convergence(train_data, t_index)
+                params.extend(list(p.values()))
+
                 diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
+                params_prev = params
+
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
                 if gnorm < (gnorm_tol / 5.0):
@@ -243,6 +258,14 @@ def train(model, ds, **kwargs):
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
                     model.results.gnorm = gnorm
+
+                    for p in model.params:
+                        model.results.params[p.name] = p.get_value()
+                        if isinstance(p, Beta):
+                            model.results.betas[p.name] = p.get_value()
+
+                    p = model.include_params_for_convergence(train_data, t_index)
+                    model.results.betas.update(p)
 
                 if gnorm < convergence_threshold:
                     converged = True
