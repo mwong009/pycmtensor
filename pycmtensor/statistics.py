@@ -33,8 +33,8 @@ def rob_variance_covariance(h, bh):
 
 def t_test(stderr, params):
     """Returns the t stats of ``params`` given the standard error (``stderr``)"""
-    params = [p() for p in params if (p.status != 1)]
-    return [p.eval() / s for p, s in zip(params, stderr)]
+    params = [value for key, value in params.items()]
+    return [p.mean() / s for p, s in zip(params, stderr)]
 
 
 def p_value(stderr, params):
@@ -50,11 +50,13 @@ def stderror(h, params):
     matrix.
 
     """
-    params = [p() for p in params if (p.status != 1)]
+    # params = [p for p in params if (p.status != 1)]
     varCovar = variance_covariance(h)
     stdErr = []
-    for i in range(len(params)):
-        if varCovar[i, i] < 0:
+    for i, p in enumerate(params):
+        if (params[p].shape == ()) and (params[p] == 0.0):
+            stdErr.append(np.nan)
+        elif varCovar[i, i] < 0:
             stdErr.append(np.finfo(float).max)
         else:
             stdErr.append(np.sqrt(varCovar[i, i] + 1e-8))  # for numerical stability
@@ -66,11 +68,13 @@ def rob_stderror(h, bh, params):
     """Returns the rob. standard error of ``params`` given the Hessian (``h``) and the
     BHHH matrix (``bh``)
     """
-    params = [p() for p in params if (p.status != 1)]
+    # params = [p for p in params if (p.status != 1)]
     robVarCovar = rob_variance_covariance(h, bh)
     robstderr = []
-    for i in range(len(params)):
-        if robVarCovar[i, i] < 0:
+    for i, p in enumerate(params):
+        if (params[p].shape == ()) and (params[p] == 0.0):
+            robstderr.append(np.nan)
+        elif robVarCovar[i, i] < 0:
             robstderr.append(np.finfo(float).max)
         else:
             robstderr.append(np.sqrt(robVarCovar[i, i] + 1e-8))
