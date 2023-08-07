@@ -330,12 +330,12 @@ def errors(prob: TensorVariable, y: TensorVariable):
         raise NotImplementedError(f"y should be int32 or int64", ("y.dtype:", y.dtype))
 
 
-def second_order_derivative(cost: TensorVariable, params: list[Beta]):
+def second_order_derivative(cost, params):
     """Symbolic representation of the 2nd order Hessian matrix given cost.
 
     Args:
-        cost: the cost function to compute the gradients over
-        params: list of params to compute the gradients over
+        cost (TensorVariable): function to compute the gradients over
+        params (List[Beta]): params to compute the gradients over
 
     Returns:
         (TensorVariable): the Hessian matrix of the cost function wrt to the params
@@ -345,23 +345,34 @@ def second_order_derivative(cost: TensorVariable, params: list[Beta]):
     """
     if not isinstance(params, list):
         raise TypeError(f"params is not list instance. type(params)={type(params)}")
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+    wrt_params = []
+    for p in params:
+        if isinstance(p, Beta):
+            param = p()
+            if hasattr(p, "output"):
+                param.name = p.name
+            wrt_params.append(param)
+
+    grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
+    grads = [aet.sum(g) for g in grads]
     mat = aet.as_tensor_variable(np.zeros((len(grads), len(grads))))
     for i in range(len(grads)):
+        grad2 = aet.grad(grads[i], wrt_params, disconnected_inputs="ignore")
+        grad2 = [aet.sum(g) for g in grad2]
         mat = aet.set_subtensor(
             x=mat[i, :],
-            y=aet.grad(grads[i], params, disconnected_inputs="ignore"),
+            y=grad2,
         )
     return mat
 
 
-def first_order_derivative(cost: TensorVariable, params: list[Beta]):
+def first_order_derivative(cost, params):
     """Symbolic representation of the 1st order gradient vector given the cost.
 
     Args:
-        cost: the cost function to compute the gradients over
-        params: list of params to compute the gradients over
+        cost (TensorVariable): function to compute the gradients over
+        params (List[Beta]): params to compute the gradients over
 
     Returns:
         (TensorVariable): the gradient vector of the cost function wrt to the params
@@ -369,12 +380,17 @@ def first_order_derivative(cost: TensorVariable, params: list[Beta]):
     Note:
         Parameters with `status=1` are ignored.
     """
-    if not isinstance(params, (dict, list)):
-        raise TypeError(
-            f"params is not list or dict instance. type(params)={type(params)}"
-        )
-    if isinstance(params, dict):
-        params = list(params.values())
-    params = [p() for p in params if (p.status != 1)]
-    grads = aet.grad(cost, params, disconnected_inputs="ignore")
+    if not isinstance(params, list):
+        raise TypeError(f"params is not list instance. type(params)={type(params)}")
+
+    wrt_params = []
+    for p in params:
+        if isinstance(p, Beta):
+            param = p()
+            if hasattr(p, "output"):
+                param.name = p.name
+            wrt_params.append(param)
+
+    grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
+    grads = [aet.sum(g) for g in grads]
     return aet.as_tensor_variable(grads)
