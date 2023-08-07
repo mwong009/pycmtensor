@@ -169,47 +169,56 @@ def train(model, ds, **kwargs):
 
     performance_graph = OrderedDict()
 
-    x_and_y = model.x + [model.y]
-    train_data = ds.train_dataset(x_and_y)
-    valid_data = ds.valid_dataset(x_and_y)
-    log_likelihood = model.log_likelihood_fn(*train_data)
+    x_y = model.x + [model.y]
+    train_data = ds.train_dataset(x_y)
+    valid_data = ds.valid_dataset(x_y)
+
+    t_index = np.arange(len(train_data[-1]))
+    log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     error = model.prediction_error_fn(*valid_data)
 
     model.results.null_loglikelihood = log_likelihood
     model.results.best_loglikelihood = log_likelihood
     model.results.best_valid_error = error
-    model.results.params = model.params
+    model.results.best_step = 0
+    model.results.gnorm = np.nan
     model.results.n_train = n_train
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
     model.results.seed = model.config.seed
+
+    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
+
+    model.results.betas = OrderedDict(
+        {p.name: p.get_value() for p in model.params if isinstance(p, Beta)}
+    )
+    model.results.params = OrderedDict({p.name: p.get_value() for p in model.params})
+
+    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
+
+    batch_data = []
+    for batch in range(n_train_batches):
+        batch_data.append(ds.train_dataset(x_y, batch, batch_size, shift))
 
     start_time = perf_counter()
     info(
         f"Start (n={n_train}, Step={step}, LL={model.results.null_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%)"
     )
 
-    params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
-
-    batch_data = []
-    for batch in range(n_train_batches):
-        batch_data.append(ds.train_dataset(x_and_y, batch, batch_size, shift))
-
     while (step < max_steps) and (not done_looping):
         learning_rate = lr_scheduler(step)  # get learning rate at this step
 
         for i in range(n_train_batches):
-            model.cost_updates_fn(*batch_data[i], learning_rate)  # update model
+            index = np.arange(len(batch_data[i][-1]))
+            model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
 
             if iteration % validation_freq == 0:
-                log_likelihood = model.log_likelihood_fn(*train_data)
+                log_likelihood = model.log_likelihood_fn(*train_data, t_index)
                 performance_graph[step] = {"log likelihood": log_likelihood}
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
                 gnorm = np.sqrt(np.sum(np.square(diff)))
-
-                params_prev = params
 
                 if gnorm < (gnorm_tol / 5.0):
                     gnorm_tol = gnorm
@@ -233,7 +242,6 @@ def train(model, ds, **kwargs):
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
-                    model.results.params = model.params
                     model.results.gnorm = gnorm
 
                 if gnorm < convergence_threshold:
@@ -269,16 +277,17 @@ def train(model, ds, **kwargs):
 
     model.results.lr_history_graph = lr_scheduler.history
     model.results.performance_graph = performance_graph
-    model.params = model.results.params
 
-    betas = [param for param in model.params if isinstance(param, Beta)]
-    n_betas = len([b for b in betas if (b.status != 1)])
+    for p in model.params:
+        p.set_value(model.results.params[p.name])
+
+    n_betas = len(model.results.betas)
     gradient_vector = np.zeros((n_train, n_betas))
     hessian = np.zeros((n_train, n_betas, n_betas))
     for n in range(n_train):
         data = [[d[n]] for d in train_data]
-        gradient_vector[n, :] = model.gradient_vector_fn(*data)
-        hessian[n, :, :] = model.hessian_fn(*data)
+        gradient_vector[n, :] = model.gradient_vector_fn(*data, np.array([0]))
+        hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
 
     bhhh = gradient_vector[:, :, None] * gradient_vector[:, None, :]
 
