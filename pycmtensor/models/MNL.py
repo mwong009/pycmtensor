@@ -1,12 +1,10 @@
 from time import perf_counter
-from typing import Dict, List, Tuple, Union
 
 import aesara
 import aesara.tensor as aet
 from aesara import pprint
-from aesara.tensor.var import TensorVariable
 
-from pycmtensor.expressions import Beta, ExpressionParser
+from pycmtensor.expressions import Beta
 from pycmtensor.functions import (
     errors,
     first_order_derivative,
@@ -14,30 +12,32 @@ from pycmtensor.functions import (
     logit,
     second_order_derivative,
 )
-from pycmtensor.logger import debug, info
+from pycmtensor.logger import info
 from pycmtensor.models.basic import BaseModel, drop_unused_variables, extract_params
 from pycmtensor.utils import time_format
 
 
-# class MNL(PyCMTensorModel):
 class MNL(BaseModel):
-    def __init__(
-        self,
-        ds,
-        params: Dict,
-        utility: Union[list[TensorVariable], TensorVariable],
-        av: List[TensorVariable] = None,
-        **kwargs: Tuple,
-    ):
+    def __init__(self, ds, params, utility, av=None, **kwargs):
         """Defines a Multinomial Logit model
 
         Args:
             ds (pycmtensor.Data): the database object
-            params: dictionary of name:parameter pair
-            utility: the vector of utility functions
-            av: list of availability conditions. If `None`, all
+            params (Dict): dictionary of name:parameter pair
+            utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
+            av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
             **kwargs: Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+
+        Attributes:
+            x (List[TensorVariable]):
+            y (TensorVariable):
+            xy (List[TensorVariable]):
+            betas (List[Beta]):
+            cost (TensorVariable):
+            p_y_given_x (TensorVariable):
+            ll (TensorVariable):
+            pred (TensorVariable):
         """
 
         super().__init__(**kwargs)
@@ -45,15 +45,15 @@ class MNL(BaseModel):
         self.params = []  # keep track of all the Params
         self.betas = []  # keep track of the Betas
         self.updates = []  # keep track of the updates
-        self.learning_rate = aet.scalar("learning_rate")
+        self.index = aet.ivector("index")  # indices of the dataset
+        self.learning_rate = aet.scalar("learning_rate")  # learning rate tensor
 
         self.y = ds.y  # Definition of the symbolic choice output (tensor)
 
         self.p_y_given_x = logit(utility, av)  # expression for the choice probability
 
-        self.ll = log_likelihood(
-            self.p_y_given_x, self.y
-        )  # expression for the likelihood
+        # expression for the likelihood
+        self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
 
         self.cost = -(self.ll / self.y.shape[0])  # expression for the cost
 
@@ -69,10 +69,11 @@ class MNL(BaseModel):
         ds.drop(drop_unused)
 
         self.x = ds.x
+        self.xy = self.x + [self.y]
         info(f"inputs in {self.name}: {self.x}")
 
         start_time = perf_counter()
-        self.build_fns()
+        self.build_fn()
         build_time = round(perf_counter() - start_time, 3)
 
         self.results.build_time = time_format(build_time)
@@ -86,15 +87,16 @@ class MNL(BaseModel):
         """
         self.cost_updates_fn = aesara.function(
             name="cost_updates",
-            inputs=self.x + [self.y] + [self.learning_rate],
+            inputs=self.x + [self.y, self.learning_rate, self.index],
             outputs=self.cost,
             updates=updates,
         )
 
-    def build_fns(self):
-        """Method to call to build mathematical operations without updates to the model. Creates class functions: `MNL.log_likelihood_fn(*inputs, output)`, `MNL.choice_probabilities_fn(*inputs)`, `MNL.choice_predictions_fn(*inputs, output)`, `MNL.prediction_error_fn(*inputs, output)`, `MNL.hessian_fn(*inputs, output)`, `MNL.gradient_vector_fn(*inputs, output)`."""
+    def build_fn(self):
+        """Method to call to build mathematical operations without updates to the model"""
+
         self.log_likelihood_fn = aesara.function(
-            name="log_likelihood", inputs=self.x + [self.y], outputs=self.ll
+            name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
         )
 
         self.choice_probabilities_fn = aesara.function(
@@ -115,14 +117,14 @@ class MNL(BaseModel):
 
         self.hessian_fn = aesara.function(
             name="hessian",
-            inputs=self.x + [self.y],
+            inputs=self.x + [self.y, self.index],
             outputs=second_order_derivative(-self.cost, self.betas),
             allow_input_downcast=True,
         )
 
         self.gradient_vector_fn = aesara.function(
             name="gradient_vector",
-            inputs=self.x + [self.y],
+            inputs=self.x + [self.y, self.index],
             outputs=first_order_derivative(-self.cost, self.betas),
             allow_input_downcast=True,
         )
