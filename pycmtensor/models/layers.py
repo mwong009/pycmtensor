@@ -1,74 +1,148 @@
 # layers.py
 """Model layers"""
+
 import aesara
 import aesara.tensor as aet
 import numpy as np
-from aesara.tensor.math import sigmoid, tanh
-from aesara.tensor.nnet import relu
 
-from ..functions import exp_mov_average
-from ..logger import debug
+import pycmtensor.functions as functions
+from pycmtensor.expressions import Beta, Bias, TensorExpressions, Weight
 
 
-class Layer:
-    """Default class type"""
-
-    pass
-
-
-class DenseLayer(Layer):
-    def __init__(self, w, bias, activation=None):
-        """Class object for dense layer
+class Layer(TensorExpressions):
+    def __init__(self, name, input, status=0, **kwargs):
+        """Default class object
 
         Args:
-            w (TensorSharedVariable): layer weights with ndim=2
-            bias (TensorSharedVariable): layer bias with ndim=1
-            activation: the activation function, possible options are ``tanh``,
-                ``relu``, ``sigm``, ``None``
+            name (str): name of the layer for identification
+            input (TensorVariable): symbolic variable of the layer input
 
-        Note:
-            Layer activation function is set based on the type of weight initialization.
-            If weight init is "he", the activation is relu, if "glorot", the activation
-            is tanh, otherwise the activation defaults to sigm.
-            Setting activation to other than ``None`` overrides this.
+        Attributes:
+            params (list): list of parameters of the layers
+            input (TensorVariable): symbolic variable of the layer input
+            output (TensorVariable): symbolic variable of the layer output
+
         """
+        self._name = name
+        self._input = input
+        self._status = status
 
-        if activation is None:
-            if w.init_type == "he":
-                activation = relu
-                debug(f"activation of DenseLayer({w.shape}) set as ReLU")
-            elif w.init_type == "glorot":
-                activation = tanh
-                debug(f"activation of DenseLayer({w.shape}) set as tanh")
-            else:
-                activation = sigmoid
-                debug(f"activation of DenseLayer({w.shape}) set as sigm")
-        else:
-            activation = activation
+    def __repr__(self):
+        return f"Layer({self.name}, size={self.n_in, self.n_out})"
 
-        self.activation = activation
-        self.w = w
-        self.bias = bias
-        self.params = [w, bias]
-
-    def apply(self, input):
-        """Function to apply the input to the computational graph"""
-        if isinstance(input, (list, tuple)):
-            input = aet.stack(input)
-        self.input = input
-
-        h = aet.dot(self.input.swapaxes(0, -1), self.w()) + self.bias()
-        self._output = self.activation(h).swapaxes(0, -1)
+    def __call__(self):
+        return self._output
 
     @property
-    def updates(self):
-        """Returns a list of update tuple pairs"""
-        return [()]
+    def params(self):
+        return self._params
+
+    @property
+    def input(self):
+        return self._input
 
     @property
     def output(self):
-        """Returns the output of this layer"""
         return self._output
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def status(self):
+        return self._status
+
+
+class DenseLayer(Layer):
+    def __init__(
+        self, name, input, n_in, n_out, init_type=None, activation=None, **kwargs
+    ):
+        """Class object for dense layer. Compute the function $h=f(w^\\top x + bias)$
+
+        Args:
+            input (TensorVariable): symbolic variable of the layer input
+            n_in (int): the number of input nodes
+            n_out (int): the number of output nodes
+            init_type (str): initialization type, possible options: `"zeros"`, `"he"`,
+                `"glorot"`, `None` (defaut)
+            activation (str): activation function $f$, possible options: `"tanh"`,
+                `"relu"`, `"sigmoid"`, `"softplus"`, `None` (defaut)
+
+        Attributes:
+            w (Weight): weight matrix of the layer
+            bias (Bias):
+        """
+        Layer.__init__(self, name, input, **kwargs)
+        self.n_in = n_in
+        self.n_out = n_out
+
+        if (not init_type in ["zeros", "he", "glorot"]) and (not init_type is None):
+            raise KeyError
+
+        w = Weight(f"{name}_W", (n_in, n_out), init_type=init_type)
+        b = Bias(f"{name}_bias", (n_out,))
+
+        if activation == "tanh":
+            activation = aet.tanh
+        elif activation == "relu":
+            activation = functions.relu
+        elif activation == "softplus":
+            activation = aet.softplus
+        elif activation == "sigmoid":
+            activation = aet.sigmoid
+
+        self.activation = activation
+        self._w = w
+        self._bias = b
+        self._params = [self.w, self.bias]
+
+        linear = (self.w.T @ input) + self.bias  # -> (n_out, len(input))
+        if n_out == 1:
+            linear = aet.flatten(linear)  # (1, len(input)) -> (len(input),)
+        if activation is None:
+            self._output = aet.as_tensor_variable(linear)
+        else:
+            self._output = activation(linear)
+
+    @property
+    def w(self):
+        return self._w
+
+    @property
+    def bias(self):
+        return self._bias
+
+    def __repr__(self):
+        return f"DenseLayer({self.name}, {self.output})"
+
+    def __call__(self):
+        return Layer.__call__(self)
+
+
+class TNBetaLayer(DenseLayer, Beta):
+    def __init__(self, name, input, init_type=None, activation=None, **kwargs):
+        """_summary_
+
+        Args:
+            name (str): name of the layer
+            input (Layer): previous layer of the neural net
+            init_type (str): initialization type, possible options: `"zeros"`, `"he"`,
+                `"glorot"`, `None` (defaut)
+            activation (str): activation function $f$, possible options: `"tanh"`,
+                `"relu"`, `"sigmoid"`, `"softplus"`, `None` (defaut)
+        """
+        if not isinstance(input, Layer):
+            raise TypeError(f"input  must be a Layer object. input type={type(input)}")
+        DenseLayer.__init__(
+            self, name, input.output, input.n_out, 1, init_type, activation, **kwargs
+        )
+
+        def __repr__(self):
+            return f"TNBetaLayer({self.name}, {self.output})"
+
+        def __call__(self):
+            return DenseLayer.__call__(self)
 
 
 class BatchNormLayer(Layer):
@@ -112,8 +186,10 @@ class BatchNormLayer(Layer):
         batch_mean = aet.mean(self.input, axis=1)
 
         # updates for the running mean and variance values
-        ema_var = exp_mov_average(batch_var, self._mv_mean, alpha=self.factor)
-        ema_mean = exp_mov_average(batch_mean, self._mv_var, alpha=self.factor)
+        ema_var = functions.exp_mov_average(batch_var, self._mv_mean, alpha=self.factor)
+        ema_mean = functions.exp_mov_average(
+            batch_mean, self._mv_var, alpha=self.factor
+        )
         self._updates.append((self._mv_var, ema_mean))
         self._updates.append((self._mv_mean, ema_var))
 
