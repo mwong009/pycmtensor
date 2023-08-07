@@ -330,7 +330,7 @@ class Beta(Param):
         return f"Beta({self.name}, {self.get_value()})"
 
 
-class RandomDraws(Expressions):
+class RandomDraws(TensorExpressions):
     """Constructor for model random draws"""
 
     def __init__(self, name: str, draw_type: str, n_draws: int):
@@ -429,7 +429,7 @@ class Weight(Param):
         Args:
             name (str): name of the parameter
             size (Union[tuple,list]): size of the array
-            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-1.0, 1.0, size)`
+            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-0.1, 0.1, size)`
             init_type (str): initialization type, see notes
 
         Note:
@@ -454,13 +454,15 @@ class Weight(Param):
             ```
 
         """
+        from pycmtensor import config
+
         Param.__init__(self, name, lb=None, ub=None)
 
         # dimension of weight must be 2
         if len(size) != 2:
             raise ValueError(f"Invalid dimensions")
 
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(seed=config.seed)
         n_in, n_out = size
 
         if value is None:
@@ -472,7 +474,7 @@ class Weight(Param):
                 scale = np.sqrt(6 / (n_in + n_out))
                 value = rng.uniform(-1, 1, size) * scale
             else:
-                debug(f"Using default initialization")
+                debug(f"Weight {self.name} using default initialization U(-0.1, 0.1)")
                 value = rng.uniform(-0.1, 0.1, size=size)
 
         if value.shape != size:
