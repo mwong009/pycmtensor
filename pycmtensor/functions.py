@@ -27,15 +27,37 @@ __all__ = [
 ]
 
 
-def exp_mov_average(
-    batch_avg: TensorVariable, moving_avg: TensorVariable, alpha: float = 0.1
-):
+def relu(x, alpha=0.0):
+    """Compute the element-wise rectified linear activation function.
+
+    Source taken from Theano 0.7.1
+
+    Args:
+        x (TensorVariable): symbolic tensor
+        alpha (Union[float, TensorSharedVariable]): Slope for negative input, usually
+            between 0 and 1. The default value of 0 will lead to the standard
+            rectifier, 1 will lead to a linear activation function, and any value in
+            between will give a leaky rectifier. A shared variable (broadcastable against `x`) will result in a parameterized rectifier with learnable slope
+            (s).
+
+    Returns:
+        (TensorVariable): Elementwise rectifier applied to `x`.
+    """
+    if alpha == 0.0:
+        return 0.5 * (x + aet.abs(x))
+    else:
+        f1 = 0.5 * (1 + alpha)
+        f2 = 0.5 * (1 - alpha)
+        return f1 * x + f2 * aet.abs(x)
+
+
+def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     """Calculates the exponential moving average (EMA) of a new minibatch
 
     Args:
-        batch_avg: the new batch value of the mean
-        moving_avg: the moving value of the accumulated mean
-        alpha: the moving average factor of the batch mean
+        batch_avg (TensorVariable): mean batch value
+        moving_avg (TensorVariable): accumulated mean
+        alpha (float): moving average factor of the batch mean
 
     Returns:
         (TensorVariable): the new moving average
