@@ -27,7 +27,7 @@ class MNL(BaseModel):
             utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
             av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
-            **kwargs: Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+            **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
 
         Attributes:
             x (List[TensorVariable]):

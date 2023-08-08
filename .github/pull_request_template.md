@@ -15,5 +15,5 @@
 ## Documentation
 - ...
 
-## Maintenence
+## Maintenance
 - ...

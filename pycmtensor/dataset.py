@@ -136,11 +136,16 @@ class Dataset:
 
     @property
     def train_index(self) -> list:
+        if self.split_frac == 1:
+            return self.index
+
         n = round(self.n * self.split_frac)
         return self.index[:n]
 
     @property
     def valid_index(self) -> list:
+        if self.split_frac == 1:
+            return self.index
         n = round(self.n * self.split_frac)
         return self.index[n:]
 

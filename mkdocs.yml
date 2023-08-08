@@ -18,6 +18,7 @@ nav:
       - __init__: developer_guide/api/__init__.md
       - config: developer_guide/api/config.md
       - dataset: developer_guide/api/dataset.md
+      - expressions: developer_guide/api/expressions.md
       - functions: developer_guide/api/functions.md
       - models: 
         - basic: developer_guide/api/models/basic.md

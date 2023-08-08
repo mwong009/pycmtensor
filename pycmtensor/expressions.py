@@ -14,18 +14,26 @@ __all__ = ["FLOATX", "Param", "Beta", "Sigma", "Bias", "Weight"]
 FLOATX = aesara.config.floatX
 
 
-class ExpressionParser:
-    """Base class for the ExpressionParser object"""
-
+class ExpressionParser(object):
     def __init__(self, expression=None):
+        """Base class for the ExpressionParser object
+
+        Args:
+            expression (TensorVariable): the TensorVariable object to evaluate
+        """
         if expression is not None:
             self.expression = str(pprint(expression))
 
     def parse(self, expression):
-        """Returns a list of str words found in expression
+        """Parses Aesara Tensor string expression from `aesara.pprint()`. This function
+        removes parentheses and Tensor operators and returns a 'clean' list of
+        expressions
 
         Args:
             expression (TensorVariable): the symbolic Tensor object to parse
+
+        Returns:
+            (list): found keywords in expressions
         """
         if isinstance(expression, str):
             stdout = expression
@@ -40,9 +48,6 @@ class ExpressionParser:
             "{",
             "}",
             "=",
-            "-1",
-            "0",
-            "1",
             "*",
             "-",
             "+",
@@ -259,15 +264,29 @@ class TensorExpressions:
 
 
 class Param(TensorExpressions):
-    def __init__(self, name: str, value=None, lb=None, ub=None, status=0):
-        """Constructor for model param object"""
+    def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
+        """Constructor for model param object
+
+        Args:
+            name (str): name of parameter
+            value (float): the default value of the parameter
+            lb (float): value lower bound
+            ub (float): value upper bound
+            status (int): if 1, do not estimate this parameter
+
+        Attributes:
+            init_value (float): the inital value set at object creation
+            shape (list): the shape of the Param
+
+        !!! note
+            `init_value` is an immutable property
+        """
         self._name = name
         self._status = status
-        if value is not None:
-            if not isinstance(value, np.ndarray):
-                value = np.asarray(value)
-            self.shared_var = aesara.shared(value, name=name, borrow=True)
-            self._init_value = value
+        if not isinstance(value, np.ndarray):
+            value = np.asarray(value)
+        self.shared_var = aesara.shared(value, name=name, borrow=True)
+        self._init_value = value
 
         if all([lb, ub]) and not (lb <= ub):
             raise ValueError(f"ub must be greater than lb. ub={ub}, lb={lb}")
@@ -303,6 +322,7 @@ class Param(TensorExpressions):
         return self.shared_var.get_value()
 
     def set_value(self, value):
+        """Set the value of the shared variable"""
         self.shared_var.set_value(value)
 
     def reset_value(self):
@@ -312,14 +332,32 @@ class Param(TensorExpressions):
 
 class Beta(Param):
     def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
-        """Class object for Beta parameters
+        """Constructor for Beta parameter
 
         Args:
-            name (str): name of the Beta class object
-            value (float): initial starting value. Defaults to ``0``
-            lb (float): lowerbound value. Defaults to ``None``
-            ub (float): upperbound value. Defaults to ``None``
-            status (int): whether to estimate (0) this Beta expression or not (1).
+            name (str): name of Beta parameter
+            value (float): the default value of the Beta parameter
+            lb (float): value lower bound
+            ub (float): value upper bound
+            status (int): if 1, do not estimate this Beta parameter
+
+        !!! example
+            Specifying a Beta parameter:
+
+            ```python
+            b_time = Beta("b_time", value=0., lb=None, ub=0., status=0)
+            ```
+
+            To obtain the raw array value from the Beta parameter:
+            ```python
+            b_time = Beta("b_time", value=-1., lb=None, ub=0., status=0)
+            b_time.get_value()
+            ```
+
+            output:
+            ```console
+            array(-1.)
+            ```
         """
         Param.__init__(self, name, lb=lb, ub=ub, status=status)
 
@@ -331,17 +369,30 @@ class Beta(Param):
 
 
 class RandomDraws(TensorExpressions):
-    """Constructor for model random draws"""
-
     def __init__(self, name: str, draw_type: str, n_draws: int):
+        """Constructor for model random draws
+
+        Args:
+            name (str): name of the RandomDraw object
+            draw_type (str): the distribution of the draw
+            n_draws (int): number of draws, determines the size of this shared tensor
+
+        !!! note
+            `draw_type` can be the following:
+
+            - `"normal"`
+            - `"lognormal"`
+
+            other distribution are also possible, see https://numpy.org/doc/stable/reference/random/generator.html#distributions. The distributions will be initialized with their default values e.g. `gumbel(loc=0., scale=1.)`
+        """
         self._name = name
         self.n_draws = n_draws
         srng = RandomStream()
         draw_type = draw_type.lower()
         if draw_type == "normal":
-            rv_n = srng.normal(0, 1, size=(n_draws, 1))
+            rv_n = srng.normal(size=(n_draws, 1))
         elif draw_type == "lognormal":
-            rv_n = srng.lognormal(0, 1, size=(n_draws, 1))
+            rv_n = srng.lognormal(size=(n_draws, 1))
         else:
             rv_n = getattr(srng, draw_type.lower())(size=(n_draws, 1))
         self.shared_var = aesara.shared(rv_n.eval(), name=self.name)

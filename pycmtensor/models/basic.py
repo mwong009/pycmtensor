@@ -78,7 +78,7 @@ class BaseModel(object):
         for p in self.params:
             p.reset_value()
 
-    def include_params_for_convergence(self, **kwargs):
+    def include_params_for_convergence(self, *args, **kwargs):
         """Returns a Ordered dict of parameters values to check for convergence
 
         Returns:
