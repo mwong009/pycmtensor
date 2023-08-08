@@ -29,6 +29,17 @@ def test_choice_error():
         ds["not_travel_mode"]
 
 
+def test_split_frac_one():
+    df = pd.read_csv("data/lpmc.dat", sep="\t")
+    df = df[df["travel_year"] == 2015]
+    ds = Dataset(df=df, choice="travel_mode")
+
+    len_dataset = len(ds.ds["travel_mode"])
+    assert ds.split_frac == 1
+    assert len(ds.train_index) == len_dataset
+    assert len(ds.valid_index) == len_dataset
+
+
 def test_dataset_property(lpmc_ds):
     ds = lpmc_ds.ds
 
@@ -101,7 +112,7 @@ def test_drop(lpmc_ds):
         lpmc_ds_cp.drop("distance")
 
 
-def test_scale(lpmc_ds):
+def test_scale_variable(lpmc_ds):
     ds = copy.copy(lpmc_ds.ds)
 
     lpmc_ds.scale_variable("distance", 1000.0)
