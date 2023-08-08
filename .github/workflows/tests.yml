@@ -83,7 +83,7 @@ jobs:
     - name: Show aesara.config ldflags
       run: |
         poetry run python -c "import aesara; print(aesara.config.blas__ldflags)"
-        poetry run python -c "import aesara; print(aesara.config.gcc_cxxflags)"
+        poetry run python -c "import aesara; print(aesara.config.gcc__cxxflags)"
     
     ########
     # Test #
