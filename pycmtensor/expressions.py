@@ -40,9 +40,6 @@ class ExpressionParser:
             "{",
             "}",
             "=",
-            "-1",
-            "0",
-            "1",
             "*",
             "-",
             "+",
@@ -259,15 +256,22 @@ class TensorExpressions:
 
 
 class Param(TensorExpressions):
-    def __init__(self, name: str, value=None, lb=None, ub=None, status=0):
-        """Constructor for model param object"""
+    def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
+        """Constructor for model param object
+
+        Args:
+            name (str): name of parameter
+            value (float): the default value of the parameter
+            lb (float): value lower bound
+            ub (float): value upper bound
+            status (int): if 1, do not estimate this parameter
+        """
         self._name = name
         self._status = status
-        if value is not None:
-            if not isinstance(value, np.ndarray):
-                value = np.asarray(value)
-            self.shared_var = aesara.shared(value, name=name, borrow=True)
-            self._init_value = value
+        if not isinstance(value, np.ndarray):
+            value = np.asarray(value)
+        self.shared_var = aesara.shared(value, name=name, borrow=True)
+        self._init_value = value
 
         if all([lb, ub]) and not (lb <= ub):
             raise ValueError(f"ub must be greater than lb. ub={ub}, lb={lb}")
@@ -312,14 +316,14 @@ class Param(TensorExpressions):
 
 class Beta(Param):
     def __init__(self, name, value=0.0, lb=None, ub=None, status=0):
-        """Class object for Beta parameters
+        """Constructor for Beta parameter
 
         Args:
-            name (str): name of the Beta class object
-            value (float): initial starting value. Defaults to ``0``
-            lb (float): lowerbound value. Defaults to ``None``
-            ub (float): upperbound value. Defaults to ``None``
-            status (int): whether to estimate (0) this Beta expression or not (1).
+            name (str): name of Beta parameter
+            value (float): the default value of the Beta parameter
+            lb (float): value lower bound
+            ub (float): value upper bound
+            status (int): if 1, do not estimate this Beta parameter
         """
         Param.__init__(self, name, lb=lb, ub=ub, status=status)
 
