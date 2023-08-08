@@ -571,6 +571,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../expressions/" class="md-nav__link">
+        expressions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../functions/" class="md-nav__link">
         functions
       </a>
@@ -592,17 +606,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5_2_7" id="__nav_5_2_7_label" tabindex="0">
           models
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_5_2_6">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_7_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_5_2_7">
           <span class="md-nav__icon md-icon"></span>
           models
         </label>
@@ -960,7 +974,7 @@
         <tr>
           <td><code>params</code></td>
           <td>
-                <code><span title="typing.Dict">Dict</span></code>
+                <code>Dict</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -974,7 +988,7 @@
         <tr>
           <td><code>utility</code></td>
           <td>
-                <code><span title="typing.Union">Union</span>[list[<span title="aesara.tensor.var.TensorVariable">TensorVariable</span>], <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+                <code>Union[list[TensorVariable], TensorVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -988,7 +1002,7 @@
         <tr>
           <td><code>av</code></td>
           <td>
-                <code><span title="typing.List">List</span>[<span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+                <code>List[TensorVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1003,7 +1017,7 @@ availability is set to 1</p>
         <tr>
           <td><code>**kwargs</code></td>
           <td>
-                <code><span title="typing.Tuple">Tuple</span></code>
+                <code>dict</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1012,6 +1026,107 @@ availability is set to 1</p>
           </td>
           <td>
                 <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code>List[TensorVariable]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>xy</code></td>
+          <td>
+                <code>List[TensorVariable]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>betas</code></td>
+          <td>
+                <code>List[<a class="autorefs autorefs-internal" title="pycmtensor.expressions.Beta" href="../../expressions/#pycmtensor.expressions.Beta">Beta</a>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cost</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>p_y_given_x</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ll</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>pred</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              
+            </div>
           </td>
         </tr>
     </tbody>
@@ -1058,7 +1173,7 @@ availability is set to 1</p>
         <tr>
           <td><code>updates</code></td>
           <td>
-                <code><span title="typing.List">List</span>[<span title="typing.Tuple">Tuple</span>[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]]</code>
+                <code>List[Tuple[TensorSharedVariable, TensorVariable]]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1088,7 +1203,7 @@ availability is set to 1</p>
 
   <div class="doc doc-contents ">
   
-      <p>Method to call to build mathematical operations without updates to the model. Creates class functions: <code>MNL.log_likelihood_fn(*inputs, output)</code>, <code>MNL.choice_probabilities_fn(*inputs)</code>, <code>MNL.choice_predictions_fn(*inputs, output)</code>, <code>MNL.prediction_error_fn(*inputs, output)</code>, <code>MNL.hessian_fn(*inputs, output)</code>, <code>MNL.gradient_vector_fn(*inputs, output)</code>.</p>
+      <p>Method to call to build mathematical operations without updates to the model</p>
 
   </div>
 

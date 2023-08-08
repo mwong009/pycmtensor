@@ -9,17 +9,17 @@
       
       
       
-        <link rel="prev" href="../config/">
+        <link rel="prev" href="../dataset/">
       
       
-        <link rel="next" href="../expressions/">
+        <link rel="next" href="../functions/">
       
       <link rel="icon" href="../../../assets/img/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
-        <title>dataset - PyCMTensor - Documentation</title>
+        <title>expressions - PyCMTensor - Documentation</title>
       
     
     
@@ -112,7 +112,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#datasetpy" class="md-skip">
+        <a href="#expressionspy" class="md-skip">
           Skip to content
         </a>
       
@@ -147,7 +147,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              dataset
+              expressions
             
           </span>
         </div>
@@ -555,6 +555,20 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../dataset/" class="md-nav__link">
+        dataset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -567,12 +581,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          dataset
+          expressions
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        dataset
+        expressions
       </a>
       
         
@@ -591,58 +605,126 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pycmtensor.dataset" class="md-nav__link">
-    dataset
+  <a href="#pycmtensor.expressions" class="md-nav__link">
+    expressions
   </a>
   
-    <nav class="md-nav" aria-label="dataset">
+    <nav class="md-nav" aria-label="expressions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset" class="md-nav__link">
-    Dataset
+  <a href="#pycmtensor.expressions.ExpressionParser" class="md-nav__link">
+    ExpressionParser
   </a>
   
-    <nav class="md-nav" aria-label="Dataset">
+    <nav class="md-nav" aria-label="ExpressionParser">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.drop" class="md-nav__link">
-    drop()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.scale_variable" class="md-nav__link">
-    scale_variable()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.split" class="md-nav__link">
-    split()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.train_dataset" class="md-nav__link">
-    train_dataset()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.valid_dataset" class="md-nav__link">
-    valid_dataset()
+  <a href="#pycmtensor.expressions.ExpressionParser.parse" class="md-nav__link">
+    parse()
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.TensorExpressions" class="md-nav__link">
+    TensorExpressions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param" class="md-nav__link">
+    Param
+  </a>
+  
+    <nav class="md-nav" aria-label="Param">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.__call__" class="md-nav__link">
+    __call__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.get_value" class="md-nav__link">
+    get_value()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.set_value" class="md-nav__link">
+    set_value()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.reset_value" class="md-nav__link">
+    reset_value()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Beta" class="md-nav__link">
+    Beta
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.RandomDraws" class="md-nav__link">
+    RandomDraws
+  </a>
+  
+    <nav class="md-nav" aria-label="RandomDraws">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.RandomDraws.get_value" class="md-nav__link">
+    get_value()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Bias" class="md-nav__link">
+    Bias
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Weight" class="md-nav__link">
+    Weight
+  </a>
   
 </li>
         
@@ -655,20 +737,6 @@
   
 </nav>
       
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../expressions/" class="md-nav__link">
-        expressions
-      </a>
     </li>
   
 
@@ -895,58 +963,126 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pycmtensor.dataset" class="md-nav__link">
-    dataset
+  <a href="#pycmtensor.expressions" class="md-nav__link">
+    expressions
   </a>
   
-    <nav class="md-nav" aria-label="dataset">
+    <nav class="md-nav" aria-label="expressions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset" class="md-nav__link">
-    Dataset
+  <a href="#pycmtensor.expressions.ExpressionParser" class="md-nav__link">
+    ExpressionParser
   </a>
   
-    <nav class="md-nav" aria-label="Dataset">
+    <nav class="md-nav" aria-label="ExpressionParser">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.drop" class="md-nav__link">
-    drop()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.scale_variable" class="md-nav__link">
-    scale_variable()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.split" class="md-nav__link">
-    split()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.train_dataset" class="md-nav__link">
-    train_dataset()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pycmtensor.dataset.Dataset.valid_dataset" class="md-nav__link">
-    valid_dataset()
+  <a href="#pycmtensor.expressions.ExpressionParser.parse" class="md-nav__link">
+    parse()
   </a>
   
 </li>
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.TensorExpressions" class="md-nav__link">
+    TensorExpressions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param" class="md-nav__link">
+    Param
+  </a>
+  
+    <nav class="md-nav" aria-label="Param">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.__call__" class="md-nav__link">
+    __call__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.get_value" class="md-nav__link">
+    get_value()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.set_value" class="md-nav__link">
+    set_value()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Param.reset_value" class="md-nav__link">
+    reset_value()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Beta" class="md-nav__link">
+    Beta
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.RandomDraws" class="md-nav__link">
+    RandomDraws
+  </a>
+  
+    <nav class="md-nav" aria-label="RandomDraws">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.RandomDraws.get_value" class="md-nav__link">
+    get_value()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Bias" class="md-nav__link">
+    Bias
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.expressions.Weight" class="md-nav__link">
+    Weight
+  </a>
   
 </li>
         
@@ -973,7 +1109,7 @@
   
 
 
-<h1 id="datasetpy">dataset.py<a class="headerlink" href="#datasetpy" title="Permanent link">&para;</a></h1>
+<h1 id="expressionspy">expressions.py<a class="headerlink" href="#expressionspy" title="Permanent link">&para;</a></h1>
 <hr />
 
 
@@ -981,13 +1117,15 @@
 
 
 
-<h2 id="pycmtensor.dataset" class="doc doc-heading">
-          <code>pycmtensor.dataset</code>
+<h2 id="pycmtensor.expressions" class="doc doc-heading">
+          <code>pycmtensor.expressions</code>
 
 
-<a href="#pycmtensor.dataset" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#pycmtensor.expressions" class="headerlink" title="Permanent link">&para;</a></h2>
 
   <div class="doc doc-contents first">
+  
+      <p>PyCMTensor expressions module</p>
 
   
 
@@ -1004,28 +1142,19 @@
 
 
 
-<h3 id="pycmtensor.dataset.Dataset" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="p">)</span></code>
+<h3 id="pycmtensor.expressions.ExpressionParser" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">ExpressionParser</span><span class="p">(</span><span class="n">expression</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
-<a href="#pycmtensor.dataset.Dataset" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.expressions.ExpressionParser" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code>object</code></p>
 
 
   
-      <p>Base PyCMTensor Dataset class object</p>
-<p>This class stores the data in an array format, and a symbolic tensor reference
-variable object. To call the tensor variable, we invoke the label of the
-variable as an item in the Dataset class, like so:
-<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;choice&quot;</span><span class="p">)</span>
-<span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;label_of_variable&quot;</span><span class="p">]</span>  <span class="o">-&gt;</span> <span class="n">TensorVariable</span>
-</code></pre></div></p>
-<p>To call the data array, we use the <code>train_dataset()</code> or <code>valid_dataset()</code>
-method. See method reference for info about the arguments. For example:
-<div class="highlight"><pre><span></span><code><span class="c1"># to get the data array for variable &quot;time&quot;</span>
-<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
-</code></pre></div></p>
+      <p>Base class for the ExpressionParser object</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1039,189 +1168,22 @@ method. See method reference for info about the arguments. For example:
     </thead>
     <tbody>
         <tr>
-          <td><code>df</code></td>
-          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the pandas dataframe object to load</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>choice</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the name of the choice variable</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  <p><strong>Attributes:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>n</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>total number of rows in the dataset</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>x</code></td>
-          <td>
-                <code>list[<span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the full list of (input) <code>TensorVariable</code> objects
-to build the tensor expression from</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>y</code></td>
+          <td><code>expression</code></td>
           <td>
                 <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the output (choice) <code>TensorVariable</code> object</p>
+              <p>the TensorVariable object to evaluate</p>
             </div>
           </td>
-        </tr>
-        <tr>
-          <td><code>scale</code></td>
           <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a dictionary of <code>float</code> values to store the scaling factor
-used for each variable</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>choice</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the name of the choice variable</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>ds</code></td>
-          <td>
-                <code>dict</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a dictionary of <code>numpy.ndarray</code> to store the values of each
-variable</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>split_frac</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the factor used to split the dataset into training and
-validation datasets</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>train_index</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the list of values of the indices of the training
-dataset</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>valid_index</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the list of values of the indices of the validation
-dataset</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>n_train</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the size of the training dataset</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>n_valid</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the size of the validation dataset</p>
-            </div>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
   </table>
 
-<details class="example" open>
-  <summary>Example</summary>
-  <p>Example initalization of a pandas dataset:</p>
-<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;datafile.csv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;mode&quot;</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-</code></pre></div>
-<p>Attributes can be access by invoking:
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">choice</span><span class="p">)</span>
-</code></pre></div></p>
-<p>Output:
-<div class="highlight"><pre><span></span><code><span class="s1">&#39;car&#39;</span>
-</code></pre></div></p>
-</details>
 
   
 
@@ -1239,15 +1201,17 @@ dataset</p>
 
 
 
-<h4 id="pycmtensor.dataset.Dataset.drop" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">drop</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+<h4 id="pycmtensor.expressions.ExpressionParser.parse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">parse</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span></code>
 
-<a href="#pycmtensor.dataset.Dataset.drop" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#pycmtensor.expressions.ExpressionParser.parse" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
   
-      <p>Method for dropping <code>variables</code> from the dataset</p>
+      <p>Parses Aesara Tensor string expression from <code>aesara.pprint()</code>. This function
+removes parentheses and Tensor operators and returns a 'clean' list of
+expressions</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1261,13 +1225,13 @@ dataset</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>variables</code></td>
+          <td><code>expression</code></td>
           <td>
-                <code>list[str]</code>
+                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>list of <code>str</code> variables from the dataset to drop</p>
+              <p>the symbolic Tensor object to parse</p>
             </div>
           </td>
           <td>
@@ -1277,7 +1241,7 @@ dataset</p>
     </tbody>
   </table>
 
-  <p><strong>Raises:</strong></p>
+  <p><strong>Returns:</strong></p>
   <table>
     <thead>
       <tr>
@@ -1288,38 +1252,83 @@ dataset</p>
     <tbody>
         <tr>
           <td>
-                <code>KeyError</code>
+                <code>list</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>raises an error if any item in <code>variables</code> is not found in the dataset or item is the choice variable</p>
+              <p>found keywords in expressions</p>
             </div>
           </td>
         </tr>
     </tbody>
   </table>
-      <div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Choice variable cannot be explicity dropped.</p>
-</div>
 
   </div>
 
 </div>
 
-<div class="doc doc-object doc-function">
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
 
 
 
-<h4 id="pycmtensor.dataset.Dataset.scale_variable" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">scale_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span></code>
+<h3 id="pycmtensor.expressions.TensorExpressions" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">TensorExpressions</span><span class="p">()</span></code>
 
-<a href="#pycmtensor.dataset.Dataset.scale_variable" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#pycmtensor.expressions.TensorExpressions" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
+
   
-      <p>Multiply values of the <code>variable</code> by <span class="arithmatex">\(1/\textrm{factor}\)</span>.</p>
+      <p>Base class for expression objects</p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.expressions.Param" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Param</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.Param" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.TensorExpressions" href="#pycmtensor.expressions.TensorExpressions">TensorExpressions</a></code></p>
+
+
+  
+      <p>Constructor for model param object</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1333,13 +1342,13 @@ dataset</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>variable</code></td>
+          <td><code>name</code></td>
           <td>
                 <code>str</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the name of the variable or a list of variable names</p>
+              <p>name of parameter</p>
             </div>
           </td>
           <td>
@@ -1347,21 +1356,150 @@ dataset</p>
           </td>
         </tr>
         <tr>
-          <td><code>factor</code></td>
+          <td><code>value</code></td>
           <td>
                 <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the scaling factor</p>
+              <p>the default value of the parameter</p>
             </div>
           </td>
           <td>
-              <em>required</em>
+                <code>0.0</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>lb</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>value lower bound</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ub</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>value upper bound</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>status</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if 1, do not estimate this parameter</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
           </td>
         </tr>
     </tbody>
   </table>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>init_value</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the inital value set at object creation</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>shape</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the shape of the Param</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>init_value</code> is an immutable property</p>
+</div>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pycmtensor.expressions.Param.name" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">name</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pycmtensor.expressions.Param.name" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns the name of the object</p>
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.expressions.Param.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.expressions.Param.__call__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns the shared value</p>
 
   </div>
 
@@ -1371,15 +1509,81 @@ dataset</p>
 
 
 
-<h4 id="pycmtensor.dataset.Dataset.split" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="p">)</span></code>
+<h4 id="pycmtensor.expressions.Param.get_value" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_value</span><span class="p">()</span></code>
 
-<a href="#pycmtensor.dataset.Dataset.split" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#pycmtensor.expressions.Param.get_value" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
   
-      <p>Method to split dataset into training and validation subsets</p>
+      <p>Returns the numpy representation of the parameter value</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.expressions.Param.set_value" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.Param.set_value" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set the value of the shared variable</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.expressions.Param.reset_value" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">reset_value</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.expressions.Param.reset_value" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Resets the value of the shared variable to the initial value</p>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.expressions.Beta" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Beta</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.Beta" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.Param" href="#pycmtensor.expressions.Param">Param</a></code></p>
+
+
+  
+      <p>Constructor for Beta parameter</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1393,17 +1597,413 @@ dataset</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>frac</code></td>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of Beta parameter</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>value</code></td>
           <td>
                 <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the fraction to split the dataset into the training set. The training set will be indexed from <code>0</code> to <code>frac</code> <span class="arithmatex">\(\times\)</span> <code>Dataset.n</code>. The validation dataset will be from the last index of the training set to the last row of the dataset.</p>
+              <p>the default value of the Beta parameter</p>
+            </div>
+          </td>
+          <td>
+                <code>0.0</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>lb</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>value lower bound</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ub</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>value upper bound</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>status</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if 1, do not estimate this Beta parameter</p>
+            </div>
+          </td>
+          <td>
+                <code>0</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>Specifying a Beta parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="n">b_time</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;b_time&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+<p>To obtain the raw array value from the Beta parameter:
+<div class="highlight"><pre><span></span><code><span class="n">b_time</span> <span class="o">=</span> <span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;b_time&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">lb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ub</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">b_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+</code></pre></div></p>
+<p>output:
+<div class="highlight"><pre><span></span><code><span class="go">array(-1.)</span>
+</code></pre></div></p>
+</div>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.expressions.RandomDraws" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">RandomDraws</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">draw_type</span><span class="p">,</span> <span class="n">n_draws</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.RandomDraws" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.TensorExpressions" href="#pycmtensor.expressions.TensorExpressions">TensorExpressions</a></code></p>
+
+
+  
+      <p>Constructor for model random draws</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the RandomDraw object</p>
             </div>
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>draw_type</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the distribution of the draw</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>n_draws</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>number of draws, determines the size of this shared tensor</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>draw_type</code> can be the following:</p>
+<ul>
+<li><code>"normal"</code></li>
+<li><code>"lognormal"</code></li>
+</ul>
+<p>other distribution are also possible, see <a href="https://numpy.org/doc/stable/reference/random/generator.html#distributions">https://numpy.org/doc/stable/reference/random/generator.html#distributions</a>. The distributions will be initialized with their default values e.g. <code>gumbel(loc=0., scale=1.)</code></p>
+</div>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.expressions.RandomDraws.get_value" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_value</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.expressions.RandomDraws.get_value" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns the numpy representation of the parameter value</p>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.expressions.Bias" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Bias</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.Bias" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.Param" href="#pycmtensor.expressions.Param">Param</a></code></p>
+
+
+  
+      <p>Class object for neural net bias vector</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the parameter</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>size</code></td>
+          <td>
+                <code>Union[tuple, list]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>size of the array</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>value</code></td>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>initial values of the parameter, if <code>None</code> given,
+defaults to <code>0</code></p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.expressions.Weight" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">Weight</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.expressions.Weight" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.Param" href="#pycmtensor.expressions.Param">Param</a></code></p>
+
+
+  
+      <p>Class object for neural net weight matrix</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the parameter</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>size</code></td>
+          <td>
+                <code>Union[tuple, list]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>size of the array</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>value</code></td>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>initial values of the parameter. Defaults to <code>random.uniform(-0.1, 0.1, size)</code></p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>init_type</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>initialization type, see notes</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
@@ -1411,254 +2011,41 @@ dataset</p>
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>The actual splitting of the dataset is done during the training procedure,
-or when invoking the <code>train_dataset()</code> or <code>valid_dataset()</code> methods</p>
-</details>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pycmtensor.dataset.Dataset.train_dataset" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">train_dataset</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-<a href="#pycmtensor.dataset.Dataset.train_dataset" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Returns a slice of the (or the full) training data array with the sequence
-matching the list of variables.</p>
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>variables</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[list, str, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a tensor, label, or list of
-tensors or list of labels</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the start of the slice of the data array. If <code>None</code> is given,
-returns the full data array.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>batch_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>length of the slice. If <code>None</code> is given, returns the
-index from <code>index</code> to <code>N</code> where <code>N</code> is the length of the array.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>shift</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the offset of the slice between <code>0</code> and <code>batch_size</code>. If
-<code>None</code> is given, <code>shift=0</code>.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a list of array object(s) corresponding to the input variables</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-      <div class="admonition example">
+  <p>Initialization types are one of the following:</p>
+<ul>
+<li>
+<p><code>"zeros"</code>: a 2-D array of zeros</p>
+</li>
+<li>
+<p><code>"he"</code>: initialization method for neural networks that takes into account
+  the non-linearity of activation functions, e.g. ReLU or Softplus [^1]</p>
+</li>
+<li>
+<p><code>"glorot"</code>: initialization method that maintains the variance for
+  symmetric activation functions, e.g. sigm, tanh [^2]</p>
+</li>
+</ul>
+<p>[^1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
+[^2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.</p>
+</details>      <div class="admonition example">
 <p class="admonition-title">Example</p>
-<p>How to retrieve data array from Dataset:
-<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;choice&quot;</span><span class="p">)</span>
-
-<span class="c1"># index &quot;age&quot; and &quot;location&quot; data arrays</span>
-<span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">([</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]])</span>
-
-<span class="c1"># similar result</span>
-<span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">([</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">])</span>
-</code></pre></div></p>
+<p>Specifying a weight array:</p>
+<div class="highlight"><pre><span></span><code><span class="n">code</span>
+</code></pre></div>
 </div>
 
-  </div>
 
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="pycmtensor.dataset.Dataset.valid_dataset" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">valid_dataset</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-<a href="#pycmtensor.dataset.Dataset.valid_dataset" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
   
-      <p>Returns a slice of the (or the full) validation data array with the sequence
-matching the list of variables.</p>
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>variables</code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[list, str, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a tensor, label, or list of
-tensors or list of labels</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the start of the slice of the data array. If <code>None</code> is given,
-returns the full data array.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>batch_size</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>length of the slice. If <code>None</code> is given, returns the
-index from <code>index</code> to <code>N</code> where <code>N</code> is the length of the array.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>shift</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>the offset of the slice between <code>0</code> and <code>batch_size</code>. If
-<code>None</code> is given, <code>shift=0</code>.</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+  <div class="doc doc-children">
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>list</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>a list of array object(s) corresponding to the input variables</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
-  </div>
 
-</div>
+
+
+
+
+
 
 
 

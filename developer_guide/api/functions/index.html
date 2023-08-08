@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../dataset/">
+        <link rel="prev" href="../expressions/">
       
       
         <link rel="next" href="../models/basic/">
@@ -569,6 +569,20 @@
               
   
   
+  
+    <li class="md-nav__item">
+      <a href="../expressions/" class="md-nav__link">
+        expressions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
     
   
   
@@ -714,17 +728,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7" >
       
       
       
-        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5_2_7" id="__nav_5_2_7_label" tabindex="0">
           models
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5_2_6">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_7">
           <span class="md-nav__icon md-icon"></span>
           models
         </label>
@@ -1075,11 +1089,11 @@
         <tr>
           <td><code>prob</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>matrix describing the choice probabilites</p>
+              <p>choice probabilites tensor</p>
             </div>
           </td>
           <td>
@@ -1089,11 +1103,11 @@
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the <code>TensorVariable</code> referencing the choice column</p>
+              <p>choice variable tensor</p>
             </div>
           </td>
           <td>
@@ -1114,7 +1128,7 @@
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1157,11 +1171,11 @@
         <tr>
           <td><code>batch_avg</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the new batch value of the mean</p>
+              <p>mean batch value</p>
             </div>
           </td>
           <td>
@@ -1171,11 +1185,11 @@
         <tr>
           <td><code>moving_avg</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the moving value of the accumulated mean</p>
+              <p>accumulated mean</p>
             </div>
           </td>
           <td>
@@ -1189,7 +1203,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the moving average factor of the batch mean</p>
+              <p>moving average factor of the batch mean</p>
             </div>
           </td>
           <td>
@@ -1210,7 +1224,7 @@
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1261,11 +1275,11 @@ value results in faster changing moving average.</p>
         <tr>
           <td><code>cost</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the cost function to compute the gradients over</p>
+              <p>function to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -1275,11 +1289,11 @@ value results in faster changing moving average.</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="pycmtensor.expressions.Beta">Beta</span>]</code>
+                <code>List[<a class="autorefs autorefs-internal" title="pycmtensor.expressions.Beta" href="../expressions/#pycmtensor.expressions.Beta">Beta</a>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>list of params to compute the gradients over</p>
+              <p>params to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -1300,7 +1314,7 @@ value results in faster changing moving average.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1347,7 +1361,7 @@ value results in faster changing moving average.</p>
         <tr>
           <td><code>p</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1361,7 +1375,7 @@ value results in faster changing moving average.</p>
         <tr>
           <td><code>q</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1386,7 +1400,7 @@ value results in faster changing moving average.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1439,7 +1453,7 @@ L = \begin{cases}
         <tr>
           <td><code>m0</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1453,7 +1467,7 @@ L = \begin{cases}
         <tr>
           <td><code>v0</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1468,7 +1482,7 @@ L = \begin{cases}
         <tr>
           <td><code>m1</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1482,7 +1496,7 @@ L = \begin{cases}
         <tr>
           <td><code>v1</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1531,7 +1545,7 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
 
 
 <h3 id="pycmtensor.functions.log_likelihood" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_likelihood</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">log_likelihood</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#pycmtensor.functions.log_likelihood" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1554,11 +1568,11 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
         <tr>
           <td><code>prob</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a <code>TensorVariable</code> matrix describing the choice probabilites</p>
+              <p>choice probabilites tensor</p>
             </div>
           </td>
           <td>
@@ -1568,15 +1582,30 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a <code>TensorVariable</code> referencing the choice variable</p>
+              <p>choice variable tensor</p>
             </div>
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>index tensor, if <code>None</code>, dynamically get the same of the
+<code>y</code> tensor</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
@@ -1593,11 +1622,11 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a symbolic representation of the log likelihood with <code>ndim=0</code>.</p>
+              <p>a symbolic tensor of the log likelihood</p>
             </div>
           </td>
         </tr>
@@ -1640,11 +1669,11 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
         <tr>
           <td><code>utility</code></td>
           <td>
-                <code><span title="typing.Union">Union</span>[list, tuple, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+                <code>Union[list, tuple, TensorVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>list of M utility equations</p>
+              <p>utility equations</p>
             </div>
           </td>
           <td>
@@ -1654,11 +1683,11 @@ therefore, for VI, <code>m1=1</code>, <code>v1=1</code></p>
         <tr>
           <td><code>avail</code></td>
           <td>
-                <code><span title="typing.Union">Union</span>[list, tuple, <span title="aesara.tensor.var.TensorVariable">TensorVariable</span>]</code>
+                <code>Union[list, tuple, TensorVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>list of M availability conditions,
+              <p>availability conditions,
 if no availability conditions are provided, defaults to <code>1</code> for all
 availabilities.</p>
             </div>
@@ -1681,7 +1710,7 @@ availabilities.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1728,7 +1757,7 @@ availabilities.</p>
         <tr>
           <td><code>y_hat</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1742,6 +1771,7 @@ availabilities.</p>
         <tr>
           <td><code>y</code></td>
           <td>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1766,7 +1796,7 @@ availabilities.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1814,7 +1844,7 @@ availabilities.</p>
         <tr>
           <td><code>x</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1828,7 +1858,7 @@ availabilities.</p>
         <tr>
           <td><code>alpha</code></td>
           <td>
-                <code><span title="typing.Union">Union</span>[float, <span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>Union[float, TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1857,7 +1887,7 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1900,7 +1930,7 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
         <tr>
           <td><code>y_hat</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1914,7 +1944,7 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
         <tr>
           <td><code>y</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1939,7 +1969,7 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1986,11 +2016,11 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
         <tr>
           <td><code>cost</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the cost function to compute the gradients over</p>
+              <p>function to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -2000,11 +2030,11 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="pycmtensor.expressions.Beta">Beta</span>]</code>
+                <code>List[<a class="autorefs autorefs-internal" title="pycmtensor.expressions.Beta" href="../expressions/#pycmtensor.expressions.Beta">Beta</a>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>list of params to compute the gradients over</p>
+              <p>params to compute the gradients over</p>
             </div>
           </td>
           <td>
@@ -2025,7 +2055,7 @@ between will give a leaky rectifier. A shared variable (broadcastable against <c
     <tbody>
         <tr>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">

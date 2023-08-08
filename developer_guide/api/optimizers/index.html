@@ -571,6 +571,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../expressions/" class="md-nav__link">
+        expressions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../functions/" class="md-nav__link">
         functions
       </a>
@@ -590,17 +604,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7" >
       
       
       
-        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_5_2_7" id="__nav_5_2_7_label" tabindex="0">
           models
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_5_2_6">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_7">
           <span class="md-nav__icon md-icon"></span>
           models
         </label>
@@ -737,6 +751,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.optimizers.RProp" class="md-nav__link">
+    RProp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.optimizers.RMSProp" class="md-nav__link">
     RMSProp
   </a>
@@ -772,8 +793,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.optimizers.BFGS" class="md-nav__link">
-    BFGS
+  <a href="#pycmtensor.optimizers.SQNBFGS" class="md-nav__link">
+    SQNBFGS
   </a>
   
 </li>
@@ -979,6 +1000,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.optimizers.RProp" class="md-nav__link">
+    RProp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.optimizers.RMSProp" class="md-nav__link">
     RMSProp
   </a>
@@ -1014,8 +1042,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.optimizers.BFGS" class="md-nav__link">
-    BFGS
+  <a href="#pycmtensor.optimizers.SQNBFGS" class="md-nav__link">
+    SQNBFGS
   </a>
   
 </li>
@@ -1157,7 +1185,7 @@
         <tr>
           <td><code>cost</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1172,7 +1200,7 @@ function where the derivatives are calculated</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1186,7 +1214,7 @@ function where the derivatives are calculated</p>
         <tr>
           <td><code>lr</code></td>
           <td>
-                <code>Union[float, <span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>Union[float, TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1266,7 +1294,7 @@ function where the derivatives are calculated</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1323,7 +1351,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>t</code></td>
           <td>
-                <code><span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span></code>
+                <code>TensorSharedVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1334,7 +1362,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>m_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1345,7 +1373,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>v_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1417,7 +1445,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1474,7 +1502,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>t</code></td>
           <td>
-                <code><span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span></code>
+                <code>TensorSharedVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1485,7 +1513,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>m_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1496,7 +1524,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>v_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1569,7 +1597,7 @@ the Adam algorithm</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1626,7 +1654,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>t</code></td>
           <td>
-                <code><span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span></code>
+                <code>TensorSharedVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1637,7 +1665,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>m_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1648,7 +1676,7 @@ Defaults to <code>0.999</code></p>
         <tr>
           <td><code>v_prev</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1726,7 +1754,7 @@ learning rate per dimension to address two drawbacks:</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1768,7 +1796,7 @@ Defaults to <code>0.95</code></p>
         <tr>
           <td><code>accumulator</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1779,7 +1807,7 @@ Defaults to <code>0.95</code></p>
         <tr>
           <td><code>delta</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1794,6 +1822,158 @@ Defaults to <code>0.95</code></p>
 <ol>
 <li id="pycmtensor.optimizers.Adadelta--fn:1">
 <p>Zeiler, 2012. ADADELTA: An Adaptive Learning Rate Method. <a href="http://arxiv.org/abs/1212.5701">http://arxiv.org/abs/1212.5701</a>&#160;<a class="footnote-backref" href="#pycmtensor.optimizers.Adadelta--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.optimizers.RProp" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">RProp</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">inc</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-06</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.optimizers.RProp" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.optimizers.Optimizer" href="#pycmtensor.optimizers.Optimizer">Optimizer</a></code></p>
+
+
+  
+      <p>An optimizer that implements the Rprop algorithm[^1]</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>params</code></td>
+          <td>
+                <code>list[TensorSharedVariable]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>parameters of the model</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>inc</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>increment step if same gradient direction</p>
+            </div>
+          </td>
+          <td>
+                <code>1.05</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>dec</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>decrement step if different gradient direction</p>
+            </div>
+          </td>
+          <td>
+                <code>0.5</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>bounds</code></td>
+          <td>
+                <code>List[float]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>min and maximum bounds for increment step</p>
+            </div>
+          </td>
+          <td>
+                <code>[1e-06, 50.0]</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>factor</code></td>
+          <td>
+                <code>List[TensorVariable]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>learning rate factor multiplier (init=1.)</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ghat</code></td>
+          <td>
+                <code>List[TensorVariable]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>previous step gradients</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="footnote">
+<hr />
+<ol>
+<li id="pycmtensor.optimizers.RProp--fn:1">
+<p>Igel, C., &amp; Hüsken, M. (2003). Empirical evaluation of the improved Rprop learning algorithms. Neurocomputing, 50, 105-123.&#160;<a class="footnote-backref" href="#pycmtensor.optimizers.RProp--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -1851,7 +2031,7 @@ Defaults to <code>0.95</code></p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1893,7 +2073,7 @@ Defaults to <code>0.9</code></p>
         <tr>
           <td><code>accumulator</code></td>
           <td>
-                <code><span title="aesara.tensor.var.TensorVariable">TensorVariable</span></code>
+                <code>TensorVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1965,7 +2145,7 @@ Defaults to <code>0.9</code></p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2007,7 +2187,7 @@ and dampens oscillations. Defaults to <code>0.9</code></p>
         <tr>
           <td><code>velocity</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2079,7 +2259,7 @@ and dampens oscillations. Defaults to <code>0.9</code></p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2121,7 +2301,7 @@ and dampens oscillations. Defaults to <code>0.9</code></p>
         <tr>
           <td><code>t</code></td>
           <td>
-                <code><span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span></code>
+                <code>TensorSharedVariable</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2132,7 +2312,7 @@ and dampens oscillations. Defaults to <code>0.9</code></p>
         <tr>
           <td><code>velocity</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2207,7 +2387,7 @@ The more updates a parameter receives, the smaller the updates.</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2234,7 +2414,7 @@ The more updates a parameter receives, the smaller the updates.</p>
         <tr>
           <td><code>accumulator</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2306,7 +2486,7 @@ The more updates a parameter receives, the smaller the updates.</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2345,10 +2525,10 @@ The more updates a parameter receives, the smaller the updates.</p>
 
 
 
-<h3 id="pycmtensor.optimizers.BFGS" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">BFGS</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<h3 id="pycmtensor.optimizers.SQNBFGS" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">SQNBFGS</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
-<a href="#pycmtensor.optimizers.BFGS" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.optimizers.SQNBFGS" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
@@ -2357,7 +2537,7 @@ The more updates a parameter receives, the smaller the updates.</p>
 
 
   
-      <p>An optimizer that implements the stochastic gradient algorithm</p>
+      <p>A L-BFGS optimizer implementing the adaptive stochastic Quasi-Newton (SQN) based approach [^1]</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2373,7 +2553,7 @@ The more updates a parameter receives, the smaller the updates.</p>
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>list[<span title="aesara.tensor.sharedvar.TensorSharedVariable">TensorSharedVariable</span>]</code>
+                <code>list[TensorSharedVariable]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2400,6 +2580,14 @@ The more updates a parameter receives, the smaller the updates.</p>
         </tr>
     </tbody>
   </table>
+      <div class="footnote">
+<hr />
+<ol>
+<li id="pycmtensor.optimizers.SQNBFGS--fn:1">
+<p>Byrd, R. H., Hansen, S. L., Nocedal, J., &amp; Singer, Y. (2016). A stochastic quasi-Newton method for large-scale optimization. SIAM Journal on Optimization, 26(2), 1008-1031.&#160;<a class="footnote-backref" href="#pycmtensor.optimizers.SQNBFGS--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
 
   
