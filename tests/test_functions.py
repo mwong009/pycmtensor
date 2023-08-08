@@ -71,7 +71,7 @@ def test_kl_multivar_norm_1():
     assert updates[0] == -0.19
 
 
-def test_kl_multivar_norm_2(rng):
+def test_kl_multivar_norm_2():
     rng = np.random.default_rng(42069)
 
     m0 = aet.vector("m0")
