@@ -66,7 +66,7 @@ class Results:
         stats.loc["Seed"] = self.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
-        stats.loc["epochs per sec"] = f"{self.epochs_per_sec} iter/s"
+        stats.loc["epochs per sec"] = f"{self.epochs_per_sec} epoch/s"
         return stats
 
     def model_statistics(self):
