@@ -152,12 +152,12 @@ def train(model, ds, **kwargs):
     validation_threshold = model.config.validation_threshold
     convergence_threshold = model.config.convergence_threshold
     validation_freq = n_train_batches
-    max_steps = model.config.max_steps
-    max_iterations = max_steps * n_train_batches
+    max_epochs = model.config.max_epochs
+    max_iterations = max_epochs * n_train_batches
 
     done_looping = False
     converged = False
-    step = 0
+    epoch = 0
     iteration = 0
     shift = 0
     gnorm_tol = np.inf
@@ -212,11 +212,11 @@ def train(model, ds, **kwargs):
 
     start_time = perf_counter()
     info(
-        f"Start (n={n_train}, Step={step}, LL={model.results.null_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%)"
+        f"Start (n={n_train}, epoch={epoch}, LL={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
     )
 
-    while (step < max_steps) and (not done_looping):
-        learning_rate = lr_scheduler(step)  # get learning rate at this step
+    while (epoch < max_epochs) and (not done_looping):
+        learning_rate = lr_scheduler(epoch)  # get learning rate at this epoch
 
         for i in range(n_train_batches):
             index = np.arange(len(batch_data[i][-1]))
@@ -224,7 +224,7 @@ def train(model, ds, **kwargs):
 
             if iteration % validation_freq == 0:
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
-                performance_graph[step] = {"log likelihood": log_likelihood}
+                performance_graph[epoch] = {"log likelihood": log_likelihood}
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 p = model.include_params_for_convergence(train_data, t_index)
@@ -235,10 +235,16 @@ def train(model, ds, **kwargs):
 
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
-                if gnorm < (gnorm_tol / 5.0):
-                    gnorm_tol = gnorm
+                bl = model.results.best_loglikelihood
+                if (
+                    (gnorm < (gnorm_min / 5.0))
+                    or (log_likelihood > (0.95 * bl))
+                    or ((epoch % (max_epochs // 10)) == 0)
+                ):
+                    error = model.prediction_error_fn(*valid_data)
+                    gnorm_min = gnorm
                     info(
-                        f"Train (Step={step}, LL={log_likelihood:.2f}, Error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                        f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                     )
 
                 if log_likelihood > model.results.best_loglikelihood:
@@ -253,7 +259,7 @@ def train(model, ds, **kwargs):
                             min(max(patience, iteration * patience_inc), max_iterations)
                         )
 
-                    model.results.best_step = step
+                    model.results.best_epoch = epoch
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
@@ -280,22 +286,22 @@ def train(model, ds, **kwargs):
             if (iteration > patience) or converged:
                 iteration -= 1
                 info(
-                    f"Train (Step={step}, LL={log_likelihood:.2f}, Error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                    f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                 )
 
                 done_looping = True  # break loop if convergence reached
                 break
 
-        step += 1  # increment step
+        epoch += 1  # increment epoch
 
     train_time = round(perf_counter() - start_time, 3)
     model.results.train_time = time_format(train_time)
-    model.results.iterations_per_sec = round(iteration / train_time, 2)
+    model.results.epochs_per_sec = round(epoch / train_time, 2)
     if converged:
         info(f"Model converged (t={train_time})")
     else:
         info(
-            f"Maximum number of iterations reached: {iteration}/{patience} (t={train_time})"
+            f"Maximum number of epochs reached: {iteration}/{patience} (t={train_time})"
         )
 
     model.results.lr_history_graph = lr_scheduler.history
@@ -318,5 +324,5 @@ def train(model, ds, **kwargs):
     model.results.hessian_matrix = hessian
 
     info(
-        f"Best results obtained at Step {model.results.best_step}: LL={model.results.best_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
+        f"Best results obtained at epoch {model.results.best_epoch}: LL={model.results.best_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
     )

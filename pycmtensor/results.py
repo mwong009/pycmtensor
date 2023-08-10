@@ -17,7 +17,7 @@ class Results:
     def __init__(self):
         self.build_time = None
         self.train_time = None
-        self.iterations_per_sec = None
+        self.epochs_per_sec = None
         self.n_params = None
         self.n_train = None
         self.n_valid = None
@@ -66,7 +66,7 @@ class Results:
         stats.loc["Seed"] = self.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
-        stats.loc["iterations per sec"] = f"{self.iterations_per_sec} iter/s"
+        stats.loc["epochs per sec"] = f"{self.epochs_per_sec} iter/s"
         return stats
 
     def model_statistics(self):
