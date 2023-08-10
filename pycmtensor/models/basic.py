@@ -2,10 +2,12 @@ from collections import OrderedDict
 from time import perf_counter
 
 import numpy as np
+from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.logger import debug, info, warning
+from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
 from pycmtensor.utils import time_format
 
@@ -86,6 +88,48 @@ class BaseModel(object):
         """
         return OrderedDict()
 
+    def build_cost_updates_fn(self, updates):
+        self.cost_updates_fn = function(
+            name="cost_updates",
+            inputs=self.x + [self.y, self.learning_rate, self.index],
+            outputs=self.cost,
+            updates=updates,
+        )
+
+    def predict(self, ds, return_probabilities=False):
+        if not "choice_probabilities_fn" in dir(self):
+            self.choice_probabilities_fn = function(
+                name="choice_probabilities",
+                inputs=self.x,
+                outputs=self.p_y_given_x,
+            )
+
+        if not "choice_predictions_fn" in dir(self):
+            self.choice_predictions_fn = function(
+                name="choice_predictions", inputs=self.x, outputs=self.pred
+            )
+
+        valid_data = ds.valid_dataset(self.x)
+
+        if return_probabilities:
+            choice = self.choice_probabilities_fn(*valid_data)
+        else:
+            choice = self.choice_predictions_fn(*valid_data)
+        return choice
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def __repr__(self):
+        return pprint(self.cost)
+
+    def __getattr__(self, name):
+        if (name == "hessian_fn") or (name == "gradient_vector_fn"):
+            self.build_gh_fn()
+            return getattr(self, name)
+        else:
+            return False
+
 
 def extract_params(cost, variables):
     """Extracts Param objects from variables
@@ -102,7 +146,10 @@ def extract_params(cost, variables):
         variables = [v for _, v in variables.items()]
 
     for variable in variables:
-        if (not isinstance(variable, Param)) or (variable.name in seen):
+        if (not isinstance(variable, Param)) or isinstance(variable, Layer):
+            continue
+
+        if isinstance(variable, Param) and (variable.name in seen):
             continue
 
         if variable.name not in symbols:
@@ -152,15 +199,15 @@ def train(model, ds, **kwargs):
     validation_threshold = model.config.validation_threshold
     convergence_threshold = model.config.convergence_threshold
     validation_freq = n_train_batches
-    max_steps = model.config.max_steps
-    max_iterations = max_steps * n_train_batches
+    max_epochs = model.config.max_epochs
+    max_iterations = max_epochs * n_train_batches
 
     done_looping = False
     converged = False
-    step = 0
+    epoch = 0
     iteration = 0
     shift = 0
-    gnorm_tol = np.inf
+    gnorm_min = np.inf
 
     optimizer = model.config.optimizer(model.params, config=model.config)
     updates = optimizer.update(model.cost, model.params, model.learning_rate)
@@ -188,7 +235,7 @@ def train(model, ds, **kwargs):
     model.results.null_loglikelihood = log_likelihood
     model.results.best_loglikelihood = log_likelihood
     model.results.best_valid_error = error
-    model.results.best_step = 0
+    model.results.best_epoch = 0
     model.results.gnorm = np.nan
     model.results.n_train = n_train
     model.results.n_valid = n_valid
@@ -212,11 +259,11 @@ def train(model, ds, **kwargs):
 
     start_time = perf_counter()
     info(
-        f"Start (n={n_train}, Step={step}, LL={model.results.null_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%)"
+        f"Start (n={n_train}, epoch={epoch}, LL={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
     )
 
-    while (step < max_steps) and (not done_looping):
-        learning_rate = lr_scheduler(step)  # get learning rate at this step
+    while (epoch < max_epochs) and (not done_looping):
+        learning_rate = lr_scheduler(epoch)  # get learning rate at this epoch
 
         for i in range(n_train_batches):
             index = np.arange(len(batch_data[i][-1]))
@@ -224,7 +271,7 @@ def train(model, ds, **kwargs):
 
             if iteration % validation_freq == 0:
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
-                performance_graph[step] = {"log likelihood": log_likelihood}
+                performance_graph[epoch] = {"log likelihood": log_likelihood}
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 p = model.include_params_for_convergence(train_data, t_index)
@@ -235,10 +282,16 @@ def train(model, ds, **kwargs):
 
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
-                if gnorm < (gnorm_tol / 5.0):
-                    gnorm_tol = gnorm
+                bl = model.results.best_loglikelihood
+                if (
+                    (gnorm < (gnorm_min / 5.0))
+                    or (log_likelihood > (0.95 * bl))
+                    or ((epoch % (max_epochs // 10)) == 0)
+                ):
+                    error = model.prediction_error_fn(*valid_data)
+                    gnorm_min = gnorm
                     info(
-                        f"Train (Step={step}, LL={log_likelihood:.2f}, Error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                        f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                     )
 
                 if log_likelihood > model.results.best_loglikelihood:
@@ -253,7 +306,7 @@ def train(model, ds, **kwargs):
                             min(max(patience, iteration * patience_inc), max_iterations)
                         )
 
-                    model.results.best_step = step
+                    model.results.best_epoch = epoch
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
@@ -263,9 +316,9 @@ def train(model, ds, **kwargs):
                         model.results.params[p.name] = p.get_value()
                         if isinstance(p, Beta):
                             model.results.betas[p.name] = p.get_value()
-
-                    p = model.include_params_for_convergence(train_data, t_index)
-                    model.results.betas.update(p)
+                    if "tn_betas_fn" in dir(model):
+                        for key, value in model.tn_betas_fn(*train_data, index).items():
+                            model.results.betas[key] = value
 
                 if gnorm < convergence_threshold:
                     converged = True
@@ -280,43 +333,48 @@ def train(model, ds, **kwargs):
             if (iteration > patience) or converged:
                 iteration -= 1
                 info(
-                    f"Train (Step={step}, LL={log_likelihood:.2f}, Error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                    f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                 )
 
                 done_looping = True  # break loop if convergence reached
                 break
 
-        step += 1  # increment step
+        epoch += 1  # increment epoch
 
     train_time = round(perf_counter() - start_time, 3)
     model.results.train_time = time_format(train_time)
-    model.results.iterations_per_sec = round(iteration / train_time, 2)
+    model.results.epochs_per_sec = round(epoch / train_time, 2)
     if converged:
         info(f"Model converged (t={train_time})")
     else:
         info(
-            f"Maximum number of iterations reached: {iteration}/{patience} (t={train_time})"
+            f"Maximum number of epochs reached: {iteration}/{patience} (t={train_time})"
         )
 
     model.results.lr_history_graph = lr_scheduler.history
     model.results.performance_graph = performance_graph
 
+    debug(f"Evaluating full hessian and bhhh matrix")
     for p in model.params:
         p.set_value(model.results.params[p.name])
 
     n_betas = len(model.results.betas)
+    # hessian = np.zeros((n_train, n_betas, n_betas))
     gradient_vector = np.zeros((n_train, n_betas))
-    hessian = np.zeros((n_train, n_betas, n_betas))
     for n in range(n_train):
         data = [[d[n]] for d in train_data]
         gradient_vector[n, :] = model.gradient_vector_fn(*data, np.array([0]))
-        hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
+    #     hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
+    bhhh = np.mean(gradient_vector[:, :, None] * gradient_vector[:, None, :])
 
-    bhhh = gradient_vector[:, :, None] * gradient_vector[:, None, :]
+    index = np.arange(len(train_data[-1]))
+    hessian = model.hessian_fn(*train_data, index)
+    # gradient_vector = model.gradient_vector_fn(*train_data, index)
+    # bhhh = (gradient_vector[:, None] * gradient_vector[None, :])
 
     model.results.bhhh_matrix = bhhh
     model.results.hessian_matrix = hessian
 
     info(
-        f"Best results obtained at Step {model.results.best_step}: LL={model.results.best_loglikelihood:.2f}, Error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
+        f"Best results obtained at epoch {model.results.best_epoch}: LL={model.results.best_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
     )

@@ -340,7 +340,7 @@ def second_order_derivative(cost, params):
     for p in params:
         if isinstance(p, Beta):
             param = p()
-            if hasattr(p, "output"):
+            if "output" in dir(p):
                 param.name = p.name
             wrt_params.append(param)
 
@@ -377,7 +377,7 @@ def first_order_derivative(cost, params):
     for p in params:
         if isinstance(p, Beta):
             param = p()
-            if hasattr(p, "output"):
+            if "output" in dir(p):
                 param.name = p.name
             wrt_params.append(param)
 

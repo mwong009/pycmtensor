@@ -75,7 +75,7 @@ class ConstantLR(Scheduler):
 class StepLR(ConstantLR):
     """Base class for step learning rate scheduler"""
 
-    def __init__(self, lr=0.01, factor=0.25, drop_every=10, **kwargs):
+    def __init__(self, lr=0.01, factor=0.95, drop_every=10, **kwargs):
         """Constructor for StepLR class object
 
         Args:
@@ -87,6 +87,7 @@ class StepLR(ConstantLR):
         self.name = "StepLR"
         self._factor = factor
         self._drop_every = drop_every
+        self._min_lr = 0.01 * lr
 
         if factor >= 1.0:
             raise ValueError(f"factor is greater than 1.")
@@ -107,7 +108,7 @@ class StepLR(ConstantLR):
     def __call__(self, step):
         """Computes the learning rate for this step"""
         decay = self.factor ** np.floor(step / self._drop_every)
-        lr = float(self.lr * decay)
+        lr = max(float(self.lr * decay), self._min_lr)
         return self._record(step, lr)
 
 
@@ -125,6 +126,7 @@ class PolynomialLR(ConstantLR):
         super().__init__(lr)
         self.name = "PolynomialLR"
         self._max_steps = max_steps
+        self._min_lr = 0.01 * lr
         self._power = power
 
         if self.power < 0:
@@ -143,7 +145,7 @@ class PolynomialLR(ConstantLR):
     def __call__(self, step):
         """Computes the learning rate for this step"""
         decay = (1 - (step / float(self.max_steps))) ** self.power
-        lr = float(self.lr * decay)
+        lr = max(float(self.lr * decay), self._min_lr)
         return self._record(step, lr)
 
 
@@ -162,6 +164,7 @@ class CyclicLR(ConstantLR):
         super().__init__(lr)
         self.name = "CyclicLR"
         self._max_lr = max_lr
+        self._min_lr = 0.001 * lr
         self._cycle_steps = cycle_steps
         self._scale_fn = scale_fn
 
@@ -183,7 +186,7 @@ class CyclicLR(ConstantLR):
         cycle = np.floor(1 + step / self.cycle_steps)
         x = np.abs(step / (self.cycle_steps / 2) - 2 * cycle + 1)
         height = (self.max_lr - self.lr) * self.scale_fn(cycle)
-        lr = self.lr + height * np.maximum(0, 1 - x)
+        lr = max(self.lr + height * np.maximum(0, 1 - x), self._min_lr)
         return self._record(step, lr)
 
     def scale_fn(self, k):
