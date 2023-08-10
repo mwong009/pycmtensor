@@ -1,3 +1,16 @@
+## v1.6.1 (2023-08-10)
+
+### Fix
+
+- **scheduler.py**: add learning rate lower bounds for decaying functions
+- **basic.py**: add placeholder arguments `*args`
+
+### Refactor
+
+- **basic.py**: improve efficency of hessian matrix calculation over the sum of log likelihood over observation
+- **basic.py**: refactoring common model functions into BaseModel
+- syntax and naming changes
+
 ## v1.6.0 (2023-08-07)
 
 ### Feat
