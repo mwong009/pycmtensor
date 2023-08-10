@@ -88,8 +88,15 @@ class Results:
     def beta_statistics(self):
         """Returns a pandas DataFrame of the model beta statistics"""
         n = len(self.hessian_matrix)
-        h = self.hessian_matrix.sum(axis=0)
-        bh = self.bhhh_matrix.sum(axis=0)
+        if self.hessian_matrix.ndim > 2:
+            h = self.hessian_matrix.sum(axis=0)
+        else:
+            h = self.hessian_matrix
+
+        if self.bhhh_matrix.ndim > 2:
+            bh = self.bhhh_matrix.sum(axis=0)
+        else:
+            bh = self.bhhh_matrix
 
         stats = pd.DataFrame(
             index=self.betas,

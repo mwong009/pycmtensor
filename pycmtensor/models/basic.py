@@ -354,18 +354,23 @@ def train(model, ds, **kwargs):
     model.results.lr_history_graph = lr_scheduler.history
     model.results.performance_graph = performance_graph
 
+    debug(f"Evaluating full hessian and bhhh matrix")
     for p in model.params:
         p.set_value(model.results.params[p.name])
 
     n_betas = len(model.results.betas)
+    # hessian = np.zeros((n_train, n_betas, n_betas))
     gradient_vector = np.zeros((n_train, n_betas))
-    hessian = np.zeros((n_train, n_betas, n_betas))
     for n in range(n_train):
         data = [[d[n]] for d in train_data]
         gradient_vector[n, :] = model.gradient_vector_fn(*data, np.array([0]))
-        hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
+    #     hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
+    bhhh = np.mean(gradient_vector[:, :, None] * gradient_vector[:, None, :])
 
-    bhhh = gradient_vector[:, :, None] * gradient_vector[:, None, :]
+    index = np.arange(len(train_data[-1]))
+    hessian = model.hessian_fn(*train_data, index)
+    # gradient_vector = model.gradient_vector_fn(*train_data, index)
+    # bhhh = (gradient_vector[:, None] * gradient_vector[None, :])
 
     model.results.bhhh_matrix = bhhh
     model.results.hessian_matrix = hessian
