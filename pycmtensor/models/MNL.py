@@ -2,7 +2,6 @@ from time import perf_counter
 
 import aesara
 import aesara.tensor as aet
-from aesara import pprint
 
 from pycmtensor.expressions import Beta
 from pycmtensor.functions import (
@@ -64,37 +63,24 @@ class MNL(BaseModel):
         self.params = extract_params(self.cost, params)
         self.betas = [p for p in self.params if isinstance(p, Beta)]
 
-        # drop unused variables form dataset
+        # drop unused variables from dataset
         drop_unused = drop_unused_variables(self.cost, self.params, ds())
         ds.drop(drop_unused)
 
         self.x = ds.x
         self.xy = self.x + [self.y]
+        info(f"choice: {self.y}")
         info(f"inputs in {self.name}: {self.x}")
 
         start_time = perf_counter()
-        self.build_fn()
+        self.build_cost_fn()
         build_time = round(perf_counter() - start_time, 3)
 
         self.results.build_time = time_format(build_time)
         info(f"Build time = {self.results.build_time}")
 
-    def build_cost_updates_fn(self, updates):
-        """Method to call to build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
-
-        Args:
-            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
-        """
-        self.cost_updates_fn = aesara.function(
-            name="cost_updates",
-            inputs=self.x + [self.y, self.learning_rate, self.index],
-            outputs=self.cost,
-            updates=updates,
-        )
-
-    def build_fn(self):
-        """Method to call to build mathematical operations without updates to the model"""
-
+    def build_cost_fn(self):
+        """method to construct aesara functions for cost and prediction errors"""
         self.log_likelihood_fn = aesara.function(
             name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
         )

@@ -2,10 +2,12 @@ from collections import OrderedDict
 from time import perf_counter
 
 import numpy as np
+from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.logger import debug, info, warning
+from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
 from pycmtensor.utils import time_format
 
@@ -102,7 +104,10 @@ def extract_params(cost, variables):
         variables = [v for _, v in variables.items()]
 
     for variable in variables:
-        if (not isinstance(variable, Param)) or (variable.name in seen):
+        if (not isinstance(variable, Param)) or isinstance(variable, Layer):
+            continue
+
+        if isinstance(variable, Param) and (variable.name in seen):
             continue
 
         if variable.name not in symbols:
@@ -160,7 +165,7 @@ def train(model, ds, **kwargs):
     epoch = 0
     iteration = 0
     shift = 0
-    gnorm_tol = np.inf
+    gnorm_min = np.inf
 
     optimizer = model.config.optimizer(model.params, config=model.config)
     updates = optimizer.update(model.cost, model.params, model.learning_rate)
@@ -188,7 +193,7 @@ def train(model, ds, **kwargs):
     model.results.null_loglikelihood = log_likelihood
     model.results.best_loglikelihood = log_likelihood
     model.results.best_valid_error = error
-    model.results.best_step = 0
+    model.results.best_epoch = 0
     model.results.gnorm = np.nan
     model.results.n_train = n_train
     model.results.n_valid = n_valid
@@ -269,9 +274,9 @@ def train(model, ds, **kwargs):
                         model.results.params[p.name] = p.get_value()
                         if isinstance(p, Beta):
                             model.results.betas[p.name] = p.get_value()
-
-                    p = model.include_params_for_convergence(train_data, t_index)
-                    model.results.betas.update(p)
+                    if "tn_betas_fn" in dir(model):
+                        for key, value in model.tn_betas_fn(*train_data, index).items():
+                            model.results.betas[key] = value
 
                 if gnorm < convergence_threshold:
                     converged = True

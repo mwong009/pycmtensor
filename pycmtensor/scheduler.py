@@ -75,7 +75,7 @@ class ConstantLR(Scheduler):
 class StepLR(ConstantLR):
     """Base class for step learning rate scheduler"""
 
-    def __init__(self, lr=0.01, factor=0.25, drop_every=10, **kwargs):
+    def __init__(self, lr=0.01, factor=0.95, drop_every=10, **kwargs):
         """Constructor for StepLR class object
 
         Args:

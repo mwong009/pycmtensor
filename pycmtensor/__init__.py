@@ -35,7 +35,7 @@ config.add(
 )
 config.add(
     "validation_threshold",
-    1.003,
+    1.005,
     "The factor of the validation error score to meet in order to register an improvement",
 )
 config.add("base_learning_rate", 0.01, "The initial learning rate of the model update")
@@ -66,8 +66,8 @@ config.add(
     "Learning rate scheduler to use for model estimation",
 )
 config.add("lr_ExpRangeCLR_gamma", 0.5, "Gamma parameter for `ExpRangeCLR`")
-config.add("lr_stepLR_factor", 0.5, "Drop step multiplier factor for `stepLR`")
-config.add("lr_stepLR_drop_every", 10, "Drop learning rate every n steps for `stepLR`")
+config.add("lr_stepLR_factor", 0.95, "Drop step multiplier factor for `stepLR`")
+config.add("lr_stepLR_drop_every", 20, "Drop learning rate every n steps for `stepLR`")
 config.add("lr_CLR_cycle_steps", 16, "Steps per cycle for `CyclicLR`")
 config.add("lr_PolynomialLR_power", 0.999, "Power factor for `PolynomialLR`")
 config.add(
