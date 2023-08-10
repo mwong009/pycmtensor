@@ -54,7 +54,7 @@ class MNL(BaseModel):
         # expression for the likelihood
         self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
 
-        self.cost = -(self.ll / self.y.shape[0])  # expression for the cost
+        self.cost = -self.ll  # expression for the cost
 
         self.pred = aet.argmax(
             self.p_y_given_x, axis=0
@@ -92,18 +92,23 @@ class MNL(BaseModel):
         )
 
     def build_gh_fn(self):
-        """method to construct aesara functions for hessians and gradient vectors"""
+        """method to construct aesara functions for hessians and gradient vectors
+
+        !!! note
+
+            The hessians and gradient vector are evaluation at the maximum **log likelihood** estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.
+        """
         self.hessian_fn = aesara.function(
             name="hessian",
             inputs=self.x + [self.y, self.index],
-            outputs=second_order_derivative(-self.cost, self.betas),
+            outputs=second_order_derivative(self.ll, self.betas),
             allow_input_downcast=True,
         )
 
         self.gradient_vector_fn = aesara.function(
             name="gradient_vector",
             inputs=self.x + [self.y, self.index],
-            outputs=first_order_derivative(-self.cost, self.betas),
+            outputs=first_order_derivative(self.ll, self.betas),
             allow_input_downcast=True,
         )
 

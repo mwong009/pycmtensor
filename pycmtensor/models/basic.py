@@ -359,18 +359,14 @@ def train(model, ds, **kwargs):
         p.set_value(model.results.params[p.name])
 
     n_betas = len(model.results.betas)
-    # hessian = np.zeros((n_train, n_betas, n_betas))
     gradient_vector = np.zeros((n_train, n_betas))
     for n in range(n_train):
         data = [[d[n]] for d in train_data]
         gradient_vector[n, :] = model.gradient_vector_fn(*data, np.array([0]))
-    #     hessian[n, :, :] = model.hessian_fn(*data, np.array([0]))
-    bhhh = np.mean(gradient_vector[:, :, None] * gradient_vector[:, None, :])
+    bhhh = np.sum(gradient_vector[:, :, None] * gradient_vector[:, None, :], axis=0)
 
     index = np.arange(len(train_data[-1]))
     hessian = model.hessian_fn(*train_data, index)
-    # gradient_vector = model.gradient_vector_fn(*train_data, index)
-    # bhhh = (gradient_vector[:, None] * gradient_vector[None, :])
 
     model.results.bhhh_matrix = bhhh
     model.results.hessian_matrix = hessian

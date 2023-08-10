@@ -121,7 +121,10 @@ class Results:
 
     def model_correlation_matrix(self):
         """Returns a pandas DataFrame of the model correlation matrix"""
-        h = self.hessian_matrix.sum(axis=0)
+        if self.hessian_matrix.ndim > 2:
+            h = self.hessian_matrix.sum(axis=0)
+        else:
+            h = self.hessian_matrix
 
         mat = pd.DataFrame(
             columns=self.betas,
@@ -133,8 +136,15 @@ class Results:
 
     def model_robust_correlation_matrix(self):
         """Returns a pandas DataFrame of the model (robust) correlation matrix"""
-        h = self.hessian_matrix.sum(axis=0)
-        bh = self.bhhh_matrix.sum(axis=0)
+        if self.hessian_matrix.ndim > 2:
+            h = self.hessian_matrix.sum(axis=0)
+        else:
+            h = self.hessian_matrix
+
+        if self.bhhh_matrix.ndim > 2:
+            bh = self.bhhh_matrix.sum(axis=0)
+        else:
+            bh = self.bhhh_matrix
 
         mat = pd.DataFrame(
             columns=self.betas,
