@@ -88,6 +88,48 @@ class BaseModel(object):
         """
         return OrderedDict()
 
+    def build_cost_updates_fn(self, updates):
+        self.cost_updates_fn = function(
+            name="cost_updates",
+            inputs=self.x + [self.y, self.learning_rate, self.index],
+            outputs=self.cost,
+            updates=updates,
+        )
+
+    def predict(self, ds, return_probabilities=False):
+        if not "choice_probabilities_fn" in dir(self):
+            self.choice_probabilities_fn = function(
+                name="choice_probabilities",
+                inputs=self.x,
+                outputs=self.p_y_given_x,
+            )
+
+        if not "choice_predictions_fn" in dir(self):
+            self.choice_predictions_fn = function(
+                name="choice_predictions", inputs=self.x, outputs=self.pred
+            )
+
+        valid_data = ds.valid_dataset(self.x)
+
+        if return_probabilities:
+            choice = self.choice_probabilities_fn(*valid_data)
+        else:
+            choice = self.choice_predictions_fn(*valid_data)
+        return choice
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def __repr__(self):
+        return pprint(self.cost)
+
+    def __getattr__(self, name):
+        if (name == "hessian_fn") or (name == "gradient_vector_fn"):
+            self.build_gh_fn()
+            return getattr(self, name)
+        else:
+            return False
+
 
 def extract_params(cost, variables):
     """Extracts Param objects from variables

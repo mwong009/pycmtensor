@@ -85,22 +85,14 @@ class MNL(BaseModel):
             name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
         )
 
-        self.choice_probabilities_fn = aesara.function(
-            name="choice_probabilities",
-            inputs=self.x,
-            outputs=self.p_y_given_x.swapaxes(0, 1),
-        )
-
-        self.choice_predictions_fn = aesara.function(
-            name="choice_predictions", inputs=self.x, outputs=self.pred
-        )
-
         self.prediction_error_fn = aesara.function(
             name="prediction_error",
             inputs=self.x + [self.y],
             outputs=errors(self.p_y_given_x, self.y),
         )
 
+    def build_gh_fn(self):
+        """method to construct aesara functions for hessians and gradient vectors"""
         self.hessian_fn = aesara.function(
             name="hessian",
             inputs=self.x + [self.y, self.index],
@@ -115,8 +107,26 @@ class MNL(BaseModel):
             allow_input_downcast=True,
         )
 
-    def __str__(self):
-        return f"{self.name}"
+    def build_cost_updates_fn(self, updates):
+        """Method to call to build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
 
-    def __repr__(self):
-        return pprint(self.cost)
+        Args:
+            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
+        """
+        BaseModel.build_cost_updates_fn(self, updates)
+
+    def predict(self, ds, return_probabilities=False):
+        """predicts the output of the most likely alternative given the validation dataset in `ds`. The formula is:
+
+        $$
+            argmax(p_n(y|x))
+        $$
+
+        Args:
+            ds (Dataset): pycmtensor dataset
+            return_probabilities (bool): if true, returns the probability vector instead
+
+        Returns:
+            (numpy.ndarray): the predicted choices or the vector of probabilities
+        """
+        return BaseModel.predict(self, ds, return_probabilities)
