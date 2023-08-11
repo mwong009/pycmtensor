@@ -1,9 +1,7 @@
 # statistics.py
 """PyCMTensor statistics module"""
-import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
-from aesara import function
 from numpy import nan_to_num as nan2num
 from scipy import stats
 
@@ -14,7 +12,6 @@ __all__ = [
     "rob_stderror",
     "stderror",
     "t_test",
-    "elasticities",
 ]
 
 
@@ -108,28 +105,3 @@ def rob_correlation_matrix(h, bh):
         mat = np.full_like(rob_var_covar, np.finfo(float).max)
 
     return mat
-
-
-def elasticities(model, db, y: int, x: str):
-    """Returns the disaggregate point elasticities of choice y wrt x
-
-    Args:
-        model (PyCMTensorModel): the model class object
-        db (pycmtensor.Data): the database object
-        y (int): the alternative index
-        x (str): the name of the variable to derive the elasticities
-
-    Returns:
-        list: the disaggregate point elasticity E_n
-    """
-    fn_elasticity = function(
-        inputs=model.inputs,
-        outputs=aet.grad(
-            aet.sum(model.p_y_given_x[y]), db[x], disconnected_inputs="ignore"
-        )
-        * db[x]
-        / model.p_y_given_x[y],
-        on_unused_input="ignore",
-    )
-    data = db.train(model.inputs)
-    return fn_elasticity(*data)

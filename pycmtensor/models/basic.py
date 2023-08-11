@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from time import perf_counter
 
+import aesara.tensor as aet
 import numpy as np
 from aesara import function, pprint
 
@@ -116,6 +117,23 @@ class BaseModel(object):
         else:
             choice = self.choice_predictions_fn(*valid_data)
         return choice
+
+    def elasticities(self, ds, wrt_choice):
+        p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
+        while p_y_given_x.ndim > 1:
+            p_y_given_x = aet.sum(p_y_given_x, axis=1)
+        dy_dx = aet.grad(aet.sum(p_y_given_x), self.x, disconnected_inputs="ignore")
+
+        if not "elasticity_fn" in dir(self):
+            self.elasticity_fn = function(
+                inputs=self.x + [self.y, self.index],
+                outputs={x.name: g * x / p_y_given_x for g, x in zip(dy_dx, self.x)},
+                on_unused_input="ignore",
+            )
+        train_data = ds.train_dataset(self.x)
+        index = np.arange((len(train_data[-1])))
+        choice = (np.ones(shape=index.shape) * wrt_choice).astype(int)
+        return self.elasticity_fn(*train_data, choice, index)
 
     def __str__(self):
         return f"{self.name}"

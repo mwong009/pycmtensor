@@ -135,3 +135,38 @@ class MNL(BaseModel):
             (numpy.ndarray): the predicted choices or the vector of probabilities
         """
         return BaseModel.predict(self, ds, return_probabilities)
+
+    def elasticities(self, ds, wrt_choice):
+        """disaggregated point/cross elasticities of choice y wrt x
+
+        Args:
+            ds (pycmtensor.Dataset): dataset containing the training data
+            wrt_choice (int): alternative to evaluate the variables on
+
+        Returns:
+            (dict): the disaggregate point elasticities of x
+
+        !!! example
+
+            To calculate the elasticity of the choosing alternative 1 w.r.t. (represented by `wrt_choice`) w.r.t. to variable x.
+
+            ```python
+            disag_elas = self.elasticities(ds, wrt_choice=1)
+            ```
+
+            output:
+            ```console
+            {
+                'variable_1': array([...]),
+                'variable_2': array([...]),
+                ...
+            }
+            ```
+
+            The return values in the dictionary are the disaggregated elasticities. To calculate the aggregated elasticities, use `np.mean()`.
+
+        !!! note
+
+            This function returns the elasticities for *all* variables. To obtain the point or cross elasticities, simply select the appropriate dictionary key from the output (`wrt_choice` w.r.t. x).
+        """
+        return BaseModel.elasticities(self, ds, wrt_choice)
