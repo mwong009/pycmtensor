@@ -297,6 +297,14 @@ class Param(TensorExpressions):
     def shape(self):
         return self._init_value.shape
 
+    @property
+    def T(self):
+        raise NotImplementedError
+
+    @property
+    def init_type(self):
+        raise NotImplementedError
+
     def __call__(self):
         """Returns the shared value"""
         return self.shared_var
@@ -409,7 +417,7 @@ class Bias(Param):
 
         Args:
             name (str): name of the parameter
-            size (Union[tuple,list]): size of the array
+            size (Union[tuple,list]): size of the array in 1 dimension
             value (numpy.ndarray): initial values of the parameter, if `None` given,
                 defaults to `0`
         """
@@ -420,9 +428,6 @@ class Bias(Param):
 
         if value is None:
             value = np.zeros(size, dtype=FLOATX)
-
-        if value.shape != size:
-            raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_type = "bias"
         self._init_value = value
@@ -441,27 +446,27 @@ class Bias(Param):
 
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = True
-            if other.shape[-1] != self().shape[0]:
-                pad_left = False
+            pad_left = False
+            if aet.eq(other.shape[-1], self().shape[0]):
+                pad_left = True
 
             b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
             return b + other
 
         else:
-            super().__add__(other)
+            return super().__add__(other)
 
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = True
-            if other.shape[-1] != self().shape[0]:
-                pad_left = False
+            pad_left = False
+            if aet.eq(other.shape[-1], self().shape[0]):
+                pad_left = True
 
             b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
             return b + other
 
         else:
-            super().__add__(other)
+            return super().__add__(other)
 
 
 class Weight(Param):
@@ -517,10 +522,8 @@ class Weight(Param):
                 value = rng.uniform(-1, 1, size) * scale
             else:
                 debug(f"Weight {self.name} using default initialization U(-0.1, 0.1)")
+                init_type = "uniform(-0.1, 0.1)"
                 value = rng.uniform(-0.1, 0.1, size=size)
-
-        if value.shape != size:
-            raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_type = init_type
         self._init_value = value
