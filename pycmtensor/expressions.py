@@ -82,7 +82,8 @@ class TensorExpressions:
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() + other
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
+            print((self() + other()).eval())
             return self() + other()
         else:
             raise NotImplementedError(
@@ -92,7 +93,7 @@ class TensorExpressions:
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other + self()
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return other() + self()
         else:
             raise NotImplementedError(
@@ -102,7 +103,7 @@ class TensorExpressions:
     def __sub__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() - other
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return self() - other()
         else:
             raise NotImplementedError(
@@ -112,7 +113,7 @@ class TensorExpressions:
     def __rsub__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other - self()
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return other() - self()
         else:
             raise NotImplementedError(
@@ -125,7 +126,7 @@ class TensorExpressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -138,7 +139,7 @@ class TensorExpressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -148,7 +149,7 @@ class TensorExpressions:
     def __div__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() / other
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return self() / other()
         else:
             raise NotImplementedError(
@@ -158,7 +159,7 @@ class TensorExpressions:
     def __rdiv__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return other / self()
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return other() / self()
         else:
             raise NotImplementedError(
@@ -171,7 +172,7 @@ class TensorExpressions:
     def __pow__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.pow(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.pow(self(), other())
         else:
             raise NotImplementedError(
@@ -181,7 +182,7 @@ class TensorExpressions:
     def __rpow__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.pow(other, self())
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.pow(other(), self())
         else:
             raise NotImplementedError(
@@ -191,7 +192,7 @@ class TensorExpressions:
     def __lt__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.lt(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.lt(self(), other())
         else:
             raise NotImplementedError(
@@ -201,7 +202,7 @@ class TensorExpressions:
     def __le__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.le(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.le(self(), other())
         else:
             raise NotImplementedError(
@@ -211,7 +212,7 @@ class TensorExpressions:
     def __gt__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.gt(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.gt(self(), other())
         else:
             raise NotImplementedError(
@@ -221,7 +222,7 @@ class TensorExpressions:
     def __ge__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.ge(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.ge(self(), other())
         else:
             raise NotImplementedError(
@@ -231,7 +232,7 @@ class TensorExpressions:
     def __eq__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.eq(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.eq(self(), other())
         else:
             raise NotImplementedError(
@@ -241,7 +242,7 @@ class TensorExpressions:
     def __ne__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return aet.neq(self(), other)
-        elif isinstance(other, self):
+        elif isinstance(other, Param):
             return aet.neq(self(), other())
         else:
             raise NotImplementedError(
@@ -295,6 +296,14 @@ class Param(TensorExpressions):
     @property
     def shape(self):
         return self._init_value.shape
+
+    @property
+    def T(self):
+        raise NotImplementedError
+
+    @property
+    def init_type(self):
+        raise NotImplementedError
 
     def __call__(self):
         """Returns the shared value"""
@@ -368,8 +377,10 @@ class RandomDraws(TensorExpressions):
 
             - `"normal"`
             - `"lognormal"`
-
-            other distribution are also possible, see https://numpy.org/doc/stable/reference/random/generator.html#distributions. The distributions will be initialized with their default values e.g. `gumbel(loc=0., scale=1.)`
+            - `"gumbel"`
+            - `"exponential"`
+            - `"gamma"`
+            - `"poisson"`
         """
         self._name = name
         self.n_draws = n_draws
@@ -379,23 +390,25 @@ class RandomDraws(TensorExpressions):
             rv_n = srng.normal(size=(n_draws, 1))
         elif draw_type == "lognormal":
             rv_n = srng.lognormal(size=(n_draws, 1))
+        elif draw_type == "gumbel":
+            rv_n = srng.gumbel(loc=0.0, scale=1.0, size=(n_draws, 1))
+        elif draw_type == "exponential":
+            rv_n = srng.exponential(scale=1.0, size=(n_draws, 1))
+        elif draw_type == "gamma":
+            rv_n = srng.gamma(shape=1.0, rate=1.0, size=(n_draws, 1))
+        elif draw_type == "poisson":
+            rv_n = srng.poisson(lam=1.0, size=(n_draws, 1))
         else:
-            rv_n = getattr(srng, draw_type.lower())(size=(n_draws, 1))
+            raise NotImplementedError
         self.shared_var = aesara.shared(rv_n.eval(), name=self.name)
 
     @property
     def name(self):
+        """returns the name of the random draw tensor variable"""
         return self._name
-
-    def __call__(self):
-        return self.shared_var
 
     def __repr__(self):
         return f"RandomDraws({self.name}, size=({self.n_draws}, 1))"
-
-    def get_value(self):
-        """Returns the numpy representation of the parameter value"""
-        return self.shared_var.get_value()
 
 
 class Bias(Param):
@@ -404,7 +417,7 @@ class Bias(Param):
 
         Args:
             name (str): name of the parameter
-            size (Union[tuple,list]): size of the array
+            size (Union[tuple,list]): size of the array in 1 dimension
             value (numpy.ndarray): initial values of the parameter, if `None` given,
                 defaults to `0`
         """
@@ -415,9 +428,6 @@ class Bias(Param):
 
         if value is None:
             value = np.zeros(size, dtype=FLOATX)
-
-        if value.shape != size:
-            raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_type = "bias"
         self._init_value = value
@@ -436,27 +446,27 @@ class Bias(Param):
 
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = True
-            if other.shape[-1] != self().shape[0]:
-                pad_left = False
+            pad_left = False
+            if aet.eq(other.shape[-1], self().shape[0]):
+                pad_left = True
 
             b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
             return b + other
 
         else:
-            super().__add__(other)
+            return super().__add__(other)
 
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = True
-            if other.shape[-1] != self().shape[0]:
-                pad_left = False
+            pad_left = False
+            if aet.eq(other.shape[-1], self().shape[0]):
+                pad_left = True
 
             b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
             return b + other
 
         else:
-            super().__add__(other)
+            return super().__add__(other)
 
 
 class Weight(Param):
@@ -512,10 +522,8 @@ class Weight(Param):
                 value = rng.uniform(-1, 1, size) * scale
             else:
                 debug(f"Weight {self.name} using default initialization U(-0.1, 0.1)")
+                init_type = "uniform(-0.1, 0.1)"
                 value = rng.uniform(-0.1, 0.1, size=size)
-
-        if value.shape != size:
-            raise ValueError(f"init_value argument is not a valid array of size {size}")
 
         self._init_type = init_type
         self._init_value = value

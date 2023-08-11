@@ -151,6 +151,33 @@ class MNL(BaseModel):
 
         Returns:
             (numpy.ndarray): the predicted choices or the vector of probabilities
+
+        !!! example
+
+            To return predicted choices:
+            ```python
+            predictions = self.predict(ds)
+            print(predictions)
+            ```
+
+            output:
+            ```console
+            {'pred_choice': array([...])}
+            ```
+
+            To return probabilities:
+            ```python
+            prob = self.predict(ds, return_probabilities=True)
+            print(prob)
+            ```
+
+            output:
+            ```console
+            {   0: array([...]),
+                1: array([...]),
+                ...
+            }
+            ```
         """
         return BaseModel.predict(self, ds, return_probabilities)
 

@@ -14,22 +14,14 @@ import pycmtensor.expressions as expressions
 
 @pytest.fixture(scope="module")
 def exp_parser():
+    # random equation
+    x = aet.scalar("x")
+    b = aet.scalar("b")
+    y = 3 * x + b
+    ep = expressions.ExpressionParser(y)
+    assert isinstance(ep.expression, str)
+
     return expressions.ExpressionParser()
-
-
-# @pytest.fixture
-# def beta_class():
-#     return expressions.Beta("b_cost", 1.0, -10.0, 10, 0)
-
-
-# @pytest.fixture
-# def weight_class(rng):
-#     return expressions.Weight("w_f1", size=(128, 128), init_type="he", rng=rng)
-
-
-# @pytest.fixture
-# def rng():
-#     return np.random.default_rng(42069)
 
 
 def test_parser(exp_parser):
@@ -39,62 +31,64 @@ def test_parser(exp_parser):
     assert all([s in symbols for s in variables])
 
 
-# def test_beta_constructor(beta_class):
-#     b_cost = beta_class
-#     assert b_cost.name == "b_cost"
-#     assert isinstance(b_cost(), TensorSharedVariable)
-#     with pytest.raises(AttributeError):
-#         b_cost.status = 1
+def test_construct_beta():
+    b_test = expressions.Beta("b_test", value=1.0)
+
+    assert isinstance(b_test, expressions.Param)
+    assert isinstance(b_test, expressions.TensorExpressions)
+
+    with pytest.raises(NotImplementedError):
+        b_test.T
+
+    with pytest.raises(NotImplementedError):
+        assert b_test.init_type == 2
 
 
-# def test_beta_update(beta_class):
-#     b_cost = beta_class
-#     assert b_cost().get_value() == 1.0
-#     assert b_cost.get_value() == 1.0
-#     f = function(
-#         inputs=[],
-#         outputs=b_cost(),
-#         updates=[(b_cost(), b_cost() + 1.0)],
-#     )
-#     for _ in range(2):
-#         value = f()
-#     assert value == 2.0
+def test_construct_weights_and_biases():
+    w_layer1 = expressions.Weight("w_layer1", size=[3, 5])
+    bias_layer1 = expressions.Bias("bias_layer1", size=(5,))
+
+    assert bias_layer1.init_type == "bias"
+    assert all(bias_layer1.T.eval() == bias_layer1.get_value())
+
+    assert w_layer1.init_type == "uniform(-0.1, 0.1)"
+
+    w_layer1 = expressions.Weight("w_layer1", size=[3, 5], init_type="zeros")
+    w_layer1 = expressions.Weight("w_layer1", size=[3, 5], init_type="glorot")
+    w_layer1 = expressions.Weight("w_layer1", size=[3, 5], init_type="he")
+
+    with pytest.raises(ValueError):
+        w_layer1_fail = expressions.Weight("w_layer1_fail", size=[3, 5, 4])
+
+    with pytest.raises(ValueError):
+        bias_layer1_fail = expressions.Bias("bias_layer1_fail", size=[3, 4])
+
+    with pytest.raises(TypeError):
+        bias_layer1_fail = expressions.Bias("bias_layer1_fail", size=4)
 
 
-# def test_weight_constructor(weight_class):
-#     w = weight_class
-#     assert w.shape == (128, 128)
-#     assert isinstance(w(), TensorSharedVariable)
+def test_bias_add():
+    x = aet.vector("x")
+    bias_layer1 = expressions.Bias("bias_layer1", size=(5,))
 
-#     with pytest.raises(ValueError):
-#         new_weight = expressions.Weight("nw", (2,))
+    g = aesara.shared(np.random.normal(size=(3, 5)))
+    y = bias_layer1 + g
 
-#     with pytest.raises(ValueError):
-#         new_weight = expressions.Weight("nw", (5, 5), init_value=np.eye(3))
+    assert (aet.eq(g.shape[-1], bias_layer1.shape[0])).eval()
+    assert y.eval().shape == (3, 5)
 
-
-# def test_weight_init(rng):
-#     w = expressions.Weight("w_none", (5, 5), rng=rng, init_type=None)
-#     gl = expressions.Weight("w_glorot", (5, 5), rng=rng, init_type="glorot")
+    w_layer1 = expressions.Weight("w_layer1", size=[3, 5], init_type="he")
+    y = (bias_layer1 + w_layer1) + (w_layer1 + bias_layer1)
+    assert y.eval().shape == (3, 5)
 
 
-# def test_weight_he(weight_class, rng):
-#     a = aesara.shared(rng.normal(size=(128,)))
+def test_construct_random_draws():
+    rnd_test = expressions.RandomDraws("rnd_test", "normal", 20)
+    rnd_test_log = expressions.RandomDraws("rnd_test_log", "lognormal", 20)
+    gumbel = expressions.RandomDraws("rnd_test2", "gumbel", 20)
+    exponential = expressions.RandomDraws("rnd_test2", "exponential", 20)
+    gamma = expressions.RandomDraws("rnd_test2", "gamma", 20)
+    poisson = expressions.RandomDraws("rnd_test2", "poisson", 20)
 
-#     for _ in range(22):
-#         w = copy(weight_class)
-#         a = aet.nnet.relu(aet.dot(w(), a))
-
-#     assert round(float(aet.mean(a).eval()), 3) == 2.082
-#     assert round(float(aet.std(a).eval()), 3) == 2.942
-
-
-# def test_weight_glorot(rng):
-#     glorot = expressions.Weight("w_glorot", (128, 128), rng=rng, init_type="glorot")
-#     a = aesara.shared(rng.normal(size=(128,)))
-
-#     for _ in range(22):
-#         w = copy(glorot)
-#         a = tanh(aet.dot(w(), a))
-#     assert round(float(aet.mean(a).eval()), 3) == 0.008
-#     assert round(float(aet.std(a).eval()), 3) == 0.194
+    with pytest.raises(NotImplementedError):
+        rnd_test_3 = expressions.RandomDraws("rnd_test3", "notgumbel", 20)

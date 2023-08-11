@@ -92,18 +92,14 @@ class BaseModel(object):
                 outputs=self.p_y_given_x,
             )
 
-        if not "choice_predictions_fn" in dir(self):
-            self.choice_predictions_fn = function(
-                name="choice_predictions", inputs=self.x, outputs=self.pred
-            )
-
         valid_data = ds.valid_dataset(self.x)
 
+        prob = self.choice_probabilities_fn(*valid_data)
+
         if return_probabilities:
-            choice = self.choice_probabilities_fn(*valid_data)
+            return {i: prob[i] for i in range(prob.shape[0])}
         else:
-            choice = self.choice_predictions_fn(*valid_data)
-        return choice
+            return {"pred_" + ds.choice: np.argmax(prob, axis=0)}
 
     def elasticities(self, ds, wrt_choice):
         p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
@@ -186,6 +182,13 @@ def drop_unused_variables(cost, params, variables):
 
 
 def train(model, ds, **kwargs):
+    """main training loop
+
+    Args:
+        model (pycmtensor.models.BaseModel): model to train
+        ds (pycmtensor.dataset.Dataset): dataset to use for training
+        **kwargs: overloaded keyword arguments. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+    """
     for key, value in kwargs.items():
         model.config.add(key, value)
 
