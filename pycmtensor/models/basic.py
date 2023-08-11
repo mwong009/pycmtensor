@@ -46,47 +46,34 @@ class BaseModel(object):
 
     @property
     def n_params(self):
-        """Return the total number of estimated parameters"""
         return self.n_betas + self.n_weights + self.n_biases
 
     @property
     def n_betas(self):
-        """Return the number of estimated Betas"""
         return len(self.betas)
 
     @property
     def n_weights(self):
-        """Return the total number of estimated Weight parameters"""
         return np.sum([np.prod(w.shape) for w in self.weights])
 
     @property
     def n_biases(self):
-        """Return the total number of estimated Weight parameters"""
         return np.sum([np.prod(b.shape) for b in self.biases])
 
     def get_weights(self):
-        """Returns a dict of Weight values"""
         return {w.name: w.get_value() for w in self.weights}
 
     def get_biases(self):
-        """Returns a dict of Weight values"""
         return {b.name: b.get_value() for b in self.biases}
 
     def get_betas(self):
-        """Returns a dict of Beta values"""
         return {beta.name: beta.get_value() for beta in self.betas}
 
     def reset_values(self):
-        """Resets Model parameters to their initial value"""
         for p in self.params:
             p.reset_value()
 
     def include_params_for_convergence(self, *args, **kwargs):
-        """Returns a Ordered dict of parameters values to check for convergence
-
-        Returns:
-            (OrderedDict): ordered dictionary of parameter values
-        """
         return OrderedDict()
 
     def build_cost_updates_fn(self, updates):

@@ -22,7 +22,7 @@ class MNL(BaseModel):
 
         Args:
             ds (pycmtensor.Data): the database object
-            params (Dict): dictionary of name:parameter pair
+            params (dict): model tensor variables
             utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
             av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
@@ -79,8 +79,26 @@ class MNL(BaseModel):
         self.results.build_time = time_format(build_time)
         info(f"Build time = {self.results.build_time}")
 
+    @property
+    def n_params(self):
+        """Return the total number of estimated parameters"""
+        return super().n_params
+
+    @property
+    def n_betas(self):
+        """Return the number of estimated Betas"""
+        return super().n_betas
+
+    def get_betas(self):
+        """Returns a dict of Beta values"""
+        return super().get_betas()
+
+    def reset_values(self):
+        """Resets Model parameters to their initial value"""
+        return super().reset_values()
+
     def build_cost_fn(self):
-        """method to construct aesara functions for cost and prediction errors"""
+        """constructs aesara functions for cost and prediction errors"""
         self.log_likelihood_fn = aesara.function(
             name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
         )
@@ -92,7 +110,7 @@ class MNL(BaseModel):
         )
 
     def build_gh_fn(self):
-        """method to construct aesara functions for hessians and gradient vectors
+        """constructs aesara functions for hessians and gradient vectors
 
         !!! note
 
@@ -113,7 +131,7 @@ class MNL(BaseModel):
         )
 
     def build_cost_updates_fn(self, updates):
-        """Method to call to build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
+        """build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
 
         Args:
             updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
