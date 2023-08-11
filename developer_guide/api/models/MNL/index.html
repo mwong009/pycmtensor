@@ -684,6 +684,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.n_betas" class="md-nav__link">
+    n_betas
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.n_params" class="md-nav__link">
+    n_params
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.build_cost_fn" class="md-nav__link">
+    build_cost_fn()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.models.MNL.MNL.build_cost_updates_fn" class="md-nav__link">
     build_cost_updates_fn()
   </a>
@@ -691,8 +712,36 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL.MNL.build_fn" class="md-nav__link">
-    build_fn()
+  <a href="#pycmtensor.models.MNL.MNL.build_gh_fn" class="md-nav__link">
+    build_gh_fn()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.elasticities" class="md-nav__link">
+    elasticities()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.get_betas" class="md-nav__link">
+    get_betas()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.predict" class="md-nav__link">
+    predict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.reset_values" class="md-nav__link">
+    reset_values()
   </a>
   
 </li>
@@ -871,6 +920,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.n_betas" class="md-nav__link">
+    n_betas
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.n_params" class="md-nav__link">
+    n_params
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.build_cost_fn" class="md-nav__link">
+    build_cost_fn()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.models.MNL.MNL.build_cost_updates_fn" class="md-nav__link">
     build_cost_updates_fn()
   </a>
@@ -878,8 +948,36 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.MNL.MNL.build_fn" class="md-nav__link">
-    build_fn()
+  <a href="#pycmtensor.models.MNL.MNL.build_gh_fn" class="md-nav__link">
+    build_gh_fn()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.elasticities" class="md-nav__link">
+    elasticities()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.get_betas" class="md-nav__link">
+    get_betas()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.predict" class="md-nav__link">
+    predict()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.MNL.MNL.reset_values" class="md-nav__link">
+    reset_values()
   </a>
   
 </li>
@@ -974,11 +1072,11 @@
         <tr>
           <td><code>params</code></td>
           <td>
-                <code>Dict</code>
+                <code>dict</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>dictionary of name:parameter pair</p>
+              <p>model tensor variables</p>
             </div>
           </td>
           <td>
@@ -1143,7 +1241,67 @@ availability is set to 1</p>
 
 
 
+<div class="doc doc-object doc-attribute">
 
+
+
+<h3 id="pycmtensor.models.MNL.MNL.n_betas" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n_betas</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pycmtensor.models.MNL.MNL.n_betas" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the number of estimated Betas</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.n_params" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">n_params</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pycmtensor.models.MNL.MNL.n_params" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the total number of estimated parameters</p>
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.build_cost_fn" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">build_cost_fn</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.MNL.MNL.build_cost_fn" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>constructs aesara functions for cost and prediction errors</p>
+
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -1157,7 +1315,7 @@ availability is set to 1</p>
 
   <div class="doc doc-contents ">
   
-      <p>Method to call to build/rebuilt cost function with updates to the model. Creates a class function <code>MNL.cost_updates_fn(*inputs, output, lr)</code> that receives a list of input variable arrays, the output array, and a learning rate.</p>
+      <p>build/rebuilt cost function with updates to the model. Creates a class function <code>MNL.cost_updates_fn(*inputs, output, lr)</code> that receives a list of input variable arrays, the output array, and a learning rate.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1195,15 +1353,240 @@ availability is set to 1</p>
 
 
 
-<h3 id="pycmtensor.models.MNL.MNL.build_fn" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">build_fn</span><span class="p">()</span></code>
+<h3 id="pycmtensor.models.MNL.MNL.build_gh_fn" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">build_gh_fn</span><span class="p">()</span></code>
 
-<a href="#pycmtensor.models.MNL.MNL.build_fn" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.models.MNL.MNL.build_gh_fn" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
   
-      <p>Method to call to build mathematical operations without updates to the model</p>
+      <p>constructs aesara functions for hessians and gradient vectors</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The hessians and gradient vector are evaluation at the maximum <strong>log likelihood</strong> estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.</p>
+</div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.elasticities" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">elasticities</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">wrt_choice</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.MNL.MNL.elasticities" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>disaggregated point/cross elasticities of choice y wrt x</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>ds</code></td>
+          <td>
+                <code><span title="pycmtensor.pycmtensor">pycmtensor</span>.<span title="pycmtensor.pycmtensor.Dataset">Dataset</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dataset containing the training data</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>wrt_choice</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>alternative to evaluate the variables on</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the disaggregate point elasticities of x</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>To calculate the elasticity of the choosing alternative 1 w.r.t. (represented by <code>wrt_choice</code>) w.r.t. to variable x.</p>
+<div class="highlight"><pre><span></span><code><span class="n">disag_elas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elasticities</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">wrt_choice</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p>output:
+<div class="highlight"><pre><span></span><code><span class="go">{</span>
+<span class="go">    &#39;variable_1&#39;: array([...]),</span>
+<span class="go">    &#39;variable_2&#39;: array([...]),</span>
+<span class="go">    ...</span>
+<span class="go">}</span>
+</code></pre></div></p>
+<p>The return values in the dictionary are the disaggregated elasticities. To calculate the aggregated elasticities, use <code>np.mean()</code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function returns the elasticities for <em>all</em> variables. To obtain the point or cross elasticities, simply select the appropriate dictionary key from the output (<code>wrt_choice</code> w.r.t. x).</p>
+</div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.get_betas" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_betas</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.MNL.MNL.get_betas" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns a dict of Beta values</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.predict" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.MNL.MNL.predict" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>predicts the output of the most likely alternative given the validation dataset in <code>ds</code>. The formula is:</p>
+<div class="arithmatex">\[
+    argmax(p_n(y|x))
+\]</div>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>ds</code></td>
+          <td>
+                <code>Dataset</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>pycmtensor dataset</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>return_probabilities</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if true, returns the probability vector instead</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the predicted choices or the vector of probabilities</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.MNL.MNL.reset_values" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">reset_values</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.MNL.MNL.reset_values" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Resets Model parameters to their initial value</p>
 
   </div>
 
