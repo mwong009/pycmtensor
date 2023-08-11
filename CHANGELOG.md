@@ -1,3 +1,13 @@
+## v1.6.3 (2023-08-11)
+
+### Fix
+
+- **expressions.py**: use predefined draw types for random draws
+- **basic.py**: include choice label(s) as a dictionary for `predict()`
+- moved elasticities from statistics to model
+
+## v1.6.2 (2023-08-10)
+
 ## v1.6.1 (2023-08-10)
 
 ### Fix
