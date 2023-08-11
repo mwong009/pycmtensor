@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from time import perf_counter
 
+import aesara.tensor as aet
 import numpy as np
 from aesara import function, pprint
 
@@ -45,47 +46,34 @@ class BaseModel(object):
 
     @property
     def n_params(self):
-        """Return the total number of estimated parameters"""
         return self.n_betas + self.n_weights + self.n_biases
 
     @property
     def n_betas(self):
-        """Return the number of estimated Betas"""
         return len(self.betas)
 
     @property
     def n_weights(self):
-        """Return the total number of estimated Weight parameters"""
         return np.sum([np.prod(w.shape) for w in self.weights])
 
     @property
     def n_biases(self):
-        """Return the total number of estimated Weight parameters"""
         return np.sum([np.prod(b.shape) for b in self.biases])
 
     def get_weights(self):
-        """Returns a dict of Weight values"""
         return {w.name: w.get_value() for w in self.weights}
 
     def get_biases(self):
-        """Returns a dict of Weight values"""
         return {b.name: b.get_value() for b in self.biases}
 
     def get_betas(self):
-        """Returns a dict of Beta values"""
         return {beta.name: beta.get_value() for beta in self.betas}
 
     def reset_values(self):
-        """Resets Model parameters to their initial value"""
         for p in self.params:
             p.reset_value()
 
     def include_params_for_convergence(self, *args, **kwargs):
-        """Returns a Ordered dict of parameters values to check for convergence
-
-        Returns:
-            (OrderedDict): ordered dictionary of parameter values
-        """
         return OrderedDict()
 
     def build_cost_updates_fn(self, updates):
@@ -116,6 +104,23 @@ class BaseModel(object):
         else:
             choice = self.choice_predictions_fn(*valid_data)
         return choice
+
+    def elasticities(self, ds, wrt_choice):
+        p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
+        while p_y_given_x.ndim > 1:
+            p_y_given_x = aet.sum(p_y_given_x, axis=1)
+        dy_dx = aet.grad(aet.sum(p_y_given_x), self.x, disconnected_inputs="ignore")
+
+        if not "elasticity_fn" in dir(self):
+            self.elasticity_fn = function(
+                inputs=self.x + [self.y, self.index],
+                outputs={x.name: g * x / p_y_given_x for g, x in zip(dy_dx, self.x)},
+                on_unused_input="ignore",
+            )
+        train_data = ds.train_dataset(self.x)
+        index = np.arange((len(train_data[-1])))
+        choice = (np.ones(shape=index.shape) * wrt_choice).astype(int)
+        return self.elasticity_fn(*train_data, choice, index)
 
     def __str__(self):
         return f"{self.name}"

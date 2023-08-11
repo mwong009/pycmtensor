@@ -22,7 +22,7 @@ class MNL(BaseModel):
 
         Args:
             ds (pycmtensor.Data): the database object
-            params (Dict): dictionary of name:parameter pair
+            params (dict): model tensor variables
             utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
             av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
@@ -79,8 +79,26 @@ class MNL(BaseModel):
         self.results.build_time = time_format(build_time)
         info(f"Build time = {self.results.build_time}")
 
+    @property
+    def n_params(self):
+        """Return the total number of estimated parameters"""
+        return super().n_params
+
+    @property
+    def n_betas(self):
+        """Return the number of estimated Betas"""
+        return super().n_betas
+
+    def get_betas(self):
+        """Returns a dict of Beta values"""
+        return super().get_betas()
+
+    def reset_values(self):
+        """Resets Model parameters to their initial value"""
+        return super().reset_values()
+
     def build_cost_fn(self):
-        """method to construct aesara functions for cost and prediction errors"""
+        """constructs aesara functions for cost and prediction errors"""
         self.log_likelihood_fn = aesara.function(
             name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
         )
@@ -92,7 +110,7 @@ class MNL(BaseModel):
         )
 
     def build_gh_fn(self):
-        """method to construct aesara functions for hessians and gradient vectors
+        """constructs aesara functions for hessians and gradient vectors
 
         !!! note
 
@@ -113,7 +131,7 @@ class MNL(BaseModel):
         )
 
     def build_cost_updates_fn(self, updates):
-        """Method to call to build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
+        """build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
 
         Args:
             updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
@@ -135,3 +153,38 @@ class MNL(BaseModel):
             (numpy.ndarray): the predicted choices or the vector of probabilities
         """
         return BaseModel.predict(self, ds, return_probabilities)
+
+    def elasticities(self, ds, wrt_choice):
+        """disaggregated point/cross elasticities of choice y wrt x
+
+        Args:
+            ds (pycmtensor.Dataset): dataset containing the training data
+            wrt_choice (int): alternative to evaluate the variables on
+
+        Returns:
+            (dict): the disaggregate point elasticities of x
+
+        !!! example
+
+            To calculate the elasticity of the choosing alternative 1 w.r.t. (represented by `wrt_choice`) w.r.t. to variable x.
+
+            ```python
+            disag_elas = self.elasticities(ds, wrt_choice=1)
+            ```
+
+            output:
+            ```console
+            {
+                'variable_1': array([...]),
+                'variable_2': array([...]),
+                ...
+            }
+            ```
+
+            The return values in the dictionary are the disaggregated elasticities. To calculate the aggregated elasticities, use `np.mean()`.
+
+        !!! note
+
+            This function returns the elasticities for *all* variables. To obtain the point or cross elasticities, simply select the appropriate dictionary key from the output (`wrt_choice` w.r.t. x).
+        """
+        return BaseModel.elasticities(self, ds, wrt_choice)

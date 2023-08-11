@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
-import pycmtensor.models.layers as layers
-from pycmtensor.expressions import Beta
 from pycmtensor.statistics import *
 
 __all__ = ["Results"]
