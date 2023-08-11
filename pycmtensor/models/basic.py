@@ -103,7 +103,7 @@ class BaseModel(object):
             choice = self.choice_probabilities_fn(*valid_data)
         else:
             choice = self.choice_predictions_fn(*valid_data)
-        return choice
+        return choice.T
 
     def elasticities(self, ds, wrt_choice):
         p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
