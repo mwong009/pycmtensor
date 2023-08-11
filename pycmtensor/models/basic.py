@@ -182,6 +182,13 @@ def drop_unused_variables(cost, params, variables):
 
 
 def train(model, ds, **kwargs):
+    """main training loop
+
+    Args:
+        model (pycmtensor.models.BaseModel): model to train
+        ds (pycmtensor.dataset.Dataset): dataset to use for training
+        **kwargs: overloaded keyword arguments. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+    """
     for key, value in kwargs.items():
         model.config.add(key, value)
 
