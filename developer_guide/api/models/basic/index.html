@@ -674,19 +674,60 @@
     BaseModel
   </a>
   
+    <nav class="md-nav" aria-label="BaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.get_weights" class="md-nav__link">
+    get_weights()
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.basic.extract_params" class="md-nav__link">
+  <a href="#pycmtensor.models.basic.BaseModel.get_biases" class="md-nav__link">
+    get_biases()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.get_betas" class="md-nav__link">
+    get_betas()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.reset_values" class="md-nav__link">
+    reset_values()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.include_params_for_convergence" class="md-nav__link">
+    include_params_for_convergence()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.extract_params" class="md-nav__link">
     extract_params()
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.basic.drop_unused_variables" class="md-nav__link">
+  <a href="#pycmtensor.models.basic.BaseModel.drop_unused_variables" class="md-nav__link">
     drop_unused_variables()
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -740,6 +781,34 @@
     <li class="md-nav__item">
       <a href="../../optimizers/" class="md-nav__link">
         optimizers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/" class="md-nav__link">
+        results
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler/" class="md-nav__link">
+        scheduler
       </a>
     </li>
   
@@ -903,19 +972,60 @@
     BaseModel
   </a>
   
+    <nav class="md-nav" aria-label="BaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.get_weights" class="md-nav__link">
+    get_weights()
+  </a>
+  
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.basic.extract_params" class="md-nav__link">
+  <a href="#pycmtensor.models.basic.BaseModel.get_biases" class="md-nav__link">
+    get_biases()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.get_betas" class="md-nav__link">
+    get_betas()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.reset_values" class="md-nav__link">
+    reset_values()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.include_params_for_convergence" class="md-nav__link">
+    include_params_for_convergence()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel.extract_params" class="md-nav__link">
     extract_params()
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.models.basic.drop_unused_variables" class="md-nav__link">
+  <a href="#pycmtensor.models.basic.BaseModel.drop_unused_variables" class="md-nav__link">
     drop_unused_variables()
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1117,7 +1227,7 @@
         <tr>
           <td><code>results</code></td>
           <td>
-                <code><span title="pycmtensor.results.Results">Results</span></code>
+                <code><a class="autorefs autorefs-internal" title="pycmtensor.results.Results" href="../../results/#pycmtensor.results.Results">Results</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1141,23 +1251,238 @@
 
 
 
+<div class="doc doc-object doc-function">
 
 
-  </div>
+
+<h4 id="pycmtensor.models.basic.BaseModel.get_weights" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_weights</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.basic.BaseModel.get_weights" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>returns the values of the weights</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>weight values</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.models.basic.BaseModel.get_biases" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_biases</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.basic.BaseModel.get_biases" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>returns the values of the biases</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>biases values</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
 
 
-<h3 id="pycmtensor.models.basic.extract_params" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">extract_params</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></code>
+<h4 id="pycmtensor.models.basic.BaseModel.get_betas" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_betas</span><span class="p">()</span></code>
 
-<a href="#pycmtensor.models.basic.extract_params" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.models.basic.BaseModel.get_betas" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>returns the values of the betas</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>beta values</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.models.basic.BaseModel.reset_values" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">reset_values</span><span class="p">()</span></code>
+
+<a href="#pycmtensor.models.basic.BaseModel.reset_values" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>resets the values of all parameters</p>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.models.basic.BaseModel.include_params_for_convergence" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">include_params_for_convergence</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.basic.BaseModel.include_params_for_convergence" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>dummy method for additional parameter objects for calculating convergence</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>*args</code></td>
+          <td>
+                <code>None</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>overloaded arguments</p>
+            </div>
+          </td>
+          <td>
+                <code>()</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>overloaded keyword arguments</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="collections.OrderedDict">OrderedDict</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a dictonary of addition parameters to include</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="pycmtensor.models.basic.BaseModel.extract_params" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">extract_params</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+<a href="#pycmtensor.models.basic.BaseModel.extract_params" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
@@ -1214,10 +1539,14 @@
 
 
 
-<h3 id="pycmtensor.models.basic.drop_unused_variables" class="doc doc-heading">
+<h4 id="pycmtensor.models.basic.BaseModel.drop_unused_variables" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">drop_unused_variables</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
 
-<a href="#pycmtensor.models.basic.drop_unused_variables" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#pycmtensor.models.basic.BaseModel.drop_unused_variables" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
@@ -1306,6 +1635,15 @@
 
 </div>
 
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
 <div class="doc doc-object doc-function">
 
 
@@ -1362,6 +1700,7 @@
         <tr>
           <td><code>**kwargs</code></td>
           <td>
+                <code>dict</code>
           </td>
           <td>
             <div class="doc-md-description">

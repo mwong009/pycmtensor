@@ -787,6 +787,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../results/" class="md-nav__link">
+        results
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduler/" class="md-nav__link">
+        scheduler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../statistics/" class="md-nav__link">
         statistics
       </a>
@@ -1045,7 +1073,7 @@
 
 
 <h2 id="pycmtensor.models.MNL.MNL" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#pycmtensor.models.MNL.MNL" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -1084,13 +1112,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>params</code></td>
+          <td><code>variables</code></td>
           <td>
                 <code>dict</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>model tensor variables</p>
+              <p>dictionary containing Param objects or a dictionary of python variables</p>
             </div>
           </td>
           <td>
@@ -1160,7 +1188,8 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>symbolic variable objects for independent
+variables</p>
             </div>
           </td>
         </tr>
@@ -1171,7 +1200,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>symbolic variable object for the choice variable</p>
             </div>
           </td>
         </tr>
@@ -1182,7 +1211,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>concatenated list of x and y</p>
             </div>
           </td>
         </tr>
@@ -1193,7 +1222,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>model beta variables</p>
             </div>
           </td>
         </tr>
@@ -1204,7 +1233,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>symbolic cost tensor variable function</p>
             </div>
           </td>
         </tr>
@@ -1215,7 +1244,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>probability tensor variable function</p>
             </div>
           </td>
         </tr>
@@ -1226,7 +1255,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>loglikelihood tensor variable function</p>
             </div>
           </td>
         </tr>
@@ -1237,7 +1266,7 @@ availability is set to 1</p>
           </td>
           <td>
             <div class="doc-md-description">
-              
+              <p>prediction tensor variable function</p>
             </div>
           </td>
         </tr>
@@ -1271,7 +1300,7 @@ availability is set to 1</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return the number of estimated Betas</p>
+      <p>Return the number of estimated betas</p>
   </div>
 
 </div>
@@ -1497,7 +1526,29 @@ availability is set to 1</p>
 
   <div class="doc doc-contents ">
   
-      <p>Returns a dict of Beta values</p>
+      <p>returns the values of the betas</p>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>beta values</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
   </div>
 
@@ -1620,7 +1671,7 @@ availability is set to 1</p>
 
   <div class="doc doc-contents ">
   
-      <p>Resets Model parameters to their initial value</p>
+      <p>resets the values of all parameters</p>
 
   </div>
 
