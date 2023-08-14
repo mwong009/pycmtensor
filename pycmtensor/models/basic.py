@@ -131,54 +131,54 @@ class BaseModel(object):
         else:
             return False
 
+    @staticmethod
+    def extract_params(cost, variables):
+        """Extracts Param objects from variables
 
-def extract_params(cost, variables):
-    """Extracts Param objects from variables
+        Args:
+            cost (TensorVariable): function to evaluate
+            variables (Union[dict, list]): list of variables from the current program
+        """
+        params = []
+        symbols = ExpressionParser.parse(cost)
+        seen = set()
 
-    Args:
-        cost (TensorVariable): function to evaluate
-        variables (Union[dict, list]): list of variables from the current program
-    """
-    params = []
-    symbols = ExpressionParser.parse(cost)
-    seen = set()
+        if isinstance(variables, dict):
+            variables = [v for _, v in variables.items()]
 
-    if isinstance(variables, dict):
-        variables = [v for _, v in variables.items()]
+        for variable in variables:
+            if (not isinstance(variable, Param)) or isinstance(variable, Layer):
+                continue
 
-    for variable in variables:
-        if (not isinstance(variable, Param)) or isinstance(variable, Layer):
-            continue
+            if isinstance(variable, Param) and (variable.name in seen):
+                continue
 
-        if isinstance(variable, Param) and (variable.name in seen):
-            continue
+            if variable.name not in symbols:
+                # raise a warning if variable is not in any utility function
+                warning(f"{variable.name} not in any utility functions")
+                continue
 
-        if variable.name not in symbols:
-            # raise a warning if variable is not in any utility function
-            warning(f"{variable.name} not in any utility functions")
-            continue
+            params.append(variable)
+            seen.add(variable.name)
 
-        params.append(variable)
-        seen.add(variable.name)
+        return params
 
-    return params
+    @staticmethod
+    def drop_unused_variables(cost, params, variables):
+        """Internal method to remove ununsed tensors
 
+        Args:
+            cost (TensorVariable): function to evaluate
+            params (Param): param objects
+            variables (dict): list of array variables from the dataset
 
-def drop_unused_variables(cost, params, variables):
-    """Internal method to remove ununsed tensors
-
-    Args:
-        cost (TensorVariable): function to evaluate
-        params (Param): param objects
-        variables (dict): list of array variables from the dataset
-
-    Returns:
-        (list): a list of param names which are not used in the model
-    """
-    symbols = ExpressionParser.parse(cost)
-    param_names = [p.name for p in params]
-    symbols = [s for s in symbols if s not in param_names]
-    return [var for var in list(variables) if var not in symbols]
+        Returns:
+            (list): a list of param names which are not used in the model
+        """
+        symbols = ExpressionParser.parse(cost)
+        param_names = [p.name for p in params]
+        symbols = [s for s in symbols if s not in param_names]
+        return [var for var in list(variables) if var not in symbols]
 
 
 def train(model, ds, **kwargs):

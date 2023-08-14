@@ -12,7 +12,7 @@ from pycmtensor.functions import (
     second_order_derivative,
 )
 from pycmtensor.logger import info
-from pycmtensor.models.basic import BaseModel, drop_unused_variables, extract_params
+from pycmtensor.models.basic import BaseModel
 from pycmtensor.utils import time_format
 
 
@@ -60,11 +60,11 @@ class MNL(BaseModel):
             self.p_y_given_x, axis=0
         )  # expression for the prediction
 
-        self.params = extract_params(self.cost, params)
+        self.params = self.extract_params(self.cost, variables)
         self.betas = [p for p in self.params if isinstance(p, Beta)]
 
         # drop unused variables from dataset
-        drop_unused = drop_unused_variables(self.cost, self.params, ds())
+        drop_unused = self.drop_unused_variables(self.cost, self.params, ds())
         ds.drop(drop_unused)
 
         self.x = ds.x
