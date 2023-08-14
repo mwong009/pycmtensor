@@ -24,7 +24,8 @@ class ExpressionParser(object):
         if expression is not None:
             self.expression = str(pprint(expression))
 
-    def parse(self, expression):
+    @staticmethod
+    def parse(expression):
         """Parses Aesara Tensor string expression from `aesara.pprint()`. This function
         removes parentheses and Tensor operators and returns a 'clean' list of
         expressions

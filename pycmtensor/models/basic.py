@@ -140,7 +140,7 @@ def extract_params(cost, variables):
         variables (Union[dict, list]): list of variables from the current program
     """
     params = []
-    symbols = ExpressionParser().parse(cost)
+    symbols = ExpressionParser.parse(cost)
     seen = set()
 
     if isinstance(variables, dict):
@@ -175,7 +175,7 @@ def drop_unused_variables(cost, params, variables):
     Returns:
         (list): a list of param names which are not used in the model
     """
-    symbols = ExpressionParser().parse(cost)
+    symbols = ExpressionParser.parse(cost)
     param_names = [p.name for p in params]
     symbols = [s for s in symbols if s not in param_names]
     return [var for var in list(variables) if var not in symbols]
