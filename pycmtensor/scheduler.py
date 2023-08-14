@@ -76,7 +76,7 @@ class ConstantLR(Scheduler):
 
         Args:
             lr (float): initial learning rate
-            **kwargs: overloaded keyword arguments
+            **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr)
         self.name = "ConstantLR"
@@ -90,7 +90,7 @@ class StepLR(Scheduler):
             lr (float): initial learning rate
             factor (float): percentage reduction to the learning rate
             drop_every (int): step down the learning rate after every n steps
-            **kwargs: overloaded keyword arguments
+            **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr)
         self.name = "StepLR"
@@ -121,9 +121,9 @@ class PolynomialLR(Scheduler):
 
         Args:
             lr (float): initial learning rate value
-            max_steps (int): the max number of training epochs
+            max_epochs (int): the max number of training epochs
             power (float): the exponential factor to decay
-            **kwargs: overloaded keyword arguments
+            **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr)
         self.name = "PolynomialLR"
@@ -191,7 +191,7 @@ class TriangularCLR(CyclicLR):
             lr (float): initial learning rate value
             max_lr (float): peak learning rate value
             cycle_steps (int): the number of steps to complete a cycle
-            **kwargs: overloaded keyword arguments
+            **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr, max_lr, cycle_steps, scale_fn=self.scale_fn)
         self.name = "TriangularCLR"
@@ -213,7 +213,7 @@ class ExpRangeCLR(CyclicLR):
             max_lr (float): peak learning rate value
             cycle_steps (int): the number of steps to complete a cycle
             gamma (float): exponential parameter. Default=0.5
-            **kwargs: overloaded keyword arguments
+            **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr, max_lr, cycle_steps, scale_fn=self.scale_fn)
         self.name = "ExpRangeCLR"

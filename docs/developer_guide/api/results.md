@@ -1,8 +1,8 @@
-# functions.py
+# results.py
 
 ---
 
-::: pycmtensor.functions
+::: pycmtensor.results
 	handler: python
 	options:
 		members_order: source

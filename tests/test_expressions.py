@@ -80,13 +80,15 @@ def test_bias_add():
     bias_layer1 = Bias("bias_layer1", size=(5,))
 
     g = aesara.shared(np.random.normal(size=(3, 5)))
-    y = bias_layer1 + g
+    x = aesara.shared(np.random.normal(size=(3, 100)))
+    # add TensorVariable and Bias object
+    y = (g.T @ x) + bias_layer1
 
-    assert (aet.eq(g.shape[-1], bias_layer1.shape[0])).eval()
-    assert y.eval().shape == (3, 5)
+    assert y.eval().shape == (5, 100)
 
     w_layer1 = Weight("w_layer1", size=[3, 5], init_type="he")
-    y = (bias_layer1 + w_layer1) + (w_layer1 + bias_layer1)
+    # add Weight and Bias object
+    y = w_layer1 + bias_layer1
     assert y.eval().shape == (3, 5)
 
 

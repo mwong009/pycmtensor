@@ -17,26 +17,27 @@ from pycmtensor.utils import time_format
 
 
 class MNL(BaseModel):
-    def __init__(self, ds, params, utility, av=None, **kwargs):
+    def __init__(self, ds, variables, utility, av=None, **kwargs):
         """Defines a Multinomial Logit model
 
         Args:
             ds (pycmtensor.Data): the database object
-            params (dict): model tensor variables
+            variables (dict): dictionary containing Param objects or a dictionary of python variables
             utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
             av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
             **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
 
         Attributes:
-            x (List[TensorVariable]):
-            y (TensorVariable):
-            xy (List[TensorVariable]):
-            betas (List[Beta]):
-            cost (TensorVariable):
-            p_y_given_x (TensorVariable):
-            ll (TensorVariable):
-            pred (TensorVariable):
+            x (List[TensorVariable]): symbolic variable objects for independent
+                variables
+            y (TensorVariable): symbolic variable object for the choice variable
+            xy (List[TensorVariable]): concatenated list of x and y
+            betas (List[Beta]): model beta variables
+            cost (TensorVariable): symbolic cost tensor variable function
+            p_y_given_x (TensorVariable): probability tensor variable function
+            ll (TensorVariable): loglikelihood tensor variable function
+            pred (TensorVariable): prediction tensor variable function
         """
 
         super().__init__(**kwargs)
@@ -86,15 +87,19 @@ class MNL(BaseModel):
 
     @property
     def n_betas(self):
-        """Return the number of estimated Betas"""
+        """Return the number of estimated betas"""
         return super().n_betas
 
     def get_betas(self):
-        """Returns a dict of Beta values"""
+        """returns the values of the betas
+
+        Returns:
+            (dict): beta values
+        """
         return super().get_betas()
 
     def reset_values(self):
-        """Resets Model parameters to their initial value"""
+        """resets the values of all parameters"""
         return super().reset_values()
 
     def build_cost_fn(self):

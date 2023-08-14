@@ -447,11 +447,7 @@ class Bias(Param):
 
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = False
-            if aet.eq(other.shape[-1], self().shape[0]):
-                pad_left = True
-
-            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            b = aet.atleast_Nd(self(), n=other.ndim, left=False)
             return b + other
 
         else:
@@ -459,11 +455,7 @@ class Bias(Param):
 
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = False
-            if aet.eq(other.shape[-1], self().shape[0]):
-                pad_left = True
-
-            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            b = aet.atleast_Nd(self(), n=other.ndim, left=False)
             return b + other
 
         else:
