@@ -781,6 +781,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../statistics/" class="md-nav__link">
+        statistics
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -1038,7 +1052,7 @@
 
   <div class="doc doc-contents ">
       <p class="doc doc-class-bases">
-        Bases: <code><span title="pycmtensor.models.basic.BaseModel">BaseModel</span></code></p>
+        Bases: <code><a class="autorefs autorefs-internal" title="pycmtensor.models.basic.BaseModel" href="../basic/#pycmtensor.models.basic.BaseModel">BaseModel</a></code></p>
 
 
   
@@ -1058,7 +1072,7 @@
         <tr>
           <td><code>ds</code></td>
           <td>
-                <code><span title="pycmtensor.pycmtensor">pycmtensor</span>.<span title="pycmtensor.pycmtensor.Data">Data</span></code>
+                <code><a class="autorefs autorefs-internal" href="../../__init__/#pycmtensor">pycmtensor</a>.<span title="pycmtensor.Data">Data</span></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1399,7 +1413,7 @@ availability is set to 1</p>
         <tr>
           <td><code>ds</code></td>
           <td>
-                <code><span title="pycmtensor.pycmtensor">pycmtensor</span>.<span title="pycmtensor.pycmtensor.Dataset">Dataset</span></code>
+                <code><a class="autorefs autorefs-internal" href="../../__init__/#pycmtensor">pycmtensor</a>.<span title="pycmtensor.Dataset">Dataset</span></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1569,6 +1583,26 @@ availability is set to 1</p>
         </tr>
     </tbody>
   </table>
+      <div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>To return predicted choices:
+<div class="highlight"><pre><span></span><code><span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+</code></pre></div></p>
+<p>output:
+<div class="highlight"><pre><span></span><code><span class="go">{&#39;pred_choice&#39;: array([...])}</span>
+</code></pre></div></p>
+<p>To return probabilities:
+<div class="highlight"><pre><span></span><code><span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</code></pre></div></p>
+<p>output:
+<div class="highlight"><pre><span></span><code><span class="go">{   0: array([...]),</span>
+<span class="go">    1: array([...]),</span>
+<span class="go">    ...</span>
+<span class="go">}</span>
+</code></pre></div></p>
+</div>
 
   </div>
 

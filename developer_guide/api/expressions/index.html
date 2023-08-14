@@ -703,8 +703,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.expressions.RandomDraws.get_value" class="md-nav__link">
-    get_value()
+  <a href="#pycmtensor.expressions.RandomDraws.name" class="md-nav__link">
+    name
   </a>
   
 </li>
@@ -826,6 +826,20 @@
     <li class="md-nav__item">
       <a href="../optimizers/" class="md-nav__link">
         optimizers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../statistics/" class="md-nav__link">
+        statistics
       </a>
     </li>
   
@@ -1061,8 +1075,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pycmtensor.expressions.RandomDraws.get_value" class="md-nav__link">
-    get_value()
+  <a href="#pycmtensor.expressions.RandomDraws.name" class="md-nav__link">
+    name
   </a>
   
 </li>
@@ -1203,6 +1217,10 @@
 
 <h4 id="pycmtensor.expressions.ExpressionParser.parse" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">parse</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
 
 <a href="#pycmtensor.expressions.ExpressionParser.parse" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -1782,8 +1800,11 @@ expressions</p>
 <ul>
 <li><code>"normal"</code></li>
 <li><code>"lognormal"</code></li>
+<li><code>"gumbel"</code></li>
+<li><code>"exponential"</code></li>
+<li><code>"gamma"</code></li>
+<li><code>"poisson"</code></li>
 </ul>
-<p>other distribution are also possible, see <a href="https://numpy.org/doc/stable/reference/random/generator.html#distributions">https://numpy.org/doc/stable/reference/random/generator.html#distributions</a>. The distributions will be initialized with their default values e.g. <code>gumbel(loc=0., scale=1.)</code></p>
 </div>
 
 
@@ -1797,25 +1818,28 @@ expressions</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
 
-<h4 id="pycmtensor.expressions.RandomDraws.get_value" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_value</span><span class="p">()</span></code>
+<h4 id="pycmtensor.expressions.RandomDraws.name" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">name</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
-<a href="#pycmtensor.expressions.RandomDraws.get_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#pycmtensor.expressions.RandomDraws.name" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
   <div class="doc doc-contents ">
   
-      <p>Returns the numpy representation of the parameter value</p>
-
+      <p>returns the name of the random draw tensor variable</p>
   </div>
 
 </div>
+
+
 
 
 
@@ -1875,7 +1899,7 @@ expressions</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>size of the array</p>
+              <p>size of the array in 1 dimension</p>
             </div>
           </td>
           <td>

@@ -637,9 +637,74 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          basic
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         basic
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic" class="md-nav__link">
+    basic
+  </a>
+  
+    <nav class="md-nav" aria-label="basic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel" class="md-nav__link">
+    BaseModel
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.extract_params" class="md-nav__link">
+    extract_params()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.drop_unused_variables" class="md-nav__link">
+    drop_unused_variables()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.train" class="md-nav__link">
+    train()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -675,6 +740,20 @@
     <li class="md-nav__item">
       <a href="../../optimizers/" class="md-nav__link">
         optimizers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../statistics/" class="md-nav__link">
+        statistics
       </a>
     </li>
   
@@ -805,6 +884,55 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic" class="md-nav__link">
+    basic
+  </a>
+  
+    <nav class="md-nav" aria-label="basic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.BaseModel" class="md-nav__link">
+    BaseModel
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.extract_params" class="md-nav__link">
+    extract_params()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.drop_unused_variables" class="md-nav__link">
+    drop_unused_variables()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pycmtensor.models.basic.train" class="md-nav__link">
+    train()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -823,6 +951,441 @@
 
 <h1 id="modelsbasicpy">models/basic.py<a class="headerlink" href="#modelsbasicpy" title="Permanent link">&para;</a></h1>
 <hr />
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="pycmtensor.models.basic" class="doc doc-heading">
+          <code>pycmtensor.models.basic</code>
+
+
+<a href="#pycmtensor.models.basic" class="headerlink" title="Permanent link">&para;</a></h2>
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pycmtensor.models.basic.BaseModel" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">BaseModel</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.basic.BaseModel" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code>object</code></p>
+
+
+  
+      <p>Basic model class object</p>
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the model</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>config</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" href="../../__init__/#pycmtensor">pycmtensor</a>.<span title="pycmtensor.Config">Config</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>pycmtensor config object</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rng</code></td>
+          <td>
+                <code>numpy.<span title="numpy.random">random</span>.<span title="numpy.random.Generator">Generator</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>random number generator</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>params</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of model parameters (<code>betas</code> &amp; <code>weights</code>)</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>betas</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of model scalar betas</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>sigmas</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of model scalar sigmas</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>weights</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of model weight matrices</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>biases</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of model vector biases</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>updates</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of (param, update) tuples</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>learning_rate</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>symbolic reference to the learning rate</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>results</code></td>
+          <td>
+                <code><span title="pycmtensor.results.Results">Results</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>stores the results of the model estimation</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.basic.extract_params" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">extract_params</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.basic.extract_params" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Extracts Param objects from variables</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>cost</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>function to evaluate</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code>Union[dict, list]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of variables from the current program</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.basic.drop_unused_variables" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">drop_unused_variables</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.basic.drop_unused_variables" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Internal method to remove ununsed tensors</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>cost</code></td>
+          <td>
+                <code>TensorVariable</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>function to evaluate</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>params</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="pycmtensor.expressions.Param" href="../../expressions/#pycmtensor.expressions.Param">Param</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>param objects</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>variables</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>list of array variables from the dataset</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a list of param names which are not used in the model</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="pycmtensor.models.basic.train" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.models.basic.train" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>main training loop</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>model</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" href="../../__init__/#pycmtensor">pycmtensor</a>.<span title="pycmtensor.models">models</span>.<span title="pycmtensor.models.BaseModel">BaseModel</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>model to train</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ds</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" href="../../__init__/#pycmtensor">pycmtensor</a>.<a class="autorefs autorefs-internal" title="pycmtensor.dataset" href="../../dataset/#pycmtensor.dataset">dataset</a>.<a class="autorefs autorefs-internal" title="pycmtensor.dataset.Dataset" href="../../dataset/#pycmtensor.dataset.Dataset">Dataset</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dataset to use for training</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>overloaded keyword arguments. See <a href="../../../user_guide/configuration">configuration</a> in the user guide for details on possible options</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 
