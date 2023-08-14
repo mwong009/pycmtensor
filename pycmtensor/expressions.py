@@ -24,7 +24,8 @@ class ExpressionParser(object):
         if expression is not None:
             self.expression = str(pprint(expression))
 
-    def parse(self, expression):
+    @staticmethod
+    def parse(expression):
         """Parses Aesara Tensor string expression from `aesara.pprint()`. This function
         removes parentheses and Tensor operators and returns a 'clean' list of
         expressions
@@ -446,11 +447,7 @@ class Bias(Param):
 
     def __radd__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = False
-            if aet.eq(other.shape[-1], self().shape[0]):
-                pad_left = True
-
-            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            b = aet.atleast_Nd(self(), n=other.ndim, left=False)
             return b + other
 
         else:
@@ -458,11 +455,7 @@ class Bias(Param):
 
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
-            pad_left = False
-            if aet.eq(other.shape[-1], self().shape[0]):
-                pad_left = True
-
-            b = aet.atleast_Nd(self(), n=other.ndim, left=pad_left)
+            b = aet.atleast_Nd(self(), n=other.ndim, left=False)
             return b + other
 
         else:

@@ -7,6 +7,7 @@ import numpy as np
 from pycmtensor.expressions import Beta, Param
 
 __all__ = [
+    "relu",
     "exp_mov_average",
     "logit",
     "loglikelihood",
@@ -55,14 +56,16 @@ def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     Returns:
         (TensorVariable): the new moving average
 
-    Note:
+    !!! note
         The moving average will decay by the difference between the existing value
         and the new value multiplied by the moving average factor. A higher `alpha`
         value results in faster changing moving average.
 
         Formula:
 
-        $$x_{EMA} = \\alpha * x_t + x_{EMA} * (1-\\alpha)$$
+        $$
+        x_{EMA} = \\alpha * x_t + x_{EMA} * (1-\\alpha)
+        $$
     """
 
     while moving_avg.ndim < batch_avg.ndim:

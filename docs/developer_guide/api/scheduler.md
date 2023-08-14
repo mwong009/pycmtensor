@@ -1,8 +1,8 @@
-# functions.py
+# scheduler.py
 
 ---
 
-::: pycmtensor.functions
+::: pycmtensor.scheduler
 	handler: python
 	options:
 		members_order: source

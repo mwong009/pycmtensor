@@ -24,6 +24,9 @@ nav:
         - basic: developer_guide/api/models/basic.md
         - MNL: developer_guide/api/models/MNL.md
       - optimizers: developer_guide/api/optimizers.md
+      - results: developer_guide/api/results.md
+      - scheduler: developer_guide/api/scheduler.md
+      - statistics: developer_guide/api/statistics.md
   - About:
     - Contributing: about/contributing.md
     - Release notes: about/release_notes.md

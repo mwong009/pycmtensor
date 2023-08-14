@@ -34,9 +34,6 @@ class BaseModel(object):
         """
         self.config = config
         self.rng = np.random.default_rng(config.seed)
-        self.weights = []
-        self.biases = []
-        self.betas = []
         self.results = Results()
 
         for key, value in kwargs.items():
@@ -50,30 +47,68 @@ class BaseModel(object):
 
     @property
     def n_betas(self):
-        return len(self.betas)
+        if "betas" in dir(self):
+            return len(self.betas)
+        return 0
 
     @property
     def n_weights(self):
-        return np.sum([np.prod(w.shape) for w in self.weights])
+        if "weights" in dir(self):
+            return np.sum([np.prod(w.shape) for w in self.weights])
+        return 0
 
     @property
     def n_biases(self):
-        return np.sum([np.prod(b.shape) for b in self.biases])
+        if "biases" in dir(self):
+            return np.sum([np.prod(b.shape) for b in self.biases])
+        return 0
 
     def get_weights(self):
-        return {w.name: w.get_value() for w in self.weights}
+        """returns the values of the weights
+
+        Returns:
+            (dict): weight values
+        """
+        if "weights" in dir(self):
+            return {w.name: w.get_value() for w in self.weights}
+        return {}
 
     def get_biases(self):
-        return {b.name: b.get_value() for b in self.biases}
+        """returns the values of the biases
+
+        Returns:
+            (dict): biases values
+        """
+        if "biases" in dir(self):
+            return {b.name: b.get_value() for b in self.biases}
+        return {}
 
     def get_betas(self):
-        return {beta.name: beta.get_value() for beta in self.betas}
+        """returns the values of the betas
+
+        Returns:
+            (dict): beta values
+        """
+        if "betas" in dir(self):
+            return {beta.name: beta.get_value() for beta in self.betas}
+        return {}
 
     def reset_values(self):
-        for p in self.params:
-            p.reset_value()
+        """resets the values of all parameters"""
+        if "params" in dir(self):
+            for p in self.params:
+                p.reset_value()
 
     def include_params_for_convergence(self, *args, **kwargs):
+        """dummy method for additional parameter objects for calculating convergence
+
+        Args:
+            *args (None): overloaded arguments
+            **kwargs (dict): overloaded keyword arguments
+
+        Returns:
+            (OrderedDict): a dictonary of addition parameters to include
+        """
         return OrderedDict()
 
     def build_cost_updates_fn(self, updates):
@@ -131,54 +166,54 @@ class BaseModel(object):
         else:
             return False
 
+    @staticmethod
+    def extract_params(cost, variables):
+        """Extracts Param objects from variables
 
-def extract_params(cost, variables):
-    """Extracts Param objects from variables
+        Args:
+            cost (TensorVariable): function to evaluate
+            variables (Union[dict, list]): list of variables from the current program
+        """
+        params = []
+        symbols = ExpressionParser.parse(cost)
+        seen = set()
 
-    Args:
-        cost (TensorVariable): function to evaluate
-        variables (Union[dict, list]): list of variables from the current program
-    """
-    params = []
-    symbols = ExpressionParser().parse(cost)
-    seen = set()
+        if isinstance(variables, dict):
+            variables = [v for _, v in variables.items()]
 
-    if isinstance(variables, dict):
-        variables = [v for _, v in variables.items()]
+        for variable in variables:
+            if (not isinstance(variable, Param)) or isinstance(variable, Layer):
+                continue
 
-    for variable in variables:
-        if (not isinstance(variable, Param)) or isinstance(variable, Layer):
-            continue
+            if isinstance(variable, Param) and (variable.name in seen):
+                continue
 
-        if isinstance(variable, Param) and (variable.name in seen):
-            continue
+            if variable.name not in symbols:
+                # raise a warning if variable is not in any utility function
+                warning(f"{variable.name} not in any utility functions")
+                continue
 
-        if variable.name not in symbols:
-            # raise a warning if variable is not in any utility function
-            warning(f"{variable.name} not in any utility functions")
-            continue
+            params.append(variable)
+            seen.add(variable.name)
 
-        params.append(variable)
-        seen.add(variable.name)
+        return params
 
-    return params
+    @staticmethod
+    def drop_unused_variables(cost, params, variables):
+        """Internal method to remove ununsed tensors
 
+        Args:
+            cost (TensorVariable): function to evaluate
+            params (Param): param objects
+            variables (dict): list of array variables from the dataset
 
-def drop_unused_variables(cost, params, variables):
-    """Internal method to remove ununsed tensors
-
-    Args:
-        cost (TensorVariable): function to evaluate
-        params (Param): param objects
-        variables (dict): list of array variables from the dataset
-
-    Returns:
-        (list): a list of param names which are not used in the model
-    """
-    symbols = ExpressionParser().parse(cost)
-    param_names = [p.name for p in params]
-    symbols = [s for s in symbols if s not in param_names]
-    return [var for var in list(variables) if var not in symbols]
+        Returns:
+            (list): a list of param names which are not used in the model
+        """
+        symbols = ExpressionParser.parse(cost)
+        param_names = [p.name for p in params]
+        symbols = [s for s in symbols if s not in param_names]
+        return [var for var in list(variables) if var not in symbols]
 
 
 def train(model, ds, **kwargs):
@@ -187,7 +222,7 @@ def train(model, ds, **kwargs):
     Args:
         model (pycmtensor.models.BaseModel): model to train
         ds (pycmtensor.dataset.Dataset): dataset to use for training
-        **kwargs: overloaded keyword arguments. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+        **kwargs (dict): overloaded keyword arguments. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
     """
     for key, value in kwargs.items():
         model.config.add(key, value)
@@ -230,7 +265,8 @@ def train(model, ds, **kwargs):
         gamma=model.config.lr_ExpRangeCLR_gamma,
     )
 
-    performance_graph = OrderedDict()
+    loglikelihood_graph = []
+    error_graph = []
 
     x_y = model.x + [model.y]
     train_data = ds.train_dataset(x_y)
@@ -249,6 +285,9 @@ def train(model, ds, **kwargs):
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
     model.results.seed = model.config.seed
+
+    loglikelihood_graph.append((0, log_likelihood))
+    error_graph.append((0, error))
 
     params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
 
@@ -279,7 +318,7 @@ def train(model, ds, **kwargs):
 
             if iteration % validation_freq == 0:
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
-                performance_graph[epoch] = {"log likelihood": log_likelihood}
+                loglikelihood_graph.append((iteration, log_likelihood))
 
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 p = model.include_params_for_convergence(train_data, t_index)
@@ -305,6 +344,7 @@ def train(model, ds, **kwargs):
                 if log_likelihood > model.results.best_loglikelihood:
                     # validate if loglikelihood improves
                     error = model.prediction_error_fn(*valid_data)
+                    error_graph.append((iteration, error))
 
                     this_ll = log_likelihood
                     best_ll = model.results.best_loglikelihood
@@ -360,7 +400,8 @@ def train(model, ds, **kwargs):
         )
 
     model.results.lr_history_graph = lr_scheduler.history
-    model.results.performance_graph = performance_graph
+    model.results.loglikelihood_graph = loglikelihood_graph
+    model.results.error_graph = error_graph
 
     debug(f"Evaluating full hessian and bhhh matrix")
     for p in model.params:

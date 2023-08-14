@@ -1,54 +1,111 @@
 # statistics.py
-"""PyCMTensor statistics module"""
-import aesara.tensor.nlinalg as nlinalg
+"""PyCMTensor statistics module
+
+This module contains methods for calculating the statistics of the estimated parameters.
+"""
 import numpy as np
-from numpy import nan_to_num as nan2num
 from scipy import stats
 
 __all__ = [
     "correlation_matrix",
-    "p_value",
     "rob_correlation_matrix",
+    "p_value",
     "rob_stderror",
     "stderror",
     "t_test",
 ]
 
 
-def variance_covariance(h):
-    """Returns the variance covariance matrix given the Hessian (``h``)"""
-    return nlinalg.pinv(nan2num(-h)).eval()
+def variance_covariance(hessian):
+    """computes the variance covariance matrix given the Hessian
+
+    Args:
+        hessian (numpy.ndarray): a 2-D hessian matrix
+
+    Returns:
+        (numpy.ndarray): the variance covariance matrix
 
 
-def rob_variance_covariance(h, bh):
-    """Returns the rob. var-covar matrix given the Hessian (``h``) and the BHHH
-    matrix (``bh``)
+    !!! notes
+
+        The variance covariance matrix is calculated by taking the inverse of the (negative) hessian matrix. If the inverse is undefined, returns a zero or a large finite number.
+
+        $$
+        varcovar = -H^{-1}
+        $$
     """
-    cr = variance_covariance(h)
-    return cr.dot(bh.dot(cr))
+    return np.linalg.pinv(np.nan_to_num(-hessian))
+
+
+def rob_variance_covariance(hessian, bhhh):
+    """computes the robust variance covariance matrix given the Hessian and the BHHH matrices
+
+    Args:
+        hessian (numpy.ndarray): the hessian matrix
+        bhhh (numpy.ndarray): the BHHH matrix
+
+    Returns:
+        (numpy.ndarray): the robust variance covariance matrix
+
+    !!! notes
+
+        The robust variance covariance matrix is computed as follows:
+
+        $$
+        rob. varcovar = (-H)^{-1}\\cdot BHHH\\cdot (-H)^{-1}
+        $$
+    """
+    cr = variance_covariance(hessian)
+    return cr.dot(bhhh.dot(cr))
 
 
 def t_test(stderr, params):
-    """Returns the t stats of ``params`` given the standard error (``stderr``)"""
-    params = [value for key, value in params.items()]
+    """computes the statistical t-test of the estimated parameter and the standard error
+
+    Args:
+        stderr (list): standard errors
+        params (list): estimated parameters
+
+    Returns:
+        (list): t-test of the estimated parameters
+    """
+    params = [value for _, value in params.items()]
     return [p.mean() / s for p, s in zip(params, stderr)]
 
 
 def p_value(stderr, params):
-    """Returns the p-value of ``params`` given the standard error (``stderr``)"""
-    tTest = t_test(stderr, params)
-    return [2.0 * (1.0 - stats.norm.cdf(abs(t))) for t in tTest]
+    """computes the p-value (statistical significance) of the estimated parameter using the two-tailed normal distribution, where p-value=$2(1-\\phi(|t|)$, $\\phi$ is the cdf of the normal distribution
 
+    Args:
+        stderr (list): standard errors
+        params (list): estimated parameters
 
-def stderror(h, params):
-    """Returns the standard error of ``params`` given the Hessian (``h``)
-
-    The std err is calculated as the square root of the variance covariance
-    matrix.
-
+    Returns:
+        (list): p-value of the estimated parameters
     """
-    # params = [p for p in params if (p.status != 1)]
-    varCovar = variance_covariance(h)
+    ttest = t_test(stderr, params)
+    return [2.0 * (1.0 - stats.norm.cdf(abs(t))) for t in ttest]
+
+
+def stderror(hessian, params):
+    """calculates the standard error of the estimated parameter given the hessian matrix
+
+    Args:
+        hessian (numpy.ndarray): the hessian matrix
+        params (list): estimated parameters
+
+    Returns:
+        (list): the standard error of the estimates
+
+    !!! note
+
+        The standard errors is calculated using the formula:
+
+        $$
+        stderr = \\sqrt{diag(-H^{-1})}
+        $$
+    """
+    varCovar = variance_covariance(hessian)
     stdErr = []
     for i, p in enumerate(params):
         if (params[p].shape == ()) and (params[p] == 0.0):
@@ -61,12 +118,26 @@ def stderror(h, params):
     return stdErr
 
 
-def rob_stderror(h, bh, params):
-    """Returns the rob. standard error of ``params`` given the Hessian (``h``) and the
-    BHHH matrix (``bh``)
+def rob_stderror(hessian, bhhh, params):
+    """calculates the robust standard error of the estimated parameter given the hessian and the bhhh matrices
+
+    Args:
+        hessian (numpy.ndarray): the hessian matrix
+        bhhh (numpy.ndarray): the bhhh matrix
+        params (list): estimated parameters
+
+    Returns:
+        (list): the robust standard error of the estimates
+
+    !!! note
+
+        The robust standard errors is calculated using the formula:
+
+        $$
+        rob. stderr = \\sqrt{diag(rob. varcovar)}
+        $$
     """
-    # params = [p for p in params if (p.status != 1)]
-    robVarCovar = rob_variance_covariance(h, bh)
+    robVarCovar = rob_variance_covariance(hessian, bhhh)
     robstderr = []
     for i, p in enumerate(params):
         if (params[p].shape == ()) and (params[p] == 0.0):
@@ -79,13 +150,20 @@ def rob_stderror(h, bh, params):
     return robstderr
 
 
-def correlation_matrix(h):
-    """Returns the correlation matrix given the Hessian (``h``)"""
-    var_covar = variance_covariance(h)
+def correlation_matrix(hessian):
+    """computes the correlation matrix from the hessian matrix
+
+    Args:
+        hessian (numpy.ndarray): the hessian matrix
+
+    Returns:
+        (numpy.ndarray): the correlation matrix
+    """
+    var_covar = variance_covariance(hessian)
     d = np.diag(var_covar)
     if (d > 0).all():
         diag = np.diag(np.sqrt(d))
-        diag_inv = nlinalg.inv(diag).eval()
+        diag_inv = np.linalg.inv(diag)
         mat = diag_inv.dot(var_covar.dot(diag_inv))
     else:
         mat = np.full_like(var_covar, np.finfo(float).max)
@@ -93,13 +171,21 @@ def correlation_matrix(h):
     return mat
 
 
-def rob_correlation_matrix(h, bh):
-    """Returns the correlation matrix given the Hessian and the BHHH matrix"""
-    rob_var_covar = rob_variance_covariance(h, bh)
+def rob_correlation_matrix(hessian, bhhh):
+    """computes the robust correlation matrix from the hessian and bhhh matrix
+
+    Args:
+        hessian (numpy.ndarray): the hessian matrix
+        bhhh (numpy.ndarray): the bhhh matrix
+
+    Returns:
+        (numpy.ndarray): the tobust correlation matrix
+    """
+    rob_var_covar = rob_variance_covariance(hessian, bhhh)
     rd = np.diag(rob_var_covar)
     if (rd > 0).all():
         diag = np.diag(np.sqrt(rd))
-        diag_inv = nlinalg.inv(diag).eval()
+        diag_inv = np.linalg.inv(diag)
         mat = diag_inv.dot(rob_var_covar.dot(diag_inv))
     else:
         mat = np.full_like(rob_var_covar, np.finfo(float).max)
