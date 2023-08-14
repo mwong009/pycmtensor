@@ -1,3 +1,11 @@
+## v1.6.4 (2023-08-14)
+
+### Refactor
+
+- changed basic model functions into staticmethod
+- **expressions.py**: make ExpressionParser.parse a staticmethod
+- remove depreciated modules
+
 ## v1.6.3 (2023-08-11)
 
 ### Fix

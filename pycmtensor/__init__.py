@@ -1,7 +1,7 @@
 """Top-level package for PyCMTensor."""
 
 __author__ = """Melvin Wong"""
-__version__ = "1.6.3"
+__version__ = "1.6.4"
 
 import aesara
 from watermark import watermark

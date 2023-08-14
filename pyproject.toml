@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycmtensor"
-version = "1.6.3"
+version = "1.6.4"
 description = "Python Tensor based package for discrete choice modelling."
 authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
@@ -73,7 +73,7 @@ quiet = false
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "1.6.3"
+version = "1.6.4"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
