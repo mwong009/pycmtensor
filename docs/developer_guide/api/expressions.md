@@ -5,4 +5,4 @@
 ::: pycmtensor.expressions
 	handler: python
 	options:
-	  members_order: source
+		members_order: source

@@ -1,8 +1,8 @@
-# dataset.py
+# statistics.py
 
 ---
 
-::: pycmtensor.dataset
+::: pycmtensor.statistics
 	handler: python
 	options:
 		members_order: source
