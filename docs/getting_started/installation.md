@@ -2,9 +2,11 @@
 
 ---
 
+## Overview
+
 To ensure complete installation including the necessary libraries, it is recommended to first install dependencies via `conda` package manager in a virtual environment, then install PyCMTensor via `pip`.
 
-## System requirements
+### System requirements
 - Python (3.9+)
 - Aesara (2.9+) - from conda-forge
 - Numpy - from conda-forge
@@ -22,26 +24,26 @@ In addition, you will need:
     - Openblas, default when Numpy is installed with pip, alternatively, with conda `blas` package
 
 
-## Installation steps
+## Installation
 
-1. [Install conda dependencies](#install-conda-dependencies)
-2. [Install PyCMTensor](#install-pycmtensor-using-pip)
-3. [Validate installation](#checking-your-installation)
+1. [Install conda dependencies](#step-1-install-conda-dependencies)
+2. [Install PyCMTensor](#step-2-install-pycmtensor-using-pip)
+3. [Validate installation](#step-3-checking-your-installation)
 
 
 
-## Install conda dependencies
+### Step 1: Install conda dependencies
 
 Install [Miniconda](https://conda.io/miniconda.html). Select the appropriate package for your operating system.
 
-Once you have installed conda, create a virtual environment and activate it
+Once you have installed conda, create a virtual environment and activate it. For example:
 
     :::bash
     conda create -n pycmtensor python=3.11 
     conda activate pycmtensor
 
 
-Install the conda dependencies:
+Next, install the conda dependencies inside the virtual environment:
 
 **Windows**
  
@@ -58,7 +60,7 @@ Install the conda dependencies:
     :::bash
     conda install -c conda-forge mkl-service gcc_linux-64 gxx_linux-64 blas aesara -y
 
-## Install PyCMTensor using pip
+### Step 2: Install PyCMTensor using pip
 
 Once the conda packages have been installed, install the rest of the packages using `pip`, type:
 
@@ -67,7 +69,7 @@ Once the conda packages have been installed, install the rest of the packages us
 
 
 
-### Checking your installation
+### Step 3: Checking your installation
 
 If PyCMTensor was installed correctly, the following should display when you run the following code in a python console:
 
@@ -78,9 +80,9 @@ If PyCMTensor was installed correctly, the following should display when you run
 Output:
 
     :::bash
-    1.3.2
+    1.6.3
 
-### Updating PyCMTensor
+## Updating PyCMTensor
 
 Update PyCMTensor by running the `pip install --upgrade pycmtensor` command
 

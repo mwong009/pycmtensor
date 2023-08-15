@@ -11,24 +11,21 @@ A Tensor-based choice modelling estimation package written in Python
 
 # Welcome
 
-PyCMTensor is a tensor-optimized discrete choice model estimation Python library 
-package, written with optimization compilers to speed up estimation of large datasets, 
-simulating very large mixed logit models or implementing neural network functions into 
-utility equations in choice models.
-
-Currently, PyCMTensor can be used to fully specify Multinomial Logit and Mixed Logit models, estimate and generate statistical tests, using optimized tensor operations via Aesara tensor libraries.
+PyCMTensor is a tensor-based discrete choice modelling estimation Python library package.
+It has a particular focus on estimation of hybrid neural networks and Logit models, as well as on Mixed Logit models. PyCMTensor models are based on computational graphs and models estimated using generalized backpropagation algorithms.
+PyCMTensor can be used to fully specify Multinomial Logit and Mixed Logit models, perform model estimation using computational graphs and generate statistical test results for econometric analysis.
 
 ## Key features
 
 Main features:
 
 - Interpretable and customizable utility specification syntaxes
-- Perform statistical tests, analyze covariances for taste parameters.
-- Fast execution of model estimation including of simulation based methods, e.g. Mixed Logit models, using Tensor based libraries 
-- Model estimation with 1st order (e.g. Adam, Stochastic Gradient Descent) or 1.5th order methods (e.g. Stochastic BFGS)
-- Specifying neural nets with weight and bias parameters inside a utility function (TasteNet)
+- Ability to specifying neural nets with weight and bias parameters inside a utility functions (e.g. TasteNet)
+- Perform specification testing, analyze covariances, standard errors for taste parameters.
+- Fast execution of model estimation including of simulation based methods, e.g. Mixed Logit models, using computational graph approach
+- Model estimating tuning with 1st order (e.g. Adam, Stochastic Gradient Descent) or 1.5th order methods (e.g. Stochastic BFGS)
 
-While other choice modelling estimation software in Python are available, e.g. Biogeme, xlogit, PyLogit, etc., PyCMTensor strives to fully implement deep learning based methods written in a simplified syntax for utility equation specification. Different software programs may occasionally vary in their behaviour and estimation results. 
+While other choice modelling estimation software in Python are available, e.g. Biogeme, xlogit, PyLogit, etc., PyCMTensor strives to fully implement deep learning based methods written in a simplified syntax for utility equation specification.
 
 ## Documentation
 
