@@ -7,6 +7,60 @@ import pytest
 import pycmtensor.functions as functions
 
 
+def test_relu():
+    x = aet.scalar("x")
+    y = functions.relu(x).eval({x: 0.6})
+    # test regular relu
+    assert functions.relu(x).eval({x: 0.6}) == 0.6
+    assert functions.relu(x).eval({x: -0.8}) == 0.0
+
+    # linear
+    assert functions.relu(x, alpha=1.0).eval({x: 1.0}) == 1.0
+    assert functions.relu(x, alpha=1.0).eval({x: -3.0}) == -3.0
+
+
+def test_exp_mov_average():
+    batch_avg = aet.vector("batch_avg")
+    moving_avg = aet.scalar("moving_avg")
+
+    y = functions.exp_mov_average(batch_avg=batch_avg, moving_avg=moving_avg, alpha=0.1)
+
+    out = y.eval({batch_avg: np.array([0.2, 0.3, 0.4]), moving_avg: np.array(0.1)})
+
+    assert out.shape[0] == 3
+    assert np.allclose(out, np.array([0.11, 0.12, 0.13]))
+
+
+def test_logit():
+    x = aet.vector("x")
+    beta = aet.scalar("beta")
+
+    with pytest.raises(NotImplementedError):
+        functions.logit(utility=None)
+
+    y = functions.logit(utility=beta * x).eval(
+        {x: np.array([0.1, 0.4, 0.6, 0.2]), beta: np.array(1.0)}
+    )
+
+    assert y.shape[0] == 4
+    assert np.allclose(y, np.array([0.19593432, 0.26448367, 0.32304109, 0.21654092]))
+    assert y.sum() == 1.0
+
+    x2 = aet.vector("x2")
+    asc = aet.scalar("asc")
+
+    y = functions.logit(
+        utility=[beta * x, beta * x + asc], avail=[np.ones(4), np.ones(4)]
+    ).eval(
+        {x: np.array([0.1, 0.4, 0.6, 0.2]), beta: np.array(1.0), asc: np.array(0.07)}
+    )
+
+    assert len(y.shape) == 2
+    assert y.shape[0] == 2
+    assert y.shape[1] == 4
+    assert np.allclose(y.sum(axis=0), np.array([1.0, 1.0, 1.0, 1.0]))
+
+
 def test_kl_divergence():
     p = aet.vector("p")
     q = aet.vector("q")

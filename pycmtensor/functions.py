@@ -51,7 +51,7 @@ def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     Args:
         batch_avg (TensorVariable): mean batch value
         moving_avg (TensorVariable): accumulated mean
-        alpha (float): moving average factor of the batch mean
+        alpha (float): ratio of moving average to batch average
 
     Returns:
         (TensorVariable): the new moving average
