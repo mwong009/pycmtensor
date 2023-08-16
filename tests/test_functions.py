@@ -141,6 +141,25 @@ def test_mae():
     assert np.round(r, 3) == 1.271
 
 
+def test_errors():
+    rng = np.random.default_rng(123)
+    x = aet.matrix("x")
+    y = aet.ivector("y")
+
+    prob = functions.logit(utility=x)
+    e = functions.errors(prob, y).eval(
+        {
+            x: rng.normal(size=(4, 15)),
+            y: rng.choice(4, size=(15,), replace=True).astype("int32"),
+        }
+    )
+
+    assert e == 0.6
+
+    with pytest.raises(NotImplementedError):
+        functions.errors(prob, aet.vector("y"))
+
+
 def test_kl_divergence():
     p = aet.vector("p")
     q = aet.vector("q")
