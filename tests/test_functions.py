@@ -31,7 +31,10 @@ def test_exp_mov_average():
     assert np.allclose(out, np.array([0.11, 0.12, 0.13]))
 
 
+@pytest.fixture(scope="module")
 def test_logit():
+    from pycmtensor.expressions import Beta
+
     x = aet.vector("x")
     beta = aet.scalar("beta")
 
@@ -49,9 +52,7 @@ def test_logit():
     x2 = aet.vector("x2")
     asc = aet.scalar("asc")
 
-    y = functions.logit(
-        utility=[beta * x, beta * x + asc], avail=[np.ones(4), np.ones(4)]
-    ).eval(
+    y = functions.logit(utility=[beta * x, asc], avail=[np.ones(4), np.ones(4)]).eval(
         {x: np.array([0.1, 0.4, 0.6, 0.2]), beta: np.array(1.0), asc: np.array(0.07)}
     )
 
@@ -59,6 +60,85 @@ def test_logit():
     assert y.shape[0] == 2
     assert y.shape[1] == 4
     assert np.allclose(y.sum(axis=0), np.array([1.0, 1.0, 1.0, 1.0]))
+
+    asc_alt = Beta("asc_alt", value=0.07)
+    y_2 = functions.logit(
+        utility=[beta * x, asc_alt], avail=[np.ones(4), np.ones(4)]
+    ).eval({x: np.array([0.1, 0.4, 0.6, 0.2]), beta: np.array(1.0)})
+
+    assert np.allclose(y, y_2)
+
+    with pytest.raises(ValueError):
+        functions.logit(utility=[beta * x, asc_alt], avail=[np.ones(4)]).eval(
+            {x: np.array([0.1, 0.4, 0.6, 0.2]), beta: np.array(1.0)}
+        )
+    return y_2
+
+
+def test_log_likelihood(test_logit):
+    prob = aet.as_tensor_variable(test_logit)
+    y = aet.ivector("y")
+
+    ll = functions.log_likelihood(prob, y).eval({y: np.array([0, 0, 0, 0])})
+    ll = functions.log_likelihood(prob, y, index=np.arange(4)).eval(
+        {y: np.array([0, 0, 0, 0])}
+    )
+
+    assert np.allclose(np.round(ll, 3), np.array(-2.313))
+
+
+def test_rmse():
+    rng = np.random.default_rng(123)
+    y = aet.vector("y")
+    y_hat = aet.vector("y_hat")
+
+    r = functions.rmse(y_hat, y).eval(
+        {y: np.array([0.1, 0.2, 0.3, 0.4]), y_hat: np.array([0.0, 0.0, 0.0, 0.0])}
+    )
+
+    assert np.round(r, 3) == 0.274
+
+    with pytest.raises(ValueError):
+        functions.rmse(y_hat, aet.matrix("y"))
+
+    y_hat = aet.matrix("y_hat")
+    y = aet.matrix("y")
+
+    r = functions.rmse(y_hat, y).eval(
+        {
+            y: rng.normal(size=(3, 5)),
+            y_hat: rng.normal(size=(3, 5)),
+        }
+    )
+
+    assert np.round(r, 3) == 1.494
+
+
+def test_mae():
+    rng = np.random.default_rng(123)
+    y = aet.vector("y")
+    y_hat = aet.vector("y_hat")
+
+    r = functions.mae(y_hat, y).eval(
+        {y: np.array([0.1, 0.2, 0.3, 0.4]), y_hat: np.array([0.0, 0.0, 0.0, 0.0])}
+    )
+
+    assert np.round(r, 3) == 0.25
+
+    with pytest.raises(ValueError):
+        functions.mae(y_hat, aet.matrix("y"))
+
+    y_hat = aet.matrix("y_hat")
+    y = aet.matrix("y")
+
+    r = functions.mae(y_hat, y).eval(
+        {
+            y: rng.normal(size=(3, 5)),
+            y_hat: rng.normal(size=(3, 5)),
+        }
+    )
+
+    assert np.round(r, 3) == 1.271
 
 
 def test_kl_divergence():

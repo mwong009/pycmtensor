@@ -187,7 +187,7 @@ def rmse(y_hat, y):
     if y_hat.ndim != y.ndim:
         msg = f"y_hat should have the same dimensions as y. y_hat.ndim: {y_hat.ndim}, q.ndim: {y.ndim}"
         raise ValueError(msg)
-    if y_hat.ndim < 1:
+    if (y_hat.ndim > 1) or (y.ndim > 1):
         y_hat = aet.flatten(y_hat)
         y = aet.flatten(y)
 
@@ -210,7 +210,7 @@ def mae(y_hat, y):
     if y_hat.ndim != y.ndim:
         msg = f"y_hat should have the same dimensions as y. y_hat.ndim: {y_hat.ndim}, q.ndim: {y.ndim}"
         raise ValueError(msg)
-    if y_hat.ndim < 1:
+    if (y_hat.ndim > 1) or (y.ndim > 1):
         y_hat = aet.flatten(y_hat)
         y = aet.flatten(y)
 
