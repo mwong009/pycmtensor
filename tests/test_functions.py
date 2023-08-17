@@ -248,60 +248,49 @@ def test_kl_multivar_norm_2():
     assert round(float(output), 3) == 6.63
 
 
-# class TestFunctions:
-# @pytest.fixture
-# def rng(self):
-#     return np.random.default_rng(42069)
+def test_derivative():
+    rng = np.random.default_rng(123)
+    from pycmtensor.expressions import Beta
 
-# @pytest.fixture
-# def logit(self, utility, availability):
-#     U = utility
-#     AV = availability
-#     return functions.logit(U, AV)
+    x = aet.vector("x")
+    y = aet.ivector("y")
+    asc1 = Beta("asc1", value=0.05)
+    b1 = Beta("b1", value=0.1)
+    b2 = Beta("b2", value=-0.25)
 
-# @pytest.fixture
-# def loglikelihood(self, logit, swissmetro_db):
-#     prob = logit
-#     db = swissmetro_db
-#     return functions.log_likelihood(prob, db.y)
+    U_1 = b1 * x + asc1
+    U_2 = b2 * x
 
-# def test_logit(self, utility, availability):
-#     U = utility
-#     AV = availability
+    p_y_given_x = functions.logit([U_1, U_2])
+    cost = functions.log_likelihood(p_y_given_x, y)
+    dy_dx = functions.first_order_derivative(cost, params=[b1, b2, asc1])
 
-#     assert len(U) == len(AV)
-#     prob = functions.logit(U, AV)
-#     assert prob.ndim == 2
+    out = dy_dx.eval(
+        {x: rng.normal(size=(13,)), y: rng.choice(2, size=(13,)).astype("int32")}
+    )
 
-#     with pytest.raises(ValueError):
-#         functions.logit(U, AV[:-1])
+    assert all(np.round(out, 3) == np.array([0.994, -0.994, -0.716]))
 
-#     U = aet.stack(U).flatten(2)
-#     prob = functions.logit(U, AV)
-#     assert prob.ndim == 2
+    with pytest.raises(TypeError):
+        functions.first_order_derivative(
+            cost, params=aet.as_tensor_variable([b1, b2, asc1])
+        )
 
-#     prob = functions.logit(U)
-#     assert type(prob) == TensorVariable
+    d2y_dx2 = functions.second_order_derivative(cost, params=[b1, b2, asc1])
 
-# def test_log_likelihood(self, loglikelihood):
-#     assert loglikelihood.ndim == 0
+    out = d2y_dx2.eval(
+        {x: rng.normal(size=(13,)), y: rng.choice(2, size=(13,)).astype("int32")}
+    )
 
-# def test_errors(self, logit, swissmetro_db):
-#     prob = logit
-#     db = swissmetro_db
-#     err = functions.errors(prob, db.y)
-#     assert err.ndim == 0
+    assert out.shape == (3, 3)
+    assert np.allclose(
+        np.round(out, 3),
+        np.array(
+            [[-3.684, 3.684, -1.044], [3.684, -3.684, 1.044], [-1.044, 1.044, -3.123]]
+        ),
+    )
 
-#     with pytest.raises(NotImplementedError):
-#         y_test = aet.vector("y")
-#         functions.errors(prob, y_test)
-
-# def test_hessians(self, mnl_model):
-#     h = functions.hessians(mnl_model.cost, mnl_model.betas)
-#     assert h.ndim == 2
-#     assert list(h.shape.eval()) == [4, 4]
-
-# def test_gradient_vector(self, mnl_model):
-#     gradients = functions.gradient_vector(mnl_model.cost, mnl_model.betas)
-#     assert gradients.ndim == 1
-#     assert list(gradients.shape.eval()) == [4]
+    with pytest.raises(TypeError):
+        functions.second_order_derivative(
+            cost, params=aet.as_tensor_variable([b1, b2, asc1])
+        )
