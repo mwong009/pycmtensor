@@ -1,5 +1,7 @@
 # expressions.py
 """PyCMTensor expressions module"""
+from typing import Union
+
 import aesara
 import aesara.tensor as aet
 import numpy as np
@@ -317,7 +319,7 @@ class Param(TensorExpressions):
         """Returns the numpy representation of the parameter value"""
         return self.shared_var.get_value()
 
-    def set_value(self, value):
+    def set_value(self, value: Union[np.ndarray, float]):
         """Set the value of the shared variable"""
         self.shared_var.set_value(value)
 
