@@ -111,6 +111,21 @@ class BaseModel(object):
         """
         return OrderedDict()
 
+    def include_regularization_terms(self, *regularizers):
+        """dummy method for additional regularizers into the cost function
+
+        Args:
+            *args (None): overloaded arguments
+            **kwargs (dict): overloaded keyword arguments
+
+        Returns:
+            (list[TensorVariable]): a list of symbolic variables that specify additional regualrizers to minimize against
+        """
+
+        if len(regularizers) > 0:
+            for reg in regularizers:
+                self.cost += reg
+
     def build_cost_updates_fn(self, updates):
         self.cost_updates_fn = function(
             name="cost_updates",
