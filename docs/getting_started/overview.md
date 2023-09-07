@@ -168,7 +168,7 @@ The `train()` function takes the following required arguments:
 
 - `model`: The model object. `MNL` in the example above
 - `ds`: The dataset object
-- `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration) in the user guide for details on possible options
+- `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration.md) in the user guide for details on possible options
 
 The other arguments `**kwargs` are optional, and they can be set when calling the `train()` function or during model specification. These optional arguments are the so-called *hyperparameters* of the model that modifies the training procedure.
 

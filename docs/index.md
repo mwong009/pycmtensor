@@ -45,9 +45,6 @@ PyCMTensor includes a set of 1st order and 1.5th order optimization routines and
 
 Some basic working code examples
 
-* [**Multinomial logit**](examples.md#multinomial-logit)
-* [**Mixed logit**](examples.md#mixed-logit)
-
 ## User guide
 
 * [**User guide**](user_guide/index.md) - Detailed guide on using PyCMTensor

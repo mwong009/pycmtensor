@@ -7,7 +7,8 @@ nav:
     - Installation: getting_started/installation.md
     - Overview: getting_started/overview.md
     - Troubleshooting & tips: getting_started/troubleshooting.md
-  - Examples: examples.md
+  - Examples: 
+    - Multnomial logit: examples/mnl.ipynb
   - User guide:
     - User guide: user_guide/index.md
     - Configuration: user_guide/configuration.md
@@ -68,6 +69,9 @@ repo_url: https://github.com/mwong009/pycmtensor
 
 plugins:
   - search
+  - mknotebooks:
+      execute: false
+      enable_default_pandas_dataframe_styling: false
   - mkdocstrings:
       handlers:
         python:
