@@ -9,6 +9,7 @@ nav:
     - Troubleshooting & tips: getting_started/troubleshooting.md
   - Examples: 
     - Multnomial logit: examples/mnl.ipynb
+    - Mixed logit: examples/mixed_mnl.ipynb
   - User guide:
     - User guide: user_guide/index.md
     - Configuration: user_guide/configuration.md
