@@ -27,6 +27,18 @@ class Layer(TensorExpressions):
         self._input = input
         self._status = status
 
+        if isinstance(input, Layer):
+            self._input = input.output
+
+        self.lb = -np.infty
+        self.ub = np.infty
+
+        for key, value in kwargs.items():
+            if key == "lb":
+                self.lb = value
+            if key == "ub":
+                self.ub = value
+
     def __repr__(self):
         return f"Layer({self.name}, size={self.n_in, self.n_out})"
 
@@ -77,6 +89,9 @@ class DenseLayer(Layer):
                 `"glorot"`, `None` (defaut)
             activation (str): activation function $f$, possible options: `"tanh"`,
                 `"relu"`, `"sigmoid"`, `"softplus"`, `None` (defaut)
+            kwargs(dict): additional keyword arguments:
+                - lb: lower bound value of the output(s)
+                - ub: upper bound value of the output(s)
 
         Attributes:
             w (pycmtensor.expressions.Weight): weight matrix of the layer (size=(n_in, n_out))
@@ -106,13 +121,15 @@ class DenseLayer(Layer):
         self._bias = b
         self._params = [self.w, self.bias]
 
-        linear = (self.w.T @ input) + self.bias  # -> (n_out, len(input))
+        linear = (self.w.T @ self.input) + self.bias  # -> (n_out, len(input))
         if n_out == 1:
             linear = aet.flatten(linear)  # (1, len(input)) -> (len(input),)
         if activation is None:
             self._output = aet.as_tensor_variable(linear)
         else:
             self._output = activation(linear)
+
+        self._output = aet.clip(self._output, self.lb, self.ub)
 
     def __repr__(self):
         return f"DenseLayer({self.name}, {self.output}; {self.params})"
@@ -140,6 +157,9 @@ class TNBetaLayer(DenseLayer, Beta):
                 `"glorot"`, `None` (defaut)
             activation (str): activation function $f$, possible options: `"tanh"`,
                 `"relu"`, `"sigmoid"`, `"softplus"`, `None` (defaut)
+            kwargs(dict): additional keyword arguments:
+                - lb: lower bound value of the output(s)
+                - ub: upper bound value of the output(s)
         """
         if not isinstance(input, Layer):
             raise TypeError(f"input  must be a Layer object. input type={type(input)}")
