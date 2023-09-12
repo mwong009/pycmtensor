@@ -45,6 +45,11 @@ def relu(x, alpha=0.0):
         return f1 * x + f2 * aet.abs(x)
 
 
+def neg_relu(x, alpha=0.0):
+    """negative variant of relu"""
+    return -relu(x, alpha)
+
+
 def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     """Calculates the exponential moving average (EMA) of a new minibatch
 

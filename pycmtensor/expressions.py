@@ -518,6 +518,9 @@ class Weight(Param):
             elif init_type == "glorot":
                 scale = np.sqrt(6 / (n_in + n_out))
                 value = rng.uniform(-1, 1, size) * scale
+            elif init_type == "neg_glorot":
+                scale = np.sqrt(6 / (n_in + n_out))
+                value = rng.uniform(-1, 0, size) * scale
             else:
                 debug(f"Weight {self.name} using default initialization U(-0.1, 0.1)")
                 init_type = "uniform(-0.1, 0.1)"
@@ -526,6 +529,10 @@ class Weight(Param):
         self._init_type = init_type
         self._init_value = value
         self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+
+    @staticmethod
+    def disp_init_types():
+        return ["zeros", "he", "glorot", "neg_glorot"]
 
     @property
     def init_type(self):
