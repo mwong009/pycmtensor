@@ -129,7 +129,7 @@ class TensorExpressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, Param):
+        elif isinstance(other, (Param, RandomDraws)):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -142,7 +142,7 @@ class TensorExpressions:
                 return aet.dot(other, self().T)
             else:
                 return self() * other
-        elif isinstance(other, Param):
+        elif isinstance(other, (Param, RandomDraws)):
             return self() * other()
         else:
             raise NotImplementedError(
@@ -413,6 +413,9 @@ class RandomDraws(TensorExpressions):
     def __repr__(self):
         return f"RandomDraws({self.name}, size=({self.n_draws}, 1))"
 
+    def __call__(self):
+        return self.shared_var
+
 
 class Bias(Param):
     def __init__(self, name, size, value=None):
@@ -453,7 +456,7 @@ class Bias(Param):
             return b + other
 
         else:
-            return super().__add__(other)
+            return super().__radd__(other)
 
     def __add__(self, other):
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
