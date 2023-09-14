@@ -231,6 +231,58 @@ class BaseModel(object):
         return [var for var in list(variables) if var not in symbols]
 
 
+def compute(model, ds, **params):
+    """Function for manual computation of model by specifying parameters as arguments
+
+    Args:
+        model (pycmtensor.models.BaseModel): model to train
+        ds (pycmtensor.dataset.Dataset): dataset to use for training
+        **params (dict): keyword arguments for model coefficients (`Params`)
+
+    Returns:
+        dict: model likelihood and error for training and validation datasets
+
+    Example:
+    ```
+    compute(model, ds, b_time=-5.009, b_purpose=0.307, asc_pt=-1.398, asc_drive=4.178,
+            asc_cycle=-3.996, b_car_own=1.4034)
+    ```
+    """
+    # saves original values and replace values by test values in params
+    p_value_old = {}
+    for p in model.params:
+        if p.name in params:
+            p_value_old[p.name] = p.get_value()
+            p.set_value(params[p.name])
+
+    # compute all the outputs of the training and validation datasets
+    x_y = model.x + [model.y]
+    train_data = ds.train_dataset(x_y)
+    valid_data = ds.valid_dataset(x_y)
+
+    t_index = np.arange(len(train_data[-1]))
+    v_index = np.arange(len(valid_data[-1]))
+
+    t_log_likelihood = model.log_likelihood_fn(*train_data, t_index)
+    t_error = model.prediction_error_fn(*train_data)
+
+    v_log_likelihood = model.log_likelihood_fn(*valid_data, v_index)
+    v_error = model.prediction_error_fn(*valid_data)
+
+    # put back original values
+    for p in model.params:
+        if p.name in p_value_old:
+            p.set_value(p_value_old[p.name])
+
+    # output results
+    return {
+        "train log likelihood": t_log_likelihood,
+        "train error": t_error,
+        "validation log likelihood": v_log_likelihood,
+        "validation error": v_error,
+    }
+
+
 def train(model, ds, **kwargs):
     """main training loop
 
@@ -344,10 +396,9 @@ def train(model, ds, **kwargs):
 
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
-                bl = model.results.best_loglikelihood
                 if (
                     (gnorm < (gnorm_min / 5.0))
-                    or (log_likelihood > (0.95 * bl))
+                    or (log_likelihood > (0.95 * model.results.best_loglikelihood))
                     or ((epoch % (max_epochs // 10)) == 0)
                 ):
                     error = model.prediction_error_fn(*valid_data)
