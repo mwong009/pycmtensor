@@ -70,7 +70,7 @@ def t_test(stderr, params):
         (list): t-test of the estimated parameters
     """
     params = [value for _, value in params.items()]
-    return [p.mean() / s for p, s in zip(params, stderr)]
+    return [np.percentile(p, 50) / s for p, s in zip(params, stderr)]
 
 
 def p_value(stderr, params):
