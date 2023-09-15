@@ -43,4 +43,4 @@ class Regularizers(object):
         if not isinstance(params, list):
             params = [params]
 
-        return weight * aet.sum([aet.sum(aet.abs(p())) for p in params])
+        return weight * aet.sum([aet.sum(aet.square(p())) for p in params])
