@@ -1,12 +1,13 @@
 # layers.py
 """Model layers"""
 
-import aesara
 import aesara.tensor as aet
 import numpy as np
 
 import pycmtensor.functions as functions
 from pycmtensor.expressions import Beta, Bias, TensorExpressions, Weight
+
+init_types = ["he", "zeros", "glorot"]
 
 
 class Layer(TensorExpressions):
@@ -101,7 +102,7 @@ class DenseLayer(Layer):
         self.n_in = n_in
         self.n_out = n_out
 
-        if (not init_type in ["zeros", "he", "glorot"]) and (not init_type is None):
+        if (not init_type in init_types) and (not init_type is None):
             raise KeyError
 
         w = Weight(f"{name}_W", (n_in, n_out), init_type=init_type)
@@ -164,7 +165,7 @@ class TNBetaLayer(DenseLayer, Beta):
         if not isinstance(input, Layer):
             raise TypeError(f"input  must be a Layer object. input type={type(input)}")
         DenseLayer.__init__(
-            self, name, input.output, input.n_out, 1, init_type, activation, **kwargs
+            self, name, input, input.n_out, 1, init_type, activation, **kwargs
         )
 
         def __repr__(self):
