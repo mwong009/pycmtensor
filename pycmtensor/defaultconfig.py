@@ -58,9 +58,8 @@ class Config:
             if type(value) == type(getattr(self, name)):
                 setattr(self, name, value)
             else:
-                raise TypeError(
-                    f"{name} must be of type {type(type(getattr(self, name)))}"
-                )
+                ftype = str(type(getattr(self, name))).split("'")[1]
+                raise TypeError(f"Incorrect type for {name}. ({ftype})")
         else:
             raise KeyError(f"{name} not a valid config parameter")
 

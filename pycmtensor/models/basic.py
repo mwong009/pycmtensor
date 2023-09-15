@@ -116,7 +116,6 @@ class BaseModel(object):
 
         Args:
             *args (None): overloaded arguments
-            **kwargs (dict): overloaded keyword arguments
 
         Returns:
             (list[TensorVariable]): a list of symbolic variables that specify additional regualrizers to minimize against
