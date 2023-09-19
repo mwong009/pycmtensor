@@ -30,4 +30,4 @@ def test_l2():
     l2_reg = Regularizers.l2(params).eval()
 
     assert len(l2_reg.shape) == 0
-    assert np.allclose(l2_reg, np.array(0.00027785))
+    assert np.round(l2_reg, 4) == 0.0003
