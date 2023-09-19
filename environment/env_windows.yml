@@ -9,6 +9,7 @@ dependencies:
     - vs2019_win-64
     - blas
     - aesara
+    - numpy=1.25
 
 # windows 
 # conda env create -f environment/env_windows.yml
