@@ -76,6 +76,11 @@ config.add(
     "Discards this number of hessian matrix updates when running the `BFGS` algorithm",
 )
 config.add("beta_clipping", True, "Enables or disables Beta value clipping")
+config.add(
+    "acceptance_method",
+    1,
+    "Best model acceptance method 1 (default): maximum loglikelihood; 0: min validation error",
+)
 
 
 def about():

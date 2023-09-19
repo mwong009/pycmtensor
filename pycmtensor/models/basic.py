@@ -310,6 +310,7 @@ def train(model, ds, **kwargs):
     validation_freq = n_train_batches
     max_epochs = model.config.max_epochs
     max_iterations = max_epochs * n_train_batches
+    acceptance_method = model.config.acceptance_method
 
     done_looping = False
     converged = False
@@ -383,48 +384,59 @@ def train(model, ds, **kwargs):
             model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
 
             if iteration % validation_freq == 0:
+                # training loglikelihood
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
                 loglikelihood_graph.append((iteration, log_likelihood))
 
+                # validation error
+                error = model.prediction_error_fn(*valid_data)
+                error_graph.append((iteration, error))
+
+                # convergence
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 p = model.include_params_for_convergence(train_data, t_index)
                 params.extend(list(p.values()))
-
                 diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
                 params_prev = params
-
                 gnorm = np.sqrt(np.sum(np.square(diff)))
+
+                # stdout
+                best_ll = model.results.best_loglikelihood
+                best_err = model.results.best_valid_error
+                vt = validation_threshold
+
+                if acceptance_method == 1:
+                    accept = log_likelihood > best_ll
+                else:
+                    accept = error < best_err
 
                 if (
                     (gnorm < (gnorm_min / 5.0))
-                    or (log_likelihood > (0.95 * model.results.best_loglikelihood))
                     or ((epoch % (max_epochs // 10)) == 0)
+                    or acceptance_method * (log_likelihood > (best_ll / vt))
+                    or (1 - acceptance_method) * (error < (best_err / vt))
                 ):
-                    error = model.prediction_error_fn(*valid_data)
-                    gnorm_min = gnorm
+                    if gnorm < (gnorm_min / 5.0):
+                        gnorm_min = gnorm
                     info(
                         f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                     )
 
-                if log_likelihood > model.results.best_loglikelihood:
-                    # validate if loglikelihood improves
-                    error = model.prediction_error_fn(*valid_data)
-                    error_graph.append((iteration, error))
-
-                    this_ll = log_likelihood
-                    best_ll = model.results.best_loglikelihood
-                    if this_ll > best_ll / validation_threshold:
-                        # increase patience if model is not converged
+                # acceptance of new results
+                if accept:
+                    if log_likelihood > (best_ll / validation_threshold):
                         patience = int(
                             min(max(patience, iteration * patience_inc), max_iterations)
                         )
 
+                    # save best results if new estimated model is accepted
                     model.results.best_epoch = epoch
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
                     model.results.gnorm = gnorm
 
+                    # save Beta params
                     for p in model.params:
                         model.results.params[p.name] = p.get_value()
                         if isinstance(p, Beta):
@@ -433,6 +445,7 @@ def train(model, ds, **kwargs):
                         for key, value in model.tn_betas_fn(*train_data, index).items():
                             model.results.betas[key] = value
 
+                # set condition for convergence
                 if gnorm < convergence_threshold:
                     converged = True
                 else:
@@ -442,7 +455,7 @@ def train(model, ds, **kwargs):
 
             iteration += 1
 
-            # reached convergence
+            # secondary condition for convergence
             if (iteration > patience) or converged:
                 iteration -= 1
                 info(
