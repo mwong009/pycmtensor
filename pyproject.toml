@@ -30,6 +30,7 @@ python = "^3.9, <3.12"
 pandas = "^1.4.1"
 scipy = "^1.7.1"
 watermark = "^2.3.1"
+numpy = "<1.26.0"
 
 
 [tool.poetry.group.test]

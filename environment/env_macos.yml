@@ -8,7 +8,7 @@ dependencies:
     - Clang
     - blas
     - aesara
-    - numpy=1.25
+    - numpy<1.26
 
 # macos
 # conda env create -f environment_macos.yml
