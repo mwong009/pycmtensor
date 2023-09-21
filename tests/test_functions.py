@@ -79,9 +79,9 @@ def test_log_likelihood(test_logit):
     prob = aet.as_tensor_variable(test_logit)
     y = aet.ivector("y")
 
-    ll = functions.log_likelihood(prob, y).eval({y: np.array([0, 0, 0, 0])})
+    ll = functions.log_likelihood(prob, y).eval({y: np.zeros((4,), dtype=np.int32)})
     ll = functions.log_likelihood(prob, y, index=np.arange(4)).eval(
-        {y: np.array([0, 0, 0, 0])}
+        {y: np.zeros((4,), dtype=np.int32)}
     )
 
     assert np.allclose(np.round(ll, 3), np.array(-2.313))
