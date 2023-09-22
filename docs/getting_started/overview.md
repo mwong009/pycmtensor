@@ -118,19 +118,19 @@ Finally, we vectorize the utility functions by putting them into a `list()`. The
 To specify the model, we create a model object from a model in the `pycmtensor.models` module.
 
 ```python
-mymodel = pycmtensor.models.MNL(ds=ds, params=locals(), utility=U, av=None)
+mymodel = pycmtensor.models.MNL(ds=ds, variables=locals(), utility=U, av=None)
 ```
 
 The `MNL` object takes the following argument:
 
 - `ds`: The dataset object
-- `params`: the list (or dict) of declared parameter objects*
+- `variables`: the list (or dict) of declared parameter objects*
 - `utility`: The list of utilities to be estimated
 - `av`: The availability conditions as a list with the same index as `utility`. See [here]() for an example on specifying availability conditions. Defaults to `None`
 - `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration.md) in the user guide for details on possible options
 
 !!! tip
-    *: We use `locals()` as a shortcut for collecting and fitering the `Beta` objects from the Python [local environment](https://docs.python.org/3/library/functions.html#locals) for the argument `params=`.
+    *: We use `locals()` as a shortcut for collecting and fitering the `Beta` objects from the Python [local environment](https://docs.python.org/3/library/functions.html#locals) for the argument `variables=`.
 
 Output:
 
@@ -138,7 +138,7 @@ Output:
     [INFO] inputs in MNL: [driving_license, dur_walking, dur_cycling, dur_pt_rail, 
     dur_pt_bus, dur_pt_int, dur_driving, cost_transit, cost_driving_fuel, 
     cost_driving_ccharge]
-    [INFO] Build time = 00:00:09
+    [INFO] Build time = 00:00:01
     
 
 
@@ -168,7 +168,7 @@ The `train()` function takes the following required arguments:
 
 - `model`: The model object. `MNL` in the example above
 - `ds`: The dataset object
-- `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration) in the user guide for details on possible options
+- `**kwargs`: Optional keyword arguments for modifying the model configuration settings. See [configuration](../user_guide/configuration.md) in the user guide for details on possible options
 
 The other arguments `**kwargs` are optional, and they can be set when calling the `train()` function or during model specification. These optional arguments are the so-called *hyperparameters* of the model that modifies the training procedure.
 
@@ -263,6 +263,51 @@ Ouput:
 
 ## Prediction and validation
 
+For choice prediction, PyCMTensor generates a vector of probabilities for each observation in the *validation* dataset. It is also possible to output discrete prediction (e.g. classification) using the Argmax function. To output the predicted probabilites after estimation, use the function:
+
+```python
+prob = mymodel.predict(ds, return_probabilities=True)
+print(pd.DataFrame(prob))
+```
+
+Output:
+```console
+	0	            1	        2	        3
+0	1.805676e-02	0.026041	0.114326	0.841576
+1	3.052870e-02	0.015358	0.128087	0.826026
+2	6.262815e-01	0.018934	0.264090	0.090694
+3	3.649617e-08	0.002540	0.072809	0.924651
+4	4.880317e-05	0.024973	0.828194	0.146784
+...	...	            ...	        ...	        ...
+```
+
+to generate probabilities for each observation in the validation dataset, or for discrete predictions, set `return_probabilties=False`.
+
+
+## Elasticities
+
+Disaggregated elasticities are generated from the model by specifiying the dataset and the reference choice as `wrt_choice`. For instance, to compute the elasticities of the mode for driving (`wrt_choice=3`) over all the input variables:
+
+```python
+elas = mymodel.elasticities(ds, wrt_choice=3)
+pd.DataFrame(elas)
+```
+
+Output:
+```console
+cost_driving_ccharge	cost_driving_fuel	cost_transit	driving_license	dur_cycling	dur_driving	dur_pt_bus	dur_pt_int	dur_pt_rail	dur_walking	purpose
+0	0.0	0.177908	0.063031	-1.237733	-3.634088	1.047106	0.287043	0.099481	0.000000	0.003005	-0.246805
+1	0.0	0.076653	0.158756	-0.747595	-2.335536	1.079767	0.000000	0.000000	0.313203	0.062477	-0.745355
+2	0.0	0.025086	0.189326	-0.000000	-2.397259	0.266012	0.000000	0.000000	0.461397	0.061311	-0.163128
+3	0.0	0.027003	0.000000	-0.670951	-0.914464	0.408430	0.000000	0.000000	0.107671	0.297314	-0.401365
+4	0.0	0.374654	0.112961	-0.000000	-6.296690	2.359637	0.062192	0.248769	0.559729	0.000010	-0.944990
+...	...	...	...	...	...	...	...	...
+```
+
+
+The aggregated elasticities can then be obtained by taking the mean over the rows
+
+
 ## Putting it all together
 
 ```python linenums="1"
@@ -323,4 +368,12 @@ train(
 print(mymodel.results.beta_statistics())
 print(mymodel.results.model_statistics())
 print(mymodel.results.benchmark())
+
+# predictions
+prob = mymodel.predict(ds, return_probabilities=True)
+print(pd.DataFrame(prob))
+
+# elasticities
+elas = mymodel.elasticities(ds, wrt_choice=1)
+print(pd.DataFrame(elas))
 ```

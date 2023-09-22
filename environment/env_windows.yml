@@ -7,8 +7,9 @@ dependencies:
     - mkl-service
     - m2w64-toolchain
     - vs2019_win-64
-    - blas
-    - aesara
+    - blas>=2.1
+    - aesara>=2.9.2
+    - numpy<1.26
 
 # windows 
 # conda env create -f environment/env_windows.yml

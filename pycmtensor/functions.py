@@ -45,13 +45,18 @@ def relu(x, alpha=0.0):
         return f1 * x + f2 * aet.abs(x)
 
 
+def neg_relu(x, alpha=0.0):
+    """negative variant of relu"""
+    return -relu(x, alpha)
+
+
 def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     """Calculates the exponential moving average (EMA) of a new minibatch
 
     Args:
         batch_avg (TensorVariable): mean batch value
         moving_avg (TensorVariable): accumulated mean
-        alpha (float): moving average factor of the batch mean
+        alpha (float): ratio of moving average to batch average
 
     Returns:
         (TensorVariable): the new moving average
@@ -187,7 +192,7 @@ def rmse(y_hat, y):
     if y_hat.ndim != y.ndim:
         msg = f"y_hat should have the same dimensions as y. y_hat.ndim: {y_hat.ndim}, q.ndim: {y.ndim}"
         raise ValueError(msg)
-    if y_hat.ndim < 1:
+    if (y_hat.ndim > 1) or (y.ndim > 1):
         y_hat = aet.flatten(y_hat)
         y = aet.flatten(y)
 
@@ -210,7 +215,7 @@ def mae(y_hat, y):
     if y_hat.ndim != y.ndim:
         msg = f"y_hat should have the same dimensions as y. y_hat.ndim: {y_hat.ndim}, q.ndim: {y.ndim}"
         raise ValueError(msg)
-    if y_hat.ndim < 1:
+    if (y_hat.ndim > 1) or (y.ndim > 1):
         y_hat = aet.flatten(y_hat)
         y = aet.flatten(y)
 

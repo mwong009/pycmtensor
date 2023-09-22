@@ -111,12 +111,27 @@ class BaseModel(object):
         """
         return OrderedDict()
 
+    def include_regularization_terms(self, *regularizers):
+        """dummy method for additional regularizers into the cost function
+
+        Args:
+            *args (None): overloaded arguments
+
+        Returns:
+            (list[TensorVariable]): a list of symbolic variables that specify additional regualrizers to minimize against
+        """
+
+        if len(regularizers) > 0:
+            for reg in regularizers:
+                self.cost += reg
+
     def build_cost_updates_fn(self, updates):
         self.cost_updates_fn = function(
             name="cost_updates",
             inputs=self.x + [self.y, self.learning_rate, self.index],
             outputs=self.cost,
             updates=updates,
+            allow_input_downcast=True,
         )
 
     def predict(self, ds, return_probabilities=False):
@@ -125,6 +140,7 @@ class BaseModel(object):
                 name="choice_probabilities",
                 inputs=self.x,
                 outputs=self.p_y_given_x,
+                allow_input_downcast=True,
             )
 
         valid_data = ds.valid_dataset(self.x)
@@ -147,6 +163,7 @@ class BaseModel(object):
                 inputs=self.x + [self.y, self.index],
                 outputs={x.name: g * x / p_y_given_x for g, x in zip(dy_dx, self.x)},
                 on_unused_input="ignore",
+                allow_input_downcast=True,
             )
         train_data = ds.train_dataset(self.x)
         index = np.arange((len(train_data[-1])))
@@ -216,13 +233,65 @@ class BaseModel(object):
         return [var for var in list(variables) if var not in symbols]
 
 
+def compute(model, ds, **params):
+    """Function for manual computation of model by specifying parameters as arguments
+
+    Args:
+        model (pycmtensor.models.BaseModel): model to train
+        ds (pycmtensor.dataset.Dataset): dataset to use for training
+        **params (dict): keyword arguments for model coefficients (`Params`)
+
+    Returns:
+        dict: model likelihood and error for training and validation datasets
+
+    Example:
+    ```
+    compute(model, ds, b_time=-5.009, b_purpose=0.307, asc_pt=-1.398, asc_drive=4.178,
+            asc_cycle=-3.996, b_car_own=1.4034)
+    ```
+    """
+    # saves original values and replace values by test values in params
+    p_value_old = {}
+    for p in model.params:
+        if p.name in params:
+            p_value_old[p.name] = p.get_value()
+            p.set_value(params[p.name])
+
+    # compute all the outputs of the training and validation datasets
+    x_y = model.x + [model.y]
+    train_data = ds.train_dataset(x_y)
+    valid_data = ds.valid_dataset(x_y)
+
+    t_index = np.arange(len(train_data[-1]))
+    v_index = np.arange(len(valid_data[-1]))
+
+    t_log_likelihood = model.log_likelihood_fn(*train_data, t_index)
+    t_error = model.prediction_error_fn(*train_data)
+
+    v_log_likelihood = model.log_likelihood_fn(*valid_data, v_index)
+    v_error = model.prediction_error_fn(*valid_data)
+
+    # put back original values
+    for p in model.params:
+        if p.name in p_value_old:
+            p.set_value(p_value_old[p.name])
+
+    # output results
+    return {
+        "train log likelihood": t_log_likelihood,
+        "train error": t_error,
+        "validation log likelihood": v_log_likelihood,
+        "validation error": v_error,
+    }
+
+
 def train(model, ds, **kwargs):
     """main training loop
 
     Args:
         model (pycmtensor.models.BaseModel): model to train
         ds (pycmtensor.dataset.Dataset): dataset to use for training
-        **kwargs (dict): overloaded keyword arguments. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+        **kwargs (dict): overloaded keyword arguments. See [configuration](../../../user_guide/configuration.md) in the user guide for details on possible options
     """
     for key, value in kwargs.items():
         model.config.add(key, value)
@@ -244,6 +313,7 @@ def train(model, ds, **kwargs):
     validation_freq = n_train_batches
     max_epochs = model.config.max_epochs
     max_iterations = max_epochs * n_train_batches
+    acceptance_method = model.config.acceptance_method
 
     done_looping = False
     converged = False
@@ -317,49 +387,59 @@ def train(model, ds, **kwargs):
             model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
 
             if iteration % validation_freq == 0:
+                # training loglikelihood
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
                 loglikelihood_graph.append((iteration, log_likelihood))
 
+                # validation error
+                error = model.prediction_error_fn(*valid_data)
+                error_graph.append((iteration, error))
+
+                # convergence
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
                 p = model.include_params_for_convergence(train_data, t_index)
                 params.extend(list(p.values()))
-
                 diff = [p_prev - p for p_prev, p in zip(params_prev, params)]
                 params_prev = params
-
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
-                bl = model.results.best_loglikelihood
+                # stdout
+                best_ll = model.results.best_loglikelihood
+                best_err = model.results.best_valid_error
+                vt = validation_threshold
+
+                if acceptance_method == 1:
+                    accept = log_likelihood > best_ll
+                else:
+                    accept = error < best_err
+
                 if (
                     (gnorm < (gnorm_min / 5.0))
-                    or (log_likelihood > (0.95 * bl))
                     or ((epoch % (max_epochs // 10)) == 0)
+                    or (accept and (log_likelihood > (best_ll / (vt * vt))))
+                    or ((1 - accept) and (error < (best_err / (vt * vt))))
                 ):
-                    error = model.prediction_error_fn(*valid_data)
-                    gnorm_min = gnorm
+                    if gnorm < (gnorm_min / 5.0):
+                        gnorm_min = gnorm
                     info(
                         f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
                     )
 
-                if log_likelihood > model.results.best_loglikelihood:
-                    # validate if loglikelihood improves
-                    error = model.prediction_error_fn(*valid_data)
-                    error_graph.append((iteration, error))
-
-                    this_ll = log_likelihood
-                    best_ll = model.results.best_loglikelihood
-                    if this_ll > best_ll / validation_threshold:
-                        # increase patience if model is not converged
+                # acceptance of new results
+                if accept:
+                    if log_likelihood > (best_ll / validation_threshold):
                         patience = int(
                             min(max(patience, iteration * patience_inc), max_iterations)
                         )
 
+                    # save best results if new estimated model is accepted
                     model.results.best_epoch = epoch
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = error
                     model.results.gnorm = gnorm
 
+                    # save Beta params
                     for p in model.params:
                         model.results.params[p.name] = p.get_value()
                         if isinstance(p, Beta):
@@ -368,6 +448,7 @@ def train(model, ds, **kwargs):
                         for key, value in model.tn_betas_fn(*train_data, index).items():
                             model.results.betas[key] = value
 
+                # set condition for convergence
                 if gnorm < convergence_threshold:
                     converged = True
                 else:
@@ -377,7 +458,7 @@ def train(model, ds, **kwargs):
 
             iteration += 1
 
-            # reached convergence
+            # secondary condition for convergence
             if (iteration > patience) or converged:
                 iteration -= 1
                 info(

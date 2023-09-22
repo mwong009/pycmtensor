@@ -159,7 +159,7 @@ class Results(object):
 
         stats = pd.DataFrame(
             index=self.betas,
-            data=[value.mean() for _, value in self.betas.items()],
+            data=[np.percentile(value, 50) for _, value in self.betas.items()],
             columns=["value"],
         )
 

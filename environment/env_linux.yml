@@ -9,6 +9,7 @@ dependencies:
     - gxx_linux-64
     - blas
     - aesara
+    - numpy<1.26
 
 # linux
 # conda env create -f environment_linux.yml

@@ -7,7 +7,9 @@ nav:
     - Installation: getting_started/installation.md
     - Overview: getting_started/overview.md
     - Troubleshooting & tips: getting_started/troubleshooting.md
-  - Examples: examples.md
+  - Examples: 
+    - Multnomial logit: examples/mnl.ipynb
+    - Mixed logit: examples/mixed_mnl.ipynb
   - User guide:
     - User guide: user_guide/index.md
     - Configuration: user_guide/configuration.md
@@ -20,6 +22,7 @@ nav:
       - dataset: developer_guide/api/dataset.md
       - expressions: developer_guide/api/expressions.md
       - functions: developer_guide/api/functions.md
+      - logger: developer_guide/api/logger.md
       - models: 
         - basic: developer_guide/api/models/basic.md
         - MNL: developer_guide/api/models/MNL.md
@@ -67,6 +70,9 @@ repo_url: https://github.com/mwong009/pycmtensor
 
 plugins:
   - search
+  - mknotebooks:
+      execute: false
+      enable_default_pandas_dataframe_styling: false
   - mkdocstrings:
       handlers:
         python:

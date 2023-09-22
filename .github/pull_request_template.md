@@ -9,7 +9,7 @@
 ## Features
 - ...
 
-## Bug fixes
+## Fixes
 - ...
 
 ## Documentation

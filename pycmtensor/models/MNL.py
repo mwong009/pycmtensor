@@ -26,7 +26,7 @@ class MNL(BaseModel):
             utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
             av (List[TensorVariable]): list of availability conditions. If `None`, all
                 availability is set to 1
-            **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration) in the user guide for details on possible options
+            **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration.md) in the user guide for details on possible options
 
         Attributes:
             x (List[TensorVariable]): symbolic variable objects for independent
@@ -105,13 +105,17 @@ class MNL(BaseModel):
     def build_cost_fn(self):
         """constructs aesara functions for cost and prediction errors"""
         self.log_likelihood_fn = aesara.function(
-            name="log_likelihood", inputs=self.x + [self.y, self.index], outputs=self.ll
+            name="log_likelihood",
+            inputs=self.x + [self.y, self.index],
+            outputs=self.ll,
+            allow_input_downcast=True,
         )
 
         self.prediction_error_fn = aesara.function(
             name="prediction_error",
             inputs=self.x + [self.y],
             outputs=errors(self.p_y_given_x, self.y),
+            allow_input_downcast=True,
         )
 
     def build_gh_fn(self):

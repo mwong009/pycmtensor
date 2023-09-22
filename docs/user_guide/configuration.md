@@ -19,17 +19,17 @@ pycmtensor.config.add('seed', 100)
 
 ## Configuration attributes
 
-### `config.seed`
-
-:	Seed value for random number generators. 
-
-	Default: `100`
-
 ### `config.batch_size`
 
 :	Number of samples processed on each iteration of the model update
 
 	Default: `32`
+
+### `config.seed`
+
+:	Seed value for random number generators. 
+
+	Default: `100`
 
 ### `config.max_epochs`
 
@@ -53,13 +53,7 @@ pycmtensor.config.add('seed', 100)
 
 :	The factor of the validation error score to meet in order to register an improvement
 
-	Default: `1.003`
-
-### `config.convergence_threshold`
-
-:	The gradient norm convergence threshold before model termination
-
-	Default: `1e-4`
+	Default: `1.005`
 
 ### `config.base_learning_rate`
 
@@ -79,6 +73,12 @@ pycmtensor.config.add('seed', 100)
 
 	Default: `1e-5`
 
+### `config.convergence_threshold`
+
+:	The gradient norm convergence threshold before model termination
+
+	Default: `1e-4`
+
 ### `config.optimizer`
 
 :	Optimization algorithm to use for model estimation
@@ -88,16 +88,12 @@ pycmtensor.config.add('seed', 100)
 	Possible options are: 
 	
 	- 1st order optimizers: `Adam`, `Nadam`, `Adam`, `Adamax`, `Adadelta`, `RMSProp`, `Momentum`, `NAG`, `AdaGrad`, `SGD`
-  	- 2nd order optimizers: `BFGS`
+  	- 2nd order optimizers: `SQNBFGS`
 
 	!!! note
 		`config.optimizer` takes a [`pycmtensor.optimizers.Optimizer`]() class object as a value. Refer to [here]() for more information on optimizers.
 
-### `config.BFGS_warmup`
 
-:	Discards this number of hessian matrix updates when running the `BFGS` algorithm
-
-	Default: `10`
 
 ### `config.lr_scheduler`
 
@@ -141,6 +137,18 @@ pycmtensor.config.add('seed', 100)
 :	Power factor for `PolynomialLR`
 
 	Default: `0.999`
+
+### `config.BFGS_warmup`
+
+:	Discards this number of hessian matrix updates when running the `BFGS` algorithm
+
+	Default: `10`
+
+### `config.beta_clipping`
+
+:	If true, Beta parameters are clipped to lower and upper bounds
+
+	Default: `True`
 
 ## Aesara config
 

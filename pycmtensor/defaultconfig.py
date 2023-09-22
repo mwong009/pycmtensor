@@ -45,30 +45,45 @@ class Config:
 
         return msg
 
-    def add(self, name, value: any, description=None):
+    def update(self, name, value, *args, **kwargs):
+        """update the config parameter
+
+        Args:
+            name (str): the name of the parameter
+            value (any): the value of the parameter
+            *args (None): overloaded arguments
+            **kwargs (dict): overloaded keyword arguments
+        """
+        if name in dir(self):
+            if type(value) == type(getattr(self, name)):
+                setattr(self, name, value)
+            else:
+                ftype = str(type(getattr(self, name))).split("'")[1]
+                raise TypeError(f"Incorrect type for {name}. ({ftype})")
+        else:
+            raise KeyError(f"{name} not a valid config parameter")
+
+    def add(self, name, value, description=None):
         """Method to add a new or update a setting in the configuration
 
         Args:
-            name (str): name of the setting
-            value: value given to the setting
-            description (str): a string text describing the function of the setting
+            name (str): the name of the parameter
+            value (any): the value of the parameter
+            description (str): description of the parameter
 
         !!! example
             To set the value of the random seed to 100
             ```python
-            pycmtensor.config.add('seed', 100)
+            pycmtensor.config.add('seed', 100, description='seed value')
             ```
         """
+        if name in dir(self):
+            self.update(name, value)
+        else:
+            setattr(self, name, value)
 
-        if name in self.__dict__:
-            # check same instance as existing parameter
-            if not isinstance(value, type(getattr(self, name))):
-                raise TypeError(f"{name} must of of type {type(getattr(self, name))}.")
-
-        setattr(self, name, value)
-
-        if description is not None:
-            self.descriptions[name] = description
+            if description is not None:
+                self.descriptions[name] = description
 
 
 config = Config()
