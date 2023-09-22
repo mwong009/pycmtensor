@@ -131,6 +131,7 @@ class BaseModel(object):
             inputs=self.x + [self.y, self.learning_rate, self.index],
             outputs=self.cost,
             updates=updates,
+            allow_input_downcast=True,
         )
 
     def predict(self, ds, return_probabilities=False):
@@ -139,6 +140,7 @@ class BaseModel(object):
                 name="choice_probabilities",
                 inputs=self.x,
                 outputs=self.p_y_given_x,
+                allow_input_downcast=True,
             )
 
         valid_data = ds.valid_dataset(self.x)
@@ -161,6 +163,7 @@ class BaseModel(object):
                 inputs=self.x + [self.y, self.index],
                 outputs={x.name: g * x / p_y_given_x for g, x in zip(dy_dx, self.x)},
                 on_unused_input="ignore",
+                allow_input_downcast=True,
             )
         train_data = ds.train_dataset(self.x)
         index = np.arange((len(train_data[-1])))
