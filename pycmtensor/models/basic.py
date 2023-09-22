@@ -413,8 +413,8 @@ def train(model, ds, **kwargs):
                 if (
                     (gnorm < (gnorm_min / 5.0))
                     or ((epoch % (max_epochs // 10)) == 0)
-                    or acceptance_method * (log_likelihood > (best_ll / vt))
-                    or (1 - acceptance_method) * (error < (best_err / vt))
+                    or (accept and (log_likelihood > (best_ll / (vt * vt))))
+                    or ((1 - accept) and (error < (best_err / (vt * vt))))
                 ):
                     if gnorm < (gnorm_min / 5.0):
                         gnorm_min = gnorm
