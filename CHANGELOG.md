@@ -1,3 +1,27 @@
+## v1.7.0 (2023-09-22)
+
+### Feat
+
+- new option for selection of model acceptance pattern
+- calculating distributed Beta now uses percentile instead of mean
+- **models**: add new func `compute` to run the model on a manual set of params
+- **regularizers**: new method `include_regularization_terms()` in BaseModel for adding regularizers
+
+### Fix
+
+- **dependencies**: prevent breakage of numpy 1.26
+- import compute from pycmtensor.models
+- fix l2 regularizer formula
+- set init_types as a module level list and add tests
+- add minmax clipping on neural net layer outputs
+- temporary function for negative relu
+- expression fix for random draw variables
+
+### Refactor
+
+- relax the condition for stdout during training
+- **config**: refactor config.add into .add() and .update() methods
+
 ## v1.6.4 (2023-08-14)
 
 ### Refactor
