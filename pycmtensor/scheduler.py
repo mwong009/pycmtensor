@@ -12,7 +12,7 @@ __all__ = [
     "StepLR",
     "PolynomialLR",
     "CyclicLR",
-    "TriangularCLR",
+    "Triangular2CLR",
     "ExpRangeCLR",
 ]
 
@@ -153,7 +153,6 @@ class CyclicLR(Scheduler):
         super().__init__(lr)
         self.name = "CyclicLR"
         self._max_lr = max_lr
-        self._min_lr = 0.01 * lr
         self._cycle_steps = cycle_steps
         self._scale_fn = scale_fn
 
@@ -168,18 +167,18 @@ class CyclicLR(Scheduler):
     def cycle_steps(self):
         return self._cycle_steps
 
-    def __call__(self, step):
-        cycle = np.floor(1 + step / self.cycle_steps)
-        x = np.abs(step / (self.cycle_steps / 2) - 2 * cycle + 1)
+    def __call__(self, epoch):
+        cycle = np.floor(1 + epoch / (2 * self.cycle_steps))
+        x = np.abs(epoch / self.cycle_steps - 2 * cycle + 1)
         height = (self.max_lr - self.lr) * self.scale_fn(cycle)
-        lr = max(self.lr + height * np.maximum(0, 1 - x), self._min_lr)
-        return self.record(step, lr)
+        lr = self.lr + height * np.maximum(0, 1 - x)
+        return self.record(epoch, lr)
 
     def scale_fn(self, k):
         return 1.0
 
 
-class TriangularCLR(CyclicLR):
+class Triangular2CLR(CyclicLR):
     def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, **kwargs):
         """Base class for Triangular Cyclic LR scheduler. The scaling of the Triangular Cyclic function is:
 
@@ -194,7 +193,7 @@ class TriangularCLR(CyclicLR):
             **kwargs (dict): overloaded keyword arguments
         """
         super().__init__(lr, max_lr, cycle_steps, scale_fn=self.scale_fn)
-        self.name = "TriangularCLR"
+        self.name = "Triangular2CLR"
 
     def scale_fn(self, k):
         return float(1.0 / (2.0 ** (k - 1.0)))

@@ -328,6 +328,7 @@ def train(model, ds, **kwargs):
 
     lr_scheduler = model.config.lr_scheduler(
         lr=model.config.base_learning_rate,
+        max_lr=model.config.max_learning_rate,
         factor=model.config.lr_stepLR_factor,
         drop_every=model.config.lr_stepLR_drop_every,
         power=model.config.lr_PolynomialLR_power,
