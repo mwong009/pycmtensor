@@ -1,3 +1,10 @@
+## v1.7.1 (2023-09-28)
+
+### Fix
+
+- **scheduler**: fixed calculation erro in cyclic lr
+- condition for stdout
+
 ## v1.7.0 (2023-09-22)
 
 ### Feat
