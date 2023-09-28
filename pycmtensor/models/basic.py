@@ -328,6 +328,7 @@ def train(model, ds, **kwargs):
 
     lr_scheduler = model.config.lr_scheduler(
         lr=model.config.base_learning_rate,
+        max_lr=model.config.max_learning_rate,
         factor=model.config.lr_stepLR_factor,
         drop_every=model.config.lr_stepLR_drop_every,
         power=model.config.lr_PolynomialLR_power,
@@ -416,8 +417,8 @@ def train(model, ds, **kwargs):
                 if (
                     (gnorm < (gnorm_min / 5.0))
                     or ((epoch % (max_epochs // 10)) == 0)
-                    or (accept and (log_likelihood > (best_ll / (vt * vt))))
-                    or ((1 - accept) and (error < (best_err / (vt * vt))))
+                    or ((acceptance_method == 1) and (log_likelihood > (best_ll / vt)))
+                    or ((acceptance_method == 0) and (error < (best_err / vt)))
                 ):
                     if gnorm < (gnorm_min / 5.0):
                         gnorm_min = gnorm
@@ -427,7 +428,7 @@ def train(model, ds, **kwargs):
 
                 # acceptance of new results
                 if accept:
-                    if log_likelihood > (best_ll / validation_threshold):
+                    if log_likelihood > (best_ll / vt):
                         patience = int(
                             min(max(patience, iteration * patience_inc), max_iterations)
                         )
