@@ -6,9 +6,9 @@ authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
 license = "MIT"
 readme = "README.md"
 
-homepage = ""
+# homepage = ""
 repository = "https://github.com/mwong009/pycmtensor"
-documentation = ""
+# documentation = ""
 
 keywords = []
 

@@ -450,7 +450,11 @@ def train(model, ds, **kwargs):
                             model.results.betas[key] = value
 
                 # set condition for convergence
-                if gnorm < convergence_threshold:
+                if (gnorm < convergence_threshold) or (
+                    (iteration > (patience / 2))
+                    and (acceptance_method == 0)
+                    and (error > (model.results.best_valid_error * 1.2))
+                ):
                     converged = True
                 else:
                     patience = int(
@@ -485,6 +489,10 @@ def train(model, ds, **kwargs):
     model.results.loglikelihood_graph = loglikelihood_graph
     model.results.error_graph = error_graph
 
+    info(
+        f"Best results obtained at epoch {model.results.best_epoch}: LL={model.results.best_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
+    )
+
     debug(f"Evaluating full hessian and bhhh matrix")
     for p in model.params:
         p.set_value(model.results.params[p.name])
@@ -501,7 +509,3 @@ def train(model, ds, **kwargs):
 
     model.results.bhhh_matrix = bhhh
     model.results.hessian_matrix = hessian
-
-    info(
-        f"Best results obtained at epoch {model.results.best_epoch}: LL={model.results.best_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
-    )

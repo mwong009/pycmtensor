@@ -6,6 +6,7 @@ from aesara import shared
 from aesara.ifelse import ifelse
 
 import pycmtensor.defaultconfig as defaultconfig
+import pycmtensor.expressions as expr
 
 config = defaultconfig.config
 
@@ -122,6 +123,45 @@ class Adam(Optimizer):
             v_t_hat = v_t / (1.0 - aet.pow(self.b2, self.t))
 
             g_t = lr * m_t_hat / (aet.sqrt(v_t_hat) + self.epsilon)
+            p_t = param - g_t
+            p_t = clip(p_t, *b)
+
+            updates.append((m, m_t))
+            updates.append((v, v_t))
+            updates.append((param, p_t))
+
+        updates.append((self.t, t_new))
+
+        return updates
+
+
+class AdamW(Adam):
+    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+        """Adam with weight decay"""
+        super().__init__(params, b1, b2)
+        self.w = config.adam_weight_decay
+
+    def update(self, cost, params, lr):
+        params2 = [p for p in params if p.status != 1]
+
+        bounds = [(p.lb, p.ub) for p in params2]
+        params = [p() for p in params2]
+        decay = [self.w * p() if isinstance(p, expr.Weight) else 0.0 for p in params2]
+        grads = aet.grad(cost, params, disconnected_inputs="ignore")
+
+        updates = []
+
+        t_new = self.t + 1.0
+        for m, v, param, grad, b, d in zip(
+            self.m_prev, self.v_prev, params, grads, bounds, decay
+        ):
+            m_t = self.b1 * m + (1.0 - self.b1) * grad
+            m_t_hat = m_t / (1.0 - aet.pow(self.b1, self.t))
+
+            v_t = self.b2 * v + (1.0 - self.b2) * aet.sqr(grad)
+            v_t_hat = v_t / (1.0 - aet.pow(self.b2, self.t))
+
+            g_t = lr * m_t_hat / (aet.sqrt(v_t_hat) + self.epsilon) + d
             p_t = param - g_t
             p_t = clip(p_t, *b)
 
