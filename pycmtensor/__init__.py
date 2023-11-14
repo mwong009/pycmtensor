@@ -60,6 +60,8 @@ config.add(
     "Optimization algorithm to use for model estimation",
 )
 
+config.add("adam_weight_decay", 0.01, "Weight decay factor for AdamW optimizer")
+
 config.add(
     "lr_scheduler",
     scheduler.ConstantLR,

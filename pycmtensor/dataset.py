@@ -1,12 +1,13 @@
 # dataset.py
 # converts pandas dataframe into an xarray dataset
 
-from typing import Union
 
 import aesara.tensor as aet
 from aesara.tensor.var import TensorVariable
 
-from pycmtensor import config
+import pycmtensor.defaultconfig as defaultconfig
+
+config = defaultconfig.config
 
 from .logger import debug, info
 
@@ -14,7 +15,7 @@ __all__ = ["Dataset"]
 
 
 class Dataset:
-    def __init__(self, df, choice):
+    def __init__(self, df, choice, **kwargs):
         """Base PyCMTensor Dataset class object
 
         This class stores the data in an array format, and a symbolic tensor reference
@@ -74,6 +75,9 @@ class Dataset:
             ```
 
         """
+        for key, value in kwargs.items():
+            config.add(key, value)
+
         if choice not in df.columns:
             raise IndexError(f"{choice} not found in dataframe.")
 
@@ -195,7 +199,9 @@ class Dataset:
         """
 
         self.split_frac = frac
-        info(f"n_train_samples:{self.n_train} n_valid_samples:{self.n_valid}")
+        info(
+            f"seed: {config.seed} n_train_samples:{self.n_train} n_valid_samples:{self.n_valid}"
+        )
 
     def _dataset_slice(self, tensors, index, batch_size, shift, n_index):
         """Internal method call for self.train_dataset or self.valid_dataset"""
