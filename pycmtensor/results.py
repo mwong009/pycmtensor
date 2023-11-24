@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
 
+from pycmtensor.logger import error
 from pycmtensor.statistics import *
 
 __all__ = ["Results"]
@@ -36,9 +37,7 @@ class Results(object):
             bhhh_matrix (numpy.ndarray): the 3-D bhhh matrix where the 1st dimension is
                 the length of the dataset and the last 2 dimensions are the matrix for
                 each data observation
-            loglikelihood_graph (list): log likelihoods at iteration i
-            error_graph (list): errors at iteration i
-            lr_history_graph (list): learning rates at iteration i
+            statistics_graph (dict): a dictionary containing the learning_rate, training, and validation statistics.
         """
         self.build_time = None
         self.train_time = None
@@ -58,9 +57,7 @@ class Results(object):
         self.bhhh_matrix = None
         self.betas = None
 
-        self.loglikelihood_graph = None
-        self.error_graph = None
-        self.lr_history_graph = None
+        self.statistics_graph = None
 
     def rho_square(self):
         """rho square value of the model
@@ -220,3 +217,56 @@ class Results(object):
         )
 
         return mat
+
+    def show_training_plot(self, sample_intervals=1):
+        """Displays the statistics graph as a line plot
+
+        Args:
+            sample_intervals (int): plot only the n-th point from the statistics
+
+        Returns:
+            (pandas.DataFrame): The statistics as a pandas dataframe
+        """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        sns.set_style("white")
+        color = sns.color_palette("tab10", 4)
+
+        statistics = pd.DataFrame(data=self.statistics_graph)
+        if (sample_intervals < 1) or (sample_intervals > len(statistics)):
+            error(f"sample_intervals must be greater than 0 or less than total length")
+            return statistics
+
+        fig, ax1 = plt.subplots()
+        ax2 = ax1.twinx()
+
+        statistics = statistics[::sample_intervals]
+        sns.lineplot(
+            data=statistics["train_error"] * 100,
+            ax=ax1,
+            color=color[0],
+            label="Train Error",
+        )
+        sns.lineplot(
+            data=statistics["valid_error"] * 100,
+            ax=ax1,
+            color=color[1],
+            label="Valid Error",
+        )
+        sns.lineplot(
+            data=statistics["train_ll"],
+            color=color[2],
+            ax=ax2,
+            label="Train Loglikelihood",
+        )
+
+        ax1.set(ylabel="Error (%)", xlabel="Epoch")
+        ax1.legend(loc="upper right", bbox_to_anchor=(0.4, -0.1))
+        ax2.set(ylabel="Loglikelihood")
+        ax2.ticklabel_format(axis="y", style="sci", scilimits=(2, 3))
+        ax2.legend(loc="upper left", bbox_to_anchor=(0.6, -0.1))
+        plt.tight_layout()
+        plt.show()
+
+        return statistics
