@@ -34,9 +34,14 @@ config.add(
     "Increase patience by this factor if model does not converge",
 )
 config.add(
-    "validation_threshold",
+    "likelihood_threshold",
     1.005,
-    "The factor of the validation error score to meet in order to register an improvement",
+    "The factor of the likelihood improvement to output a result",
+)
+config.add(
+    "validation_threshold",
+    1.2,
+    "The factor of the validation error improvement",
 )
 config.add("base_learning_rate", 0.01, "The initial learning rate of the model update")
 config.add(

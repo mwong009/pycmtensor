@@ -307,7 +307,8 @@ def train(model, ds, **kwargs):
     model.config.BFGS_warmup = model.config.BFGS_warmup * n_train_batches
 
     patience = max(model.config.patience, n_train_batches)
-    patience_inc = model.config.patience_increase
+    p_inc = model.config.patience_increase
+    likelihood_threshold = model.config.likelihood_threshold
     validation_threshold = model.config.validation_threshold
     convergence_threshold = model.config.convergence_threshold
     validation_freq = n_train_batches
@@ -410,7 +411,9 @@ def train(model, ds, **kwargs):
                 vt = validation_threshold
 
                 if acceptance_method == 1:
-                    accept = log_likelihood > best_ll
+                    accept = log_likelihood > best_loglikelihood
+                    if log_likelihood > (best_loglikelihood / likelihood_threshold):
+                        info_print = True
                 else:
                     accept = error < best_err
 
@@ -450,16 +453,17 @@ def train(model, ds, **kwargs):
                             model.results.betas[key] = value
 
                 # set condition for convergence
-                if (gnorm < convergence_threshold) or (
-                    (iteration > (patience / 2))
-                    and (acceptance_method == 0)
-                    and (error > (model.results.best_valid_error * 1.2))
-                ):
-                    converged = True
-                else:
-                    patience = int(
-                        min(max(patience, iteration * patience_inc), max_iterations)
-                    )
+                converged = any(
+                    [
+                        gnorm < convergence_threshold,
+                        iteration > patience,
+                        (acceptance_method != 1)
+                        and (
+                            valid_error
+                            > (model.results.best_valid_error * validation_threshold)
+                        ),
+                    ]
+                )
 
             iteration += 1
 
