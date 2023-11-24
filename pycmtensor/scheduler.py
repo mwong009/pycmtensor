@@ -44,29 +44,32 @@ class Scheduler:
 
         return msg[:-2] + ")"
 
-    def __call__(self, i):
-        self.record(i, self.lr)
+    def __call__(self, epoch):
+        self.record(self.lr)
         return self.lr
 
     @property
     def lr(self):
         return self._base_lr
 
+    @property  # alias for lr
+    def learning_rate(self):
+        return self._base_lr
+
     @property
     def history(self):
         return self._history
 
-    def record(self, iteration, lr):
+    def record(self, lr):
         """Saves the history of the learning rate and returns the current learning rate
 
         Args:
-            iteration (int): the interation number
             lr (float): the learning rate
 
         Returns:
             (float): the current learning rate
         """
-        self.history.append((iteration, lr))
+        self.history.append(lr)
         return lr
 
 
@@ -109,10 +112,10 @@ class StepLR(Scheduler):
     def drop_every(self):
         return self._drop_every
 
-    def __call__(self, iteration):
-        decay = self.factor ** np.floor(iteration / self._drop_every)
+    def __call__(self, epoch):
+        decay = self.factor ** np.floor(epoch / self._drop_every)
         lr = max(float(self.lr * decay), self._min_lr)
-        return self.record(iteration, lr)
+        return self.record(lr)
 
 
 class PolynomialLR(Scheduler):
@@ -142,10 +145,10 @@ class PolynomialLR(Scheduler):
     def max_epochs(self):
         return self._max_epochs
 
-    def __call__(self, iteration):
-        decay = (1 - (iteration / float(self.max_epochs))) ** self.power
+    def __call__(self, epoch):
+        decay = (1 - (epoch / float(self.max_epochs))) ** self.power
         lr = max(float(self.lr * decay), self._min_lr)
-        return self.record(iteration, lr)
+        return self.record(lr)
 
 
 class CyclicLR(Scheduler):
@@ -172,7 +175,7 @@ class CyclicLR(Scheduler):
         x = np.abs(epoch / self.cycle_steps - 2 * cycle + 1)
         height = (self.max_lr - self.lr) * self.scale_fn(cycle)
         lr = self.lr + height * np.maximum(0, 1 - x)
-        return self.record(epoch, lr)
+        return self.record(lr)
 
     def scale_fn(self, k):
         return 1.0
