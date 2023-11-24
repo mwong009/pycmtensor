@@ -1,3 +1,15 @@
+## v1.8.0 (2023-11-24)
+
+### Feat
+
+- **utils**: add new function to display numbers as human readable format
+- **results**: add new function to plot training statistics
+
+### Fix
+
+- **scheduler**: fix missing arguments
+- **basic**: renamed variable to avoid confusion
+
 ## v1.7.1 (2023-09-28)
 
 ### Fix
