@@ -124,7 +124,7 @@ def rob_stderror(hessian, bhhh, params):
     Args:
         hessian (numpy.ndarray): the hessian matrix
         bhhh (numpy.ndarray): the bhhh matrix
-        params (list): estimated parameters
+        params (dict): estimated parameters
 
     Returns:
         (list): the robust standard error of the estimates

@@ -10,6 +10,7 @@ from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
+from pycmtensor.utils import human_format as hf
 from pycmtensor.utils import time_format
 
 config = defaultconfig.config
@@ -233,12 +234,13 @@ class BaseModel(object):
         return [var for var in list(variables) if var not in symbols]
 
 
-def compute(model, ds, **params):
+def compute(model, ds, update=False, **params):
     """Function for manual computation of model by specifying parameters as arguments
 
     Args:
         model (pycmtensor.models.BaseModel): model to train
         ds (pycmtensor.dataset.Dataset): dataset to use for training
+        update (bool): if True, run `cost_updates_fn` once before computing the model
         **params (dict): keyword arguments for model coefficients (`Params`)
 
     Returns:
@@ -264,6 +266,20 @@ def compute(model, ds, **params):
 
     t_index = np.arange(len(train_data[-1]))
     v_index = np.arange(len(valid_data[-1]))
+
+    if update:
+        lr_scheduler = model.config.lr_scheduler(
+            lr=model.config.base_learning_rate,
+            max_lr=model.config.max_learning_rate,
+            max_epochs=model.config.max_epochs,
+            factor=model.config.lr_stepLR_factor,
+            drop_every=model.config.lr_stepLR_drop_every,
+            power=model.config.lr_PolynomialLR_power,
+            cycle_steps=model.config.lr_CLR_cycle_steps,
+            gamma=model.config.lr_ExpRangeCLR_gamma,
+        )
+        learning_rate = lr_scheduler(0)
+        model.cost_updates_fn(*train_data, learning_rate, t_index)
 
     t_log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     t_error = model.prediction_error_fn(*train_data)
@@ -313,15 +329,17 @@ def train(model, ds, **kwargs):
     convergence_threshold = model.config.convergence_threshold
     validation_freq = n_train_batches
     max_epochs = model.config.max_epochs
-    max_iterations = max_epochs * n_train_batches
+    max_iter = max_epochs * n_train_batches
     acceptance_method = model.config.acceptance_method
 
+    stdout_count = 0
     done_looping = False
     converged = False
     epoch = 0
     iteration = 0
     shift = 0
     gnorm_min = np.inf
+    info_print = False
 
     optimizer = model.config.optimizer(model.params, config=model.config)
     updates = optimizer.update(model.cost, model.params, model.learning_rate)
@@ -330,6 +348,7 @@ def train(model, ds, **kwargs):
     lr_scheduler = model.config.lr_scheduler(
         lr=model.config.base_learning_rate,
         max_lr=model.config.max_learning_rate,
+        max_epochs=model.config.max_epochs,
         factor=model.config.lr_stepLR_factor,
         drop_every=model.config.lr_stepLR_drop_every,
         power=model.config.lr_PolynomialLR_power,
@@ -337,29 +356,36 @@ def train(model, ds, **kwargs):
         gamma=model.config.lr_ExpRangeCLR_gamma,
     )
 
-    loglikelihood_graph = []
-    error_graph = []
+    statistics_graph = {
+        "train_ll": [],
+        "train_error": [],
+        "valid_error": [],
+    }
 
     x_y = model.x + [model.y]
     train_data = ds.train_dataset(x_y)
     valid_data = ds.valid_dataset(x_y)
 
     t_index = np.arange(len(train_data[-1]))
-    log_likelihood = model.log_likelihood_fn(*train_data, t_index)
-    error = model.prediction_error_fn(*valid_data)
 
-    model.results.null_loglikelihood = log_likelihood
+    log_likelihood = model.log_likelihood_fn(*train_data, t_index)
+    train_error = model.prediction_error_fn(*train_data)
+
+    if set(ds.train_index) != set(ds.valid_index):
+        valid_error = model.prediction_error_fn(*valid_data)
+    else:
+        valid_error = train_error
+
     model.results.best_loglikelihood = log_likelihood
-    model.results.best_valid_error = error
+    model.results.best_valid_error = valid_error
     model.results.best_epoch = 0
     model.results.gnorm = np.nan
+
+    model.results.null_loglikelihood = log_likelihood
     model.results.n_train = n_train
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
     model.results.seed = model.config.seed
-
-    loglikelihood_graph.append((0, log_likelihood))
-    error_graph.append((0, error))
 
     params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
 
@@ -382,7 +408,7 @@ def train(model, ds, **kwargs):
     )
 
     while (epoch < max_epochs) and (not done_looping):
-        learning_rate = lr_scheduler(epoch)  # get learning rate at this epoch
+        learning_rate = lr_scheduler(epoch)  # get learning rate
 
         for i in range(n_train_batches):
             index = np.arange(len(batch_data[i][-1]))
@@ -391,11 +417,18 @@ def train(model, ds, **kwargs):
             if iteration % validation_freq == 0:
                 # training loglikelihood
                 log_likelihood = model.log_likelihood_fn(*train_data, t_index)
-                loglikelihood_graph.append((iteration, log_likelihood))
+                statistics_graph["train_ll"].append(log_likelihood)
 
                 # validation error
-                error = model.prediction_error_fn(*valid_data)
-                error_graph.append((iteration, error))
+                valid_error = model.prediction_error_fn(*valid_data)
+                statistics_graph["valid_error"].append(valid_error)
+
+                # training error
+                if set(ds.train_index) != set(ds.valid_index):
+                    train_error = model.prediction_error_fn(*train_data)
+                else:
+                    train_error = valid_error
+                statistics_graph["train_error"].append(train_error)
 
                 # convergence
                 params = [p.get_value() for p in model.params if isinstance(p, Beta)]
@@ -406,41 +439,42 @@ def train(model, ds, **kwargs):
                 gnorm = np.sqrt(np.sum(np.square(diff)))
 
                 # stdout
-                best_ll = model.results.best_loglikelihood
-                best_err = model.results.best_valid_error
-                vt = validation_threshold
+                best_loglikelihood = model.results.best_loglikelihood
+                best_error = model.results.best_valid_error
 
                 if acceptance_method == 1:
                     accept = log_likelihood > best_loglikelihood
                     if log_likelihood > (best_loglikelihood / likelihood_threshold):
                         info_print = True
                 else:
-                    accept = error < best_err
+                    accept = valid_error < best_error
+                    info_print = True
 
-                if (
-                    (gnorm < (gnorm_min / 5.0))
-                    or ((epoch % (max_epochs // 10)) == 0)
-                    or ((acceptance_method == 1) and (log_likelihood > (best_ll / vt)))
-                    or ((acceptance_method == 0) and (error < (best_err / vt)))
-                ):
-                    if gnorm < (gnorm_min / 5.0):
-                        gnorm_min = gnorm
+                if (gnorm < (gnorm_min / 5.0)) or ((epoch % (max_epochs // 10)) == 0):
+                    info_print = True
+
+                if gnorm < (gnorm_min / 5.0):
+                    gnorm_min = gnorm
+
+                if (round(perf_counter() - start_time) // 300) > stdout_count:
+                    stdout_count += 1
+                    info_print = True
+
+                if info_print:
                     info(
-                        f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                        f"Train (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e}, {hf(iteration)}/{hf(patience)})"
                     )
+                    info_print = False
 
-                # acceptance of new results
+                # acceptance of new best results
                 if accept:
-                    if log_likelihood > (best_ll / vt):
-                        patience = int(
-                            min(max(patience, iteration * patience_inc), max_iterations)
-                        )
-
-                    # save best results if new estimated model is accepted
+                    accept = False
+                    patience = int(min(max(patience, iteration * p_inc), max_iter))
+                    # save new best results if new estimated model is accepted
                     model.results.best_epoch = epoch
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
-                    model.results.best_valid_error = error
+                    model.results.best_valid_error = valid_error
                     model.results.gnorm = gnorm
 
                     # save Beta params
@@ -469,9 +503,8 @@ def train(model, ds, **kwargs):
 
             # secondary condition for convergence
             if (iteration > patience) or converged:
-                iteration -= 1
                 info(
-                    f"Train (epoch={epoch}, LL={log_likelihood:.2f}, error={error*100:.2f}%, gnorm={gnorm:.5e}, {iteration}/{patience})"
+                    f"Train (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e}, {hf(iteration-1)}/{hf(patience)})"
                 )
 
                 done_looping = True  # break loop if convergence reached
@@ -486,12 +519,13 @@ def train(model, ds, **kwargs):
         info(f"Model converged (t={train_time})")
     else:
         info(
-            f"Maximum number of epochs reached: {iteration}/{patience} (t={train_time})"
+            f"Max iterations reached: {hf(iteration-1)}/{hf(patience)} (t={train_time})"
         )
 
-    model.results.lr_history_graph = lr_scheduler.history
-    model.results.loglikelihood_graph = loglikelihood_graph
-    model.results.error_graph = error_graph
+    for key, value in statistics_graph.items():
+        statistics_graph[key] = np.array(value).tolist()
+    statistics_graph["learning_rate"] = lr_scheduler.history
+    model.results.statistics_graph = statistics_graph
 
     info(
         f"Best results obtained at epoch {model.results.best_epoch}: LL={model.results.best_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%, gnorm={model.results.gnorm:.5e}"
