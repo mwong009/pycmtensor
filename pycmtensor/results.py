@@ -37,7 +37,9 @@ class Results(object):
             bhhh_matrix (numpy.ndarray): the 3-D bhhh matrix where the 1st dimension is
                 the length of the dataset and the last 2 dimensions are the matrix for
                 each data observation
-            statistics_graph (dict): a dictionary containing the learning_rate, training, and validation statistics.
+            statistics_graph (dict): a dictionary containing the learning_rate, training, and validation statistics
+            betas (dict): a dictionary containing the Beta coefficients
+            params (dict): a dictionary containing all model coefficients
         """
         self.build_time = None
         self.train_time = None
@@ -55,7 +57,9 @@ class Results(object):
         self.gnorm = None
         self.hessian_matrix = None
         self.bhhh_matrix = None
-        self.betas = None
+
+        self.betas = {}
+        self.params = {}
 
         self.statistics_graph = None
 

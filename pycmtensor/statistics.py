@@ -63,8 +63,8 @@ def t_test(stderr, params):
     """computes the statistical t-test of the estimated parameter and the standard error
 
     Args:
-        stderr (list): standard errors
-        params (list): estimated parameters
+        stderr (pandas.Series): standard errors
+        params (dict): estimated parameters
 
     Returns:
         (list): t-test of the estimated parameters
@@ -77,8 +77,8 @@ def p_value(stderr, params):
     """computes the p-value (statistical significance) of the estimated parameter using the two-tailed normal distribution, where p-value=$2(1-\\phi(|t|)$, $\\phi$ is the cdf of the normal distribution
 
     Args:
-        stderr (list): standard errors
-        params (list): estimated parameters
+        stderr (pandas.Series): standard errors
+        params (dict): estimated parameters
 
     Returns:
         (list): p-value of the estimated parameters
@@ -92,7 +92,7 @@ def stderror(hessian, params):
 
     Args:
         hessian (numpy.ndarray): the hessian matrix
-        params (list): estimated parameters
+        params (dict): estimated parameters containing numpy arrays
 
     Returns:
         (list): the standard error of the estimates
