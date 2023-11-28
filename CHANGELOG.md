@@ -1,3 +1,13 @@
+## v1.8.1 (2023-11-28)
+
+### Fix
+
+- **basic**: add lr_scheduler to `compute()` function
+
+### Refactor
+
+- clean up and enhance code with codiumAI
+
 ## v1.8.0 (2023-11-24)
 
 ### Feat
