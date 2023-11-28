@@ -266,7 +266,7 @@ Ouput:
 For choice prediction, PyCMTensor generates a vector of probabilities for each observation in the *validation* dataset. It is also possible to output discrete prediction (e.g. classification) using the Argmax function. To output the predicted probabilites after estimation, use the function:
 
 ```python
-prob = mymodel.predict(ds, return_probabilities=True)
+prob = mymodel.predict(ds)
 print(pd.DataFrame(prob))
 ```
 
@@ -370,7 +370,7 @@ print(mymodel.results.model_statistics())
 print(mymodel.results.benchmark())
 
 # predictions
-prob = mymodel.predict(ds, return_probabilities=True)
+prob = mymodel.predict(ds)
 print(pd.DataFrame(prob))
 
 # elasticities

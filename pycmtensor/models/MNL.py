@@ -40,7 +40,7 @@ class MNL(BaseModel):
             pred (TensorVariable): prediction tensor variable function
         """
 
-        super().__init__(**kwargs)
+        BaseModel.__init__(self, **kwargs)
         self.name = "MNL"
         self.params = []  # keep track of all the Params
         self.betas = []  # keep track of the Betas
@@ -82,28 +82,75 @@ class MNL(BaseModel):
 
     @property
     def n_params(self):
-        """Return the total number of estimated parameters"""
+        """
+        Returns the number of parameters in the Multinomial Logit model.
+
+        Returns:
+            int: The number of parameters in the Multinomial Logit model.
+        """
         return super().n_params
 
     @property
     def n_betas(self):
-        """Return the number of estimated betas"""
+        """Return the number of estimated betas in the Multinomial Logit model.
+
+        Returns:
+            int: The number of estimated betas.
+        """
         return super().n_betas
 
     def get_betas(self):
-        """returns the values of the betas
+        """Returns the values of the betas in the model as a dictionary.
 
         Returns:
-            (dict): beta values
+            dict: A dictionary containing the beta values, where the keys represent the beta names and the values represent their corresponding values.
         """
         return super().get_betas()
 
-    def reset_values(self):
-        """resets the values of all parameters"""
+    def reset_values(self) -> None:
+        """Resets the values of all parameters by calling the reset_values method of the parent class.
+
+        This method resets the values of all parameters to their initial values.
+
+        Example Usage:
+        ```python
+        # Create an instance of the MNL class
+        model = MNL(ds, variables, utility, av=None)
+
+        # Call the reset_values method to reset the parameter values
+        model.reset_values()
+        ```
+
+        Inputs:
+        - None
+
+        Flow:
+        1. The `reset_values` method is called.
+        2. The method calls the `reset_values` method of the parent class `BaseModel` to reset the values of all parameters.
+
+        Outputs:
+        - None
+        """
         return super().reset_values()
 
     def build_cost_fn(self):
-        """constructs aesara functions for cost and prediction errors"""
+        """Constructs Aesara functions for calculating the cost and prediction errors of the Multinomial Logit model.
+
+        Inputs:
+        - None
+
+        Outputs:
+        - None
+
+        Example Usage:
+        ```python
+        # Create an instance of the MNL class
+        model = MNL(ds, variables, utility, av=None)
+
+        # Call the build_cost_fn method
+        model.build_cost_fn()
+        ```
+        """
         self.log_likelihood_fn = aesara.function(
             name="log_likelihood",
             inputs=self.x + [self.y, self.index],
@@ -119,7 +166,11 @@ class MNL(BaseModel):
         )
 
     def build_gh_fn(self):
-        """constructs aesara functions for hessians and gradient vectors
+        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+
+        Returns:
+            hessian_fn (Aesara function): A function that computes the Hessian matrix.
+            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
 
         !!! note
 
@@ -140,31 +191,31 @@ class MNL(BaseModel):
         )
 
     def build_cost_updates_fn(self, updates):
-        """build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
+        """Build or rebuild the cost function with updates to the model.
+
+        This method creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that takes a list of input variable arrays, an output array, and a learning rate as arguments.
 
         Args:
-            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
+            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): A list of tuples containing the target shared variable and the new value of the variable.
         """
         BaseModel.build_cost_updates_fn(self, updates)
 
-    def predict(self, ds, return_probabilities=False):
-        """predicts the output of the most likely alternative given the validation dataset in `ds`. The formula is:
-
-        $$
-            argmax(p_n(y|x))
-        $$
+    def predict(self, ds):
+        """Predicts the output of the most likely alternative given the validation dataset.
 
         Args:
-            ds (Dataset): pycmtensor dataset
-            return_probabilities (bool): if true, returns the probability vector instead
+            ds (Dataset): A pycmtensor dataset object containing the validation data.
 
         Returns:
-            (numpy.ndarray): the predicted choices or the vector of probabilities
+            numpy.ndarray: The predicted choices or the vector of probabilities.
 
         !!! example
 
-            To return predicted choices:
             ```python
+            # Create an instance of the MNL class
+            model = MNL(ds, variables, utility, av=None)
+
+            # Predict the choices using the predict method
             predictions = self.predict(ds)
             print(predictions)
             ```
@@ -174,9 +225,9 @@ class MNL(BaseModel):
             {'pred_choice': array([...])}
             ```
 
-            To return probabilities:
             ```python
-            prob = self.predict(ds, return_probabilities=True)
+            # Predict the probabilities using the predict method
+            prob = self.predict(ds)
             print(prob)
             ```
 
@@ -187,18 +238,20 @@ class MNL(BaseModel):
                 ...
             }
             ```
+
+            The expected output for `predictions` is a dictionary with the key `'pred_choice'` and an array of predicted choices as the value. The expected output for `probabilities` is a dictionary with the keys representing the alternative indices and the values being arrays of probabilities.
         """
-        return BaseModel.predict(self, ds, return_probabilities)
+        return BaseModel.predict(self, ds)
 
     def elasticities(self, ds, wrt_choice):
-        """disaggregated point/cross elasticities of choice y wrt x
+        """Calculate the disaggregated point/cross elasticities of the choice variable `y` with respect to the independent variables `x` in a Multinomial Logit model.
 
         Args:
-            ds (pycmtensor.Dataset): dataset containing the training data
-            wrt_choice (int): alternative to evaluate the variables on
+            ds (pycmtensor.Dataset): Dataset containing the training data.
+            wrt_choice (int): Alternative to evaluate the variables on.
 
         Returns:
-            (dict): the disaggregate point elasticities of x
+            dict: Disaggregated point elasticities of the independent variables `x`.
 
         !!! example
 

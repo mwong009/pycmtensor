@@ -164,7 +164,7 @@ class TasteNet(BaseModel):
         """
         BaseModel.build_cost_updates_fn(self, updates)
 
-    def predict(self, ds, return_probabilities=False):
+    def predict(self, ds):
         """predicts the output of the most likely alternative given the validation dataset in `ds`. The formula is:
 
         $$
@@ -173,7 +173,6 @@ class TasteNet(BaseModel):
 
         Args:
             ds (Dataset): pycmtensor dataset
-            return_probabilities (bool): if true, returns the probability vector instead
 
         Returns:
             (numpy.ndarray): the predicted choices or the vector of probabilities
@@ -191,7 +190,7 @@ class TasteNet(BaseModel):
             array([...])
             ```
         """
-        return BaseModel.predict(self, ds, return_probabilities)
+        return BaseModel.predict(self, ds)
 
     def elasticities(self, ds, wrt_choice):
         """disaggregate point/cross elasticities of choice y wrt x

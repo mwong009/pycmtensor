@@ -9,20 +9,17 @@ import aesara.tensor as aet
 __all__ = ["Regularizers"]
 
 
-class Regularizers(object):
-    def __init__(self):
-        pass
-
+class Regularizers:
     @staticmethod
     def l1(params, weight=0.001):
         """compute the L1 norm of the tensors
 
         Args:
-            params (Union[list[TensorVariable], TensorVariable]): the parameters to compute the L1 norm
-            weight (float): value for penalizing the regularization term
+            params (Union[list[TensorVariable], TensorVariable]): The parameters to compute the L1 norm.
+            weight (float): The value for penalizing the regularization term. Default value is 0.001.
 
         Returns:
-            (TensorVariable): the L1 norm (sum of absolute values)
+            (TensorVariable): The L1 norm, which is the sum of absolute values of the tensors.
         """
         if not isinstance(params, list):
             params = [params]
@@ -31,14 +28,14 @@ class Regularizers(object):
 
     @staticmethod
     def l2(params, weight=0.0001):
-        """compute the L2 norm of the tensors
+        """Compute the L2 norm of the tensors
 
         Args:
-            params (Union[list[TensorVariable], TensorVariable]): the parameters to compute the L2 norm
-            weight (float): value for penalizing the regularization term
+            params (Union[list[TensorVariable], TensorVariable]): The parameters to compute the L2 norm.
+            weight (float): The value for penalizing the regularization term. Default value is 0.0001.
 
         Returns:
-            (TensorVariable): the L2 norm (sum of squared values)
+            (TensorVariable): The L2 norm, which is the sum of squared values of the tensors.
         """
         if not isinstance(params, list):
             params = [params]

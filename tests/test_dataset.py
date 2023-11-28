@@ -36,8 +36,8 @@ def test_split_frac_one():
 
     len_dataset = len(ds.ds["travel_mode"])
     assert ds.split_frac == 1
-    assert len(ds.train_index) == len_dataset
-    assert len(ds.valid_index) == len_dataset
+    assert len(ds.idx_train) == len_dataset
+    assert len(ds.idx_valid) == len_dataset
 
 
 def test_dataset_property(lpmc_ds):
@@ -51,8 +51,8 @@ def test_dataset_property(lpmc_ds):
     assert lpmc_ds.n_train == len_train_dataset
     assert lpmc_ds.n_valid == len_valid_dataset
 
-    assert all(lpmc_ds.train_index == lpmc_ds.index[:len_train_dataset])
-    assert all(lpmc_ds.valid_index == lpmc_ds.index[len_train_dataset:])
+    assert all(lpmc_ds.idx_train == lpmc_ds.index[:len_train_dataset])
+    assert all(lpmc_ds.idx_valid == lpmc_ds.index[len_train_dataset:])
 
     assert ds == lpmc_ds()
 
