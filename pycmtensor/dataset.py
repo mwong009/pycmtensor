@@ -1,6 +1,6 @@
-# dataset.py
-# converts pandas dataframe into an xarray dataset
-
+"""
+The code snippet is a part of a class called `Dataset` that converts a pandas DataFrame into an xarray dataset. It initializes the dataset object with the DataFrame and the name of the choice variable. It also provides methods to access and manipulate the dataset.
+"""
 
 import aesara.tensor as aet
 from aesara.tensor.var import TensorVariable
@@ -9,62 +9,42 @@ import pycmtensor.defaultconfig as defaultconfig
 
 config = defaultconfig.config
 
-from .logger import debug, info
+from pycmtensor.logger import debug, info
 
 __all__ = ["Dataset"]
 
 
 class Dataset:
     def __init__(self, df, choice, **kwargs):
-        """Base PyCMTensor Dataset class object
-
-        This class stores the data in an array format, and a symbolic tensor reference
-        variable object. To call the tensor variable, we invoke the label of the
-        variable as an item in the Dataset class, like so:
-        ```python
-        ds = Dataset(df=df, choice="choice")
-        return ds["label_of_variable"]  -> TensorVariable
-        ```
-
-        To call the data array, we use the `train_dataset()` or `valid_dataset()`
-        method. See method reference for info about the arguments. For example:
-        ```python
-        # to get the data array for variable "time"
-        arr = ds.train_dataset(ds["time"])
-        ```
+        """Initialize the Dataset object with a pandas DataFrame and the name of the choice variable.
 
         Args:
-            df (pandas.DataFrame): the pandas dataframe object to load
-            choice (str): the name of the choice variable
+            df (pandas.DataFrame): The pandas DataFrame object containing the dataset.
+            choice (str): The name of the choice variable.
+            **kwargs (optional): Additional keyword arguments to configure the dataset.
 
         Attributes:
-            n (int): total number of rows in the dataset
-            x (list[TensorVariable]): the full list of (input) `TensorVariable` objects
-                to build the tensor expression from
-            y (TensorVariable): the output (choice) `TensorVariable` object
-            scale (dict): a dictionary of `float` values to store the scaling factor
-                used for each variable
-            choice (str): the name of the choice variable
-            ds (dict): a dictionary of `numpy.ndarray` to store the values of each
-                variable
-            split_frac (float): the factor used to split the dataset into training and
-                validation datasets
-            train_index (list): the list of values of the indices of the training
-                dataset
-            valid_index (list): the list of values of the indices of the validation
-                dataset
-            n_train (int): the size of the training dataset
-            n_valid (int): the size of the validation dataset
+            n (int): The number of rows in the dataset.
+            x (list[TensorVariable]): The list of input TensorVariable objects.
+            y (TensorVariable): The output TensorVariable object.
+            scale (dict): A dictionary of scaling factors for each variable.
+            choice (str): The name of the choice variable.
+            ds (dict): A dictionary of variable values.
+            split_frac (float): The split fraction used to split the dataset.
+            idx_train (list): The list of indices of the training dataset.
+            idx_valid (list): The list of indices of the validation dataset.
+            n_train (int): The size of the training dataset.
+            n_valid (int): The size of the validation dataset.
 
         Example:
-            Example initalization of a pandas dataset:
+            Example initialization of a Dataset object:
 
             ```python
             ds = Dataset(df=pd.read_csv("datafile.csv", sep=","), choice="mode")
             ds.split(frac=0.8)
             ```
 
-            Attributes can be access by invoking:
+            Accessing attributes:
             ```python
             print(ds.choice)
             ```
@@ -74,6 +54,8 @@ class Dataset:
             'car'
             ```
 
+        Raises:
+            IndexError: If the choice variable is not found in the DataFrame columns.
         """
         for key, value in kwargs.items():
             config.add(key, value)
@@ -81,7 +63,7 @@ class Dataset:
         if choice not in df.columns:
             raise IndexError(f"{choice} not found in dataframe.")
 
-        df[choice] = df[choice].astype("int")  # ensure choice variable is an integer
+        df[choice] = df[choice].astype("int")
         df.reset_index(drop=True, inplace=True)
         while df[choice].min() > 0:
             df[choice] -= df[choice].min()
@@ -111,12 +93,22 @@ class Dataset:
         return self.ds
 
     def __getitem__(self, key):
+        """Returns the input or output variable(s) of the dataset object by their names.
+
+        Args:
+            key (str or list or tuple): The name(s) of the variable(s) to be accessed.
+
+        Returns:
+            TensorVariable or list of TensorVariable: The input or output variable(s) corresponding to the given name(s).
+
+        Raises:
+            KeyError: If the given name(s) do not match any input or output variable.
+        """
         if isinstance(key, (list, tuple)):
             return self._make_tensor(key)
         else:
             if key in [var.name for var in self.x]:
-                i = [x.name for x in self.x].index(key)
-                return self.x[i]
+                return self.x[[x.name for x in self.x].index(key)]
             if key == self.y.name:
                 return self.y
             else:
@@ -132,28 +124,27 @@ class Dataset:
 
     @property
     def n_train(self) -> int:
-        return len(self.train_index)
+        return len(self.idx_train)
 
     @property
     def n_valid(self) -> int:
-        return len(self.valid_index)
+        return len(self.idx_valid)
 
     @property
-    def train_index(self) -> list:
+    def idx_train(self) -> list:
         if self.split_frac == 1:
             return self.index
-
         n = round(self.n * self.split_frac)
         return self.index[:n]
 
     @property
-    def valid_index(self) -> list:
+    def idx_valid(self) -> list:
         if self.split_frac == 1:
             return self.index
         n = round(self.n * self.split_frac)
         return self.index[n:]
 
-    def drop(self, variables):
+    def drop(self, variables) -> None:
         """Method for dropping `variables` from the dataset
 
         Args:
@@ -163,10 +154,13 @@ class Dataset:
             KeyError: raises an error if any item in `variables` is not found in the dataset or item is the choice variable
 
         !!! Warning
-            Choice variable cannot be explicity dropped.
+            Choice variable cannot be explicitly dropped.
         """
         for variable in variables:
-            if (variable in self.ds) and (variable != self.choice):
+            if variable == self.choice:
+                raise KeyError(f"Cannot drop choice variable '{variable}'")
+
+            if variable in self.ds:
                 i = [x.name for x in self.x].index(variable)
                 del self.x[i]
                 del self.scale[variable]
@@ -174,9 +168,9 @@ class Dataset:
                 debug(f"Dropped input variable '{variable}' from dataset")
 
             else:
-                raise KeyError
+                raise KeyError(f"Variable '{variable}' not found in dataset")
 
-    def scale_variable(self, variable, factor):
+    def scale_variable(self, variable, factor) -> None:
         """Multiply values of the `variable` by $1/\\textrm{factor}$.
 
         Args:
@@ -187,15 +181,16 @@ class Dataset:
         self.scale[variable] = self.scale[variable] * factor
 
     def split(self, frac):
-        """Method to split dataset into training and validation subsets
+        """Method to split the dataset into training and validation subsets based on a given fraction.
 
         Args:
-            frac (float): the fraction to split the dataset into the training set. The training set will be indexed from `0` to `frac` $\\times$ `Dataset.n`. The validation dataset will be from the last index of the training set to the last row of the dataset.
+            frac (float): The fraction to split the dataset into the training set.
 
-        Note:
-            The actual splitting of the dataset is done during the training procedure,
-            or when invoking the `train_dataset()` or `valid_dataset()` methods
+        Returns:
+            None
 
+        Notes:
+            - The actual splitting of the dataset is done during the training procedure or when invoking the `train_dataset()` or `valid_dataset()` methods.
         """
 
         self.split_frac = frac
@@ -269,7 +264,7 @@ class Dataset:
             ```
         """
 
-        n_index = self.train_index
+        n_index = self.idx_train
 
         return self._dataset_slice(variables, index, batch_size, shift, n_index)
 
@@ -291,6 +286,6 @@ class Dataset:
             (list): a list of array object(s) corresponding to the input variables
         """
 
-        n_index = self.valid_index
+        n_index = self.idx_valid
 
         return self._dataset_slice(variables, index, batch_size, shift, n_index)

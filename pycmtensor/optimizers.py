@@ -33,43 +33,43 @@ class Optimizer:
 
         Args:
             name (str): name of the optimizer
+            epsilon (float, optional): small value to avoid division by zero.
+                Defaults to `1e-8`
 
         """
         self.name = name
-        self._epsilon = shared(epsilon, name="epsilion")
+        self._epsilon = shared(epsilon, name="epsilon")
 
     @property
     def epsilon(self):
         return self._epsilon
 
     def __repr__(self):
-        return f"{self.name}"
-
-    def update(self, cost, params, lr):
-        """Update parameters for aesara function calls
-
-        Args:
-            cost (TensorVariable): a scalar element for the expression of the cost
-                function where the derivatives are calculated
-            params (list[TensorSharedVariable]): parameters of the model
-            lr (Union[float, TensorSharedVariable]): the learning rate
+        """Returns a string representation of the optimizer object.
 
         Returns:
-            (list): a list of `(param, param_new)` tuple pairs
+            str: A string representation of the optimizer object, including its name and parameters.
         """
-        pass
+        return f"{self.name}"
+
+    def update(self, **kwargs):
+        """Update parameters for aesara function calls
+
+        Returns:
+            None
+        """
+        raise NotImplementedError("Subclasses must implement the `update` method.")
 
 
 class Adam(Optimizer):
     def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
-        """An optimizer that implments the Adam algorithm[^1]
+        """An optimizer that implements the Adam algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to `0.9`
-            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to `0.999`
+            params (list): A list of parameters.
+            b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
+            b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
+            **kwargs: Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -137,7 +137,18 @@ class Adam(Optimizer):
 
 class AdamW(Adam):
     def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
-        """Adam with weight decay"""
+        """Initializes the AdamW class with the given parameters.
+
+        Args:
+            params (list): A list of parameters.
+            b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
+            b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
+            **kwargs: Additional keyword arguments.
+
+        Example:
+            params = [...] # list of parameters
+            adamw = AdamW(params, b1=0.9, b2=0.999)
+        """
         super().__init__(params, b1, b2)
         self.w = config.adam_weight_decay
 
@@ -179,11 +190,10 @@ class Nadam(Adam):
         """An optimizer that implements the Nesterov Adam algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to `0.9`
-            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to `0.999`
+            params (list): A list of parameters.
+            b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
+            b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
+            **kwargs: Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -236,11 +246,10 @@ class Adamax(Adam):
         the Adam algorithm
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            b1 (float, optional): exponential decay rate for the 1st moment estimates.
-                Defaults to `0.9`
-            b2 (float, optional): exponential decay rate for the 2nd moment estimates.
-                Defaults to `0.999`
+            params (list): A list of parameters.
+            b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
+            b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
+            **kwargs: Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -291,13 +300,12 @@ class Adadelta(Optimizer):
         - The need for a manually selected global learning rate
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            rho (float, optional): the decay rate for learning rate.
-                Defaults to `0.95`
+            params (list[TensorSharedVariable]): A list of shared variables representing the parameters of the model.
+            rho (float, optional): A float representing the decay rate for the learning rate. Defaults to 0.95.
 
         Attributes:
-            accumulator (list[TensorSharedVariable]): gradient accumulator
-            delta (list[TensorSharedVariable]): adaptive difference between gradients
+            accumulator (list[TensorSharedVariable]): A list of gradient accumulators.
+            delta (list[TensorSharedVariable]): A list of adaptive differences between gradients.
 
         [^1]: Zeiler, 2012. ADADELTA: An Adaptive Learning Rate Method. http://arxiv.org/abs/1212.5701
         """
@@ -347,14 +355,14 @@ class RProp(Optimizer):
         """An optimizer that implements the Rprop algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            inc (float, optional): increment step if same gradient direction
-            dec (float, optional): decrement step if different gradient direction
-            bounds (List[float]): min and maximum bounds for increment step
+            params (list[TensorSharedVariable]): A list of TensorSharedVariable objects representing the parameters of the model.
+            inc (float, optional): A float representing the increment step if the gradient direction is the same.
+            dec (float, optional): A float representing the decrement step if the gradient direction is different.
+            bounds (list[float]): A list of floats representing the minimum and maximum bounds for the increment step.
 
         Attributes:
-            factor (List[TensorVariable]): learning rate factor multiplier (init=1.)
-            ghat (List[TensorVariable]): previous step gradients
+            factor (list[TensorVariable]): A list of learning rate factor multipliers (init=1.0).
+            ghat (list[TensorVariable]): A list of previous step gradients.
 
         [^1]: Igel, C., & Hüsken, M. (2003). Empirical evaluation of the improved Rprop learning algorithms. Neurocomputing, 50, 105-123.
         """
@@ -397,14 +405,14 @@ class RMSProp(Optimizer):
         """An optimizer that implements the RMSprop algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            rho (float, optional): discounting factor for the history/coming gradient.
-                Defaults to `0.9`
+            params (list[TensorSharedVariable]): Parameters of the model.
+            rho (float, optional): Discounting factor for the history/coming gradient. Defaults to 0.9.
 
         Attributes:
-            accumulator (TensorVariable): gradient accumulator
+            accumulator (TensorVariable): Gradient accumulator.
 
-        [^1]: Hinton, 2012. rmsprop: Divide the gradient by a running average of its recent magnitude. http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
+        [^1]: Hinton, G. E. (2012). rmsprop: Divide the gradient by a running average of its recent magnitude.
+              Retrieved from http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
         """
         super().__init__(name="RMSProp")
         self.rho = shared(rho)
@@ -436,15 +444,14 @@ class RMSProp(Optimizer):
 
 class Momentum(Optimizer):
     def __init__(self, params, mu=0.9, **kwargs):
-        """An optimizer that implements the Momentum algorithm[^1]
+        """Initializes the Momentum optimizer[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            mu (float, optional): acceleration factor in the relevant direction
-                and dampens oscillations. Defaults to `0.9`
+            params (list[TensorSharedVariable]): A list of parameters of the model.
+            mu (float, optional): The acceleration factor in the relevant direction and dampens oscillations. Defaults to `0.9`.
 
         Attributes:
-            velocity (list[TensorSharedVariable]): momentum velocity
+            velocity (list[TensorSharedVariable]): The momentum velocity.
 
         [^1]: Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
         """
@@ -478,13 +485,12 @@ class NAG(Momentum):
         """An optimizer that implements the Nestrov Accelerated Gradient algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            mu (float, optional): acceleration factor in the relevant direction
-                and dampens oscillations. Defaults to `0.9`
+            params (list[TensorSharedVariable]): A list of parameters of the model.
+            mu (float, optional): The acceleration factor in the relevant direction. Defaults to `0.99`.
 
         Attributes:
-            t (TensorSharedVariable): momentum time step
-            velocity (list[TensorSharedVariable]): momentum velocity
+            t (TensorSharedVariable): The momentum time step.
+            velocity (list[TensorSharedVariable]): The momentum velocity.
 
         [^1]: Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
         """
@@ -585,11 +591,11 @@ class SGD(Optimizer):
 
 class SQNBFGS(Optimizer):
     def __init__(self, params, config=None, **kwargs):
-        """A L-BFGS optimizer implementing the adaptive stochastic Quasi-Newton (SQN) based approach [^1]
+        """Initializes the SQNBFGS optimizer object[^1]
 
         Args:
-            params (list[TensorSharedVariable]): parameters of the model
-            config (pycmtensor.config): pycmtensor config object
+            params (list[TensorSharedVariable]): The parameters of the model.
+            config (pycmtensor.config): The pycmtensor config object.
 
         [^1]: Byrd, R. H., Hansen, S. L., Nocedal, J., & Singer, Y. (2016). A stochastic quasi-Newton method for large-scale optimization. SIAM Journal on Optimization, 26(2), 1008-1031.
         """
@@ -670,6 +676,17 @@ class SQNBFGS(Optimizer):
 
 
 def clip(param, min, max):
+    """
+    Clips the value of a parameter within a specified range.
+
+    Args:
+        param (float): The parameter value to be clipped.
+        min (float): The minimum value that the parameter can take.
+        max (float): The maximum value that the parameter can take.
+
+    Returns:
+        float: The clipped value of the parameter.
+    """
     if any([min, max]) and (config.beta_clipping):
         if min is None:
             min = -9999.0

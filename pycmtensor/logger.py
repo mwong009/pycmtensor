@@ -1,7 +1,27 @@
-# logger.py
 """PyCMTensor logger module
 
 This module sets the logging state of the program. Verbosity is defined by `set_level()`
+
+## Example Usage
+```python
+# Set the logger level to DEBUG
+set_level(DEBUG)
+
+# Get the effective level of the logger
+level = get_effective_level()
+
+# Log a message at the INFO level
+info("This is an informational message")
+
+# Log a message at the WARNING level
+warning("This is a warning message")
+```
+
+## Inputs
+- `level` (int): The level of the logger to be set. It can be one of the predefined levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
+
+## Outputs
+- None
 """
 import logging
 

@@ -1,4 +1,25 @@
-"""Top-level package for PyCMTensor."""
+"""Top-level package for PyCMTensor.
+
+This code snippet defines the default configuration settings for the PyCMTensor package. It sets various parameters such as batch size, seed value, maximum number of epochs, learning rate, optimizer, and learning rate scheduler.
+
+Example Usage:
+import pycmtensor.defaultconfig as defaultconfig
+
+config = defaultconfig.config
+
+print(config.batch_size)  # Output: 32
+print(config.seed)  # Output: 100
+print(config.max_epochs)  # Output: 500
+print(config.base_learning_rate)  # Output: 0.01
+print(config.optimizer)  # Output: <class 'pycmtensor.optimizers.Adam'>
+print(config.lr_scheduler)  # Output: <class 'pycmtensor.scheduler.ConstantLR'>
+
+Inputs:
+No specific inputs are required for this code snippet.
+
+Outputs:
+The code snippet does not produce any outputs directly. It sets the default configuration settings for the PyCMTensor package, which can be accessed and used by other parts of the package.
+"""
 
 __author__ = """Melvin Wong"""
 __version__ = "1.8.0"

@@ -127,15 +127,35 @@ class BaseModel(object):
                 self.cost += reg
 
     def build_cost_updates_fn(self, updates):
+        """Builds a function that calculates the cost updates for a model.
+
+        Args:
+            updates (dict): A dictionary of updates for the model.
+
+        Returns:
+            None
+        """
+        inputs = self.x + [self.y, self.learning_rate, self.index]
+        outputs = self.cost
+
         self.cost_updates_fn = function(
             name="cost_updates",
-            inputs=self.x + [self.y, self.learning_rate, self.index],
-            outputs=self.cost,
+            inputs=inputs,
+            outputs=outputs,
             updates=updates,
             allow_input_downcast=True,
         )
 
-    def predict(self, ds, return_probabilities=False):
+    def predict(self, dataset):
+        """Make predictions on a given dataset.
+
+        Args:
+            dataset: The dataset on which predictions are to be made.
+
+        Returns:
+            A dictionary containing the predicted choices, true choices, and choice probabilities
+            for each data point in the dataset.
+        """
         if not "choice_probabilities_fn" in dir(self):
             self.choice_probabilities_fn = function(
                 name="choice_probabilities",
@@ -144,18 +164,29 @@ class BaseModel(object):
                 allow_input_downcast=True,
             )
 
-        valid_data = ds.valid_dataset(self.x)
-
+        valid_data = dataset.valid_dataset(self.x)
+        valid_ground_truth = dataset.valid_dataset(self.y)
         prob = self.choice_probabilities_fn(*valid_data)
+        result = {
+            **{i: prob[i] for i in range(prob.shape[0])},
+            f"pred_{dataset.choice}": np.argmax(prob, axis=0),
+            f"true_{dataset.choice}": valid_ground_truth[0],
+        }
+        return result
 
-        if return_probabilities:
-            return {i: prob[i] for i in range(prob.shape[0])}
-        else:
-            return {"pred_" + ds.choice: np.argmax(prob, axis=0)}
+    def elasticities(self, dataset, wrt_choice):
+        """
+        Calculate the elasticities of the model based on the given dataset and choice.
 
-    def elasticities(self, ds, wrt_choice):
+        Args:
+            dataset: The dataset used to calculate the elasticities.
+            wrt_choice: The choice with respect to which the elasticities are calculated.
+
+        Returns:
+            The elasticities of the model based on the given dataset and choice.
+        """
         p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
-        while p_y_given_x.ndim > 1:
+        for _ in range(p_y_given_x.ndim - 1):
             p_y_given_x = aet.sum(p_y_given_x, axis=1)
         dy_dx = aet.grad(aet.sum(p_y_given_x), self.x, disconnected_inputs="ignore")
 
@@ -166,7 +197,7 @@ class BaseModel(object):
                 on_unused_input="ignore",
                 allow_input_downcast=True,
             )
-        train_data = ds.train_dataset(self.x)
+        train_data = dataset.train_dataset(self.x)
         index = np.arange((len(train_data[-1])))
         choice = (np.ones(shape=index.shape) * wrt_choice).astype(int)
         return self.elasticity_fn(*train_data, choice, index)
@@ -178,7 +209,7 @@ class BaseModel(object):
         return pprint(self.cost)
 
     def __getattr__(self, name):
-        if (name == "hessian_fn") or (name == "gradient_vector_fn"):
+        if name in ["hessian_fn", "gradient_vector_fn"]:
             self.build_gh_fn()
             return getattr(self, name)
         else:
@@ -253,10 +284,9 @@ def compute(model, ds, update=False, **params):
     ```
     """
     # saves original values and replace values by test values in params
-    p_value_old = {}
+    p_value_old = {p.name: p.get_value() for p in model.params if p.name in params}
     for p in model.params:
         if p.name in params:
-            p_value_old[p.name] = p.get_value()
             p.set_value(params[p.name])
 
     # compute all the outputs of the training and validation datasets
@@ -302,7 +332,7 @@ def compute(model, ds, update=False, **params):
 
 
 def train(model, ds, **kwargs):
-    """main training loop
+    """Main training loop
 
     Args:
         model (pycmtensor.models.BaseModel): model to train
@@ -371,13 +401,14 @@ def train(model, ds, **kwargs):
     log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     train_error = model.prediction_error_fn(*train_data)
 
-    if set(ds.train_index) != set(ds.valid_index):
+    if set(ds.idx_train) != set(ds.idx_valid):
         valid_error = model.prediction_error_fn(*valid_data)
     else:
         valid_error = train_error
 
     model.results.best_loglikelihood = log_likelihood
     model.results.best_valid_error = valid_error
+    model.results.best_train_error = train_error
     model.results.best_epoch = 0
     model.results.gnorm = np.nan
 
@@ -424,7 +455,7 @@ def train(model, ds, **kwargs):
                 statistics_graph["valid_error"].append(valid_error)
 
                 # training error
-                if set(ds.train_index) != set(ds.valid_index):
+                if set(ds.idx_train) != set(ds.idx_valid):
                     train_error = model.prediction_error_fn(*train_data)
                 else:
                     train_error = valid_error
@@ -475,6 +506,7 @@ def train(model, ds, **kwargs):
                     model.results.best_iteration = iteration
                     model.results.best_loglikelihood = log_likelihood
                     model.results.best_valid_error = valid_error
+                    model.results.best_train_error = train_error
                     model.results.gnorm = gnorm
 
                     # save Beta params

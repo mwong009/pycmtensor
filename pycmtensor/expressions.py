@@ -1,5 +1,6 @@
-# expressions.py
-"""PyCMTensor expressions module"""
+"""
+The code snippet is a part of the PyCMTensor expressions module. It defines a base class for parsing and manipulating Aesara tensor expressions. The class provides methods for parsing a tensor expression to remove parentheses and tensor operators, and returns a clean list of keywords found in the expression. It also defines a base class for expression objects, which includes overloaded operators for tensor operations such as addition, subtraction, multiplication, division, and comparison.
+"""
 from typing import Union
 
 import aesara
@@ -17,63 +18,83 @@ FLOATX = aesara.config.floatX
 
 
 class ExpressionParser(object):
+    HARD_CODED_STRINGS = [
+        "(",
+        ")",
+        ",",
+        "[",
+        "]",
+        "{",
+        "}",
+        "=",
+        "*",
+        "-",
+        "+",
+        "/",
+        ":",
+        "AdvancedSubtensor",
+        "Reshape",
+        "ARange",
+        "Assert",
+        "Shape",
+        "BroadcastTo",
+        "Composite",
+        "Could",
+        "ScalarFromTensor",
+        "Abs",
+        "Softmax",
+        "Switch",
+        "dtype",
+    ]
+
     def __init__(self, expression=None):
-        """Base class for the ExpressionParser object
+        """Base class for parsing and manipulating Aesara tensor expressions.
 
         Args:
-            expression (TensorVariable): the TensorVariable object to evaluate
+            expression (TensorVariable, optional): The tensor expression to parse. Defaults to None.
         """
         if expression is not None:
             self.expression = str(pprint(expression))
 
     @staticmethod
     def parse(expression):
-        """Parses Aesara Tensor string expression from `aesara.pprint()`. This function
-        removes parentheses and Tensor operators and returns a 'clean' list of
-        expressions
+        """Parses a tensor expression to remove parentheses and tensor operators.
 
         Args:
-            expression (TensorVariable): the symbolic Tensor object to parse
+            expression (TensorVariable): The symbolic tensor object to parse.
 
         Returns:
-            (list): found keywords in expressions
+            list: The clean list of keywords found in the expression.
         """
-        if isinstance(expression, str):
-            stdout = expression
-        else:
-            stdout = str(pprint(expression))
-        for s in [
-            "(",
-            ")",
-            ",",
-            "[",
-            "]",
-            "{",
-            "}",
-            "=",
-            "*",
-            "-",
-            "+",
-            "/",
-            ":",
-            "AdvancedSubtensor",
-            "Reshape",
-            "ARange",
-            "Assert",
-            "Shape",
-            "BroadcastTo",
-            "Composite",
-            "Could",
-            "ScalarFromTensor",
-            "Abs",
-            "Softmax",
-            "Switch",
-            "dtype",
-        ]:
-            stdout = str.replace(stdout, s, " ")
-        symbols = [s for s in str.split(stdout, " ") if len(s) > 0]
-        symbols = list(set(symbols))
+        stdout = ExpressionParser._get_stdout(expression)
+        stdout = ExpressionParser._remove_parentheses(stdout)
+        stdout = ExpressionParser._remove_tensor_operators(stdout)
+        symbols = ExpressionParser._remove_duplicates(stdout)
         return symbols
+
+    @staticmethod
+    def _get_stdout(expression):
+        if isinstance(expression, str):
+            return expression
+        else:
+            return str(pprint(expression))
+
+    @staticmethod
+    def _remove_parentheses(stdout):
+        for s in ["(", ")", "[", "]", "{", "}"]:
+            stdout = stdout.replace(s, " ")
+        return stdout
+
+    @staticmethod
+    def _remove_tensor_operators(stdout):
+        for s in ExpressionParser.HARD_CODED_STRINGS:
+            stdout = stdout.replace(s, " ")
+        return stdout
+
+    @staticmethod
+    def _remove_duplicates(stdout):
+        symbols = [s for s in stdout.split(" ") if len(s) > 0]
+        return list(set(symbols))
 
 
 class TensorExpressions:
@@ -86,10 +107,9 @@ class TensorExpressions:
         if isinstance(other, (TensorVariable, TensorSharedVariable)):
             return self() + other
         elif isinstance(other, Param):
-            print((self() + other()).eval())
             return self() + other()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -99,7 +119,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return other() + self()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -109,7 +129,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return self() - other()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -119,7 +139,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return other() - self()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -132,7 +152,7 @@ class TensorExpressions:
         elif isinstance(other, (Param, RandomDraws)):
             return self() * other()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"__mul__ {other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -145,7 +165,7 @@ class TensorExpressions:
         elif isinstance(other, (Param, RandomDraws)):
             return self() * other()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -155,7 +175,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return self() / other()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -165,7 +185,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return other() / self()
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -178,7 +198,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.pow(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -188,7 +208,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.pow(other(), self())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -198,7 +218,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.lt(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -208,7 +228,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.le(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -218,7 +238,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.gt(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -228,7 +248,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.ge(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -238,7 +258,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.eq(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -248,7 +268,7 @@ class TensorExpressions:
         elif isinstance(other, Param):
             return aet.neq(self(), other())
         else:
-            raise NotImplementedError(
+            raise TypeError(
                 f"{other} must be a TensorVariable or TensorShared Variable object"
             )
 
@@ -268,6 +288,9 @@ class Param(TensorExpressions):
             init_value (float): the inital value set at object creation
             shape (list): the shape of the Param
 
+        Raises:
+            ValueError: If `lb` is greater than `ub`
+
         !!! note
             `init_value` is an immutable property
         """
@@ -278,8 +301,8 @@ class Param(TensorExpressions):
         self.shared_var = aesara.shared(value, name=name, borrow=True)
         self._init_value = value
 
-        if all([lb, ub]) and not (lb <= ub):
-            raise ValueError(f"ub must be greater than lb. ub={ub}, lb={lb}")
+        if lb is not None and ub is not None and lb > ub:
+            raise ValueError("lb must be less than or equal to ub")
         self.ub = ub
         self.lb = lb
 
@@ -290,14 +313,17 @@ class Param(TensorExpressions):
 
     @property
     def init_value(self):
+        """Returns the initial value of the parameter"""
         return self._init_value
 
     @property
     def status(self):
+        """Returns the status of the parameter"""
         return self._status
 
     @property
     def shape(self):
+        """Returns the shape of the initial value of the parameter"""
         return self._init_value.shape
 
     @property
@@ -309,10 +335,11 @@ class Param(TensorExpressions):
         raise NotImplementedError
 
     def __call__(self):
-        """Returns the shared value"""
+        """Returns the shared value of the parameter"""
         return self.shared_var
 
     def __repr__(self):
+        """Returns a string representation of the parameter"""
         return f"Param({self.name}, {self.shape})"
 
     def get_value(self):
@@ -320,7 +347,7 @@ class Param(TensorExpressions):
         return self.shared_var.get_value()
 
     def set_value(self, value: Union[np.ndarray, float]):
-        """Set the value of the shared variable"""
+        """Sets the value of the shared variable"""
         self.shared_var.set_value(value)
 
     def reset_value(self):
@@ -333,11 +360,11 @@ class Beta(Param):
         """Constructor for Beta parameter
 
         Args:
-            name (str): name of Beta parameter
-            value (float): the default value of the Beta parameter
-            lb (float): value lower bound
-            ub (float): value upper bound
-            status (int): if 1, do not estimate this Beta parameter
+            name (str): The name of the Beta parameter.
+            value (float): The default value of the Beta parameter.
+            lb (float): The lower bound of the Beta parameter.
+            ub (float): The upper bound of the Beta parameter.
+            status (int): The status of the Beta parameter.
 
         !!! example
             Specifying a Beta parameter:
@@ -368,22 +395,18 @@ class Beta(Param):
 
 class RandomDraws(TensorExpressions):
     def __init__(self, name: str, draw_type: str, n_draws: int):
-        """Constructor for model random draws
+        """Constructor for the RandomDraws class.
 
         Args:
-            name (str): name of the RandomDraw object
-            draw_type (str): the distribution of the draw
-            n_draws (int): number of draws, determines the size of this shared tensor
+            name (str): The name of the RandomDraw object.
+            draw_type (str): The distribution of the draw. Can be "normal", "lognormal", "gumbel", "exponential", "gamma", or "poisson".
+            n_draws (int): The number of draws, which determines the size of the shared tensor.
 
-        !!! note
-            `draw_type` can be the following:
+        Raises:
+            NotImplementedError: If an unsupported draw_type is provided.
 
-            - `"normal"`
-            - `"lognormal"`
-            - `"gumbel"`
-            - `"exponential"`
-            - `"gamma"`
-            - `"poisson"`
+        Returns:
+            None. The method initializes the object and creates a shared variable.
         """
         self._name = name
         self.n_draws = n_draws
@@ -422,10 +445,9 @@ class Bias(Param):
         """Class object for neural net bias vector
 
         Args:
-            name (str): name of the parameter
-            size (Union[tuple,list]): size of the array in 1 dimension
-            value (numpy.ndarray): initial values of the parameter, if `None` given,
-                defaults to `0`
+            name (str): The name of the parameter.
+            size (Union[tuple,list]): The size of the array in 1 dimension.
+            value (numpy.ndarray): The initial values of the parameter. If `None` is given, it defaults to `0`.
         """
         Param.__init__(self, name, lb=None, ub=None)
 

@@ -52,6 +52,7 @@ class Results(object):
         self.null_loglikelihood = -np.inf
         self.best_loglikelihood = -np.inf
         self.best_valid_error = 1.0
+        self.best_train_error = 1.0
         self.best_epoch = 0
 
         self.gnorm = None
@@ -127,18 +128,19 @@ class Results(object):
             (pandas.DataFrame): Summary of the model statistics
         """
         stats = pd.DataFrame(columns=["value"]).astype("object")
-        stats.loc["Number of training samples used"] = int(self.n_train)
-        stats.loc["Number of validation samples used"] = int(self.n_valid)
-        stats.loc["Number of estimated parameters in the model"] = int(self.n_params)
-        stats.loc["Null. log likelihood"] = self.null_loglikelihood
-        stats.loc["Final log likelihood"] = self.best_loglikelihood
-        stats.loc["Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
-        stats.loc["Likelihood ratio test"] = self.loglikelihood_ratio_test()
-        stats.loc["Rho square"] = self.rho_square()
-        stats.loc["Rho square bar"] = self.rho_square_bar()
-        stats.loc["Akaike Information Criterion"] = self.AIC()
-        stats.loc["Bayesian Information Criterion"] = self.BIC()
-        stats.loc["Final gradient norm"] = f"{self.gnorm:.5e}"
+        stats.loc["Number of training samples used"] = f"{self.n_train:d}"
+        stats.loc["Number of validation samples used"] = f"{self.n_valid:d}"
+        stats.loc["Number of estimated parameters in the model"] = f"{self.n_params:d}"
+        stats.loc["Null. log likelihood"] = f"{self.null_loglikelihood:.2f}"
+        stats.loc["Final log likelihood"] = f"{self.best_loglikelihood:.2f}"
+        stats.loc["Validation Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
+        stats.loc["Training Accuracy"] = f"{100*(1-self.best_train_error):.2f}%"
+        stats.loc["Likelihood ratio test"] = f"{self.loglikelihood_ratio_test():.2f}"
+        stats.loc["Rho square"] = f"{self.rho_square():.3f}"
+        stats.loc["Rho square bar"] = f"{self.rho_square_bar():.3f}"
+        stats.loc["Akaike Information Criterion"] = f"{self.AIC():.2f}"
+        stats.loc["Bayesian Information Criterion"] = f"{self.BIC():.2f}"
+        stats.loc["Final gradient norm"] = f"{self.gnorm:.3e}"
         return stats
 
     def beta_statistics(self):
@@ -162,7 +164,7 @@ class Results(object):
             index=self.betas,
             data=[np.percentile(value, 50) for _, value in self.betas.items()],
             columns=["value"],
-        )
+        ).round(3)
 
         stats["std err"] = stderror(h, self.betas)
         stats["t-test"] = t_test(stats["std err"], self.betas)
@@ -171,6 +173,7 @@ class Results(object):
         stats["rob. std err"] = rob_stderror(h, bh, self.betas)
         stats["rob. t-test"] = t_test(stats["rob. std err"], self.betas)
         stats["rob. p-value"] = p_value(stats["rob. std err"], self.betas)
+        stats = stats.round(3)
 
         for key, value in self.betas.items():
             if value.shape != ():
@@ -196,7 +199,7 @@ class Results(object):
             data=correlation_matrix(h),
         )
 
-        return mat
+        return mat.round(3)
 
     def model_robust_correlation_matrix(self):
         """Robust correlation matrix calculated from the hessian and bhhh
@@ -220,7 +223,7 @@ class Results(object):
             data=rob_correlation_matrix(h, bh),
         )
 
-        return mat
+        return mat.round(3)
 
     def show_training_plot(self, sample_intervals=1):
         """Displays the statistics graph as a line plot
