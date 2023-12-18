@@ -102,3 +102,15 @@ def test_construct_random_draws():
 
     with pytest.raises(NotImplementedError):
         rnd_test_3 = RandomDraws("rnd_test3", "notgumbel", 20)
+
+
+def test_shared_var_math_ops():
+    b1 = Beta("b1", value=-1.0)
+    b2 = Beta("b2", value=1.0)
+    b3 = Beta("b3", value=-0.5)
+
+    params = [b1, b2, b3]
+
+    # sum of all params should be 1
+    result = aet.sum([aet.sum(aet.clip(p(), 0, np.inf)) for p in params])
+    assert result.eval() == 1.0
