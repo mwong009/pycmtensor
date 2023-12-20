@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pycmtensor"
 version = "1.8.1"
-description = "Python Tensor based package for discrete choice modelling."
-authors = ["Melvin Wong <m.j.w.wong@tue.nl>"]
+description = "A robust and efficient Python package leveraging tensor computations for advanced discrete choice modelling."
+authors = ["Melvin Wong"]
 license = "MIT"
 readme = "README.md"
 
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/mwong009/pycmtensor"
 # documentation = ""
 
-keywords = []
+keywords = ["tensor", "discrete choice modelling", "transportation", "economics", "python", "data analysis", "machine learning", "artificial intelligence", "scientific computing"]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -62,36 +62,75 @@ pymdown-extensions = "^10.0.1"
 mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 mknotebooks = "^0.8.0"
 
+[tool.poetry.scripts]
+run-tests = "pytest"
+run-docs = "mkdocs serve"
+run-docs-deploy = "mkdocs gh-deploy"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
 skip_glob = ".pytest_cache/*"
 
 [tool.black]
 line-length = 88
-target-version = ["py311"]
-quiet = false
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
 
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "1.8.1"
 tag_format = "v$version"
+bump_message = "Bump version: {current_version} → {new_version}"
 version_files = [
     "pyproject.toml:version",
     "pycmtensor/__init__.py",
 ]
 
-[tool.pytest]
-markers = []
-## poetry run pytest .
 
 [tool.pytest.ini_options]
-addopts = ["--cov=pycmtensor", "--cov-report=xml"]
+addopts = ["--cov=pycmtensor", "--cov-report=xml", "--cov-report=term", "--junitxml=test-reports/junit.xml"]
 filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
 
 [tool.coverage.run]
-omit = [".*", "*/site-packages/*", "tests/*", "docs/*", "samples/*"]
-# poetry run coverage run -m pytest && poetry run coverage report
+source = ["pycmtensor"]
+omit = ["tests/*", "docs/*", "samples/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]
+show_missing = true
