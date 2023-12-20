@@ -36,43 +36,24 @@ jobs:
         echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
       shell: bash
 
-    ###########
-    # Windows #
-    ###########
-    - name: Install Conda dependencies (windows)
-      if: matrix.os == 'windows-latest'
+    - name: Install Conda dependencies
       run: |
-        conda install -c conda-forge aesara -y
+        conda install -c conda-forge aesara=2.9.3 numpy=1.25.2 scipy=1.11.4 pandas=1.5.3 seaborn=0.12.2 poetry=1.7.1 watermark=2.4.3 pytest=7.4.3 pytest-cov=4.1.0 -y
 
-    ##################
-    # Linux (Ubuntu) #
-    ##################
-    - name: Install conda dependencies (linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        conda install -c conda-forge aesara -y
-
-    ###########
-    # Mac OSX #
-    ###########
-    - name: Install conda dependencies (macos)
-      if: matrix.os == 'macos-latest'
-      run: |
-        conda install -c conda-forge aesara -y
-    
+    ############
+    # Mac OS X #
+    ############
     - name: Xcode check (macos)
       if: matrix.os == 'macos-latest'
       run: |
         clang --version
         xcrun --show-sdk-path
     
-    ##################
-    # Install Poetry #
-    ##################
-    - name: Install package dependencies
+    ################
+    # Set up tests #
+    ################
+    - name: View version
       run: |
-        pip install poetry
-        poetry install --with test
         poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
 
     - name: Show contents of .aesararc

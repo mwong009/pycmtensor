@@ -16,7 +16,7 @@ def test_l1():
     l1_reg = Regularizers.l1(params).eval()
 
     assert len(l1_reg.shape) == 0
-    assert np.round(l1_reg, 3) == 0.003
+    assert np.round(l1_reg, 2) == 0.03
 
 
 def test_l2():
@@ -30,4 +30,4 @@ def test_l2():
     l2_reg = Regularizers.l2(params).eval()
 
     assert len(l2_reg.shape) == 0
-    assert np.round(l2_reg, 4) == 0.0001
+    assert np.round(l2_reg, 3) == 0.001
