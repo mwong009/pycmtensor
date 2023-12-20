@@ -38,8 +38,7 @@ jobs:
 
     - name: Install Conda dependencies
       run: |
-        conda env create --file environment.yml
-        conda activate pycmtensor-dev
+        conda install -c conda-forge aesara=2.9.3 numpy=1.25.2 scipy=1.11.4 pandas=1.5.3 seaborn=0.12.2 watermark=2.4.3 poetry=1.7.1 pytest>=6.2.5 pytest-cov>=3.0.0 -y
       shell: bash
 
     ############
@@ -80,7 +79,7 @@ jobs:
       
     - name: Upload coverage to codecov.io
       if: |
-        (matrix.os == 'windows-latest') &&
+        (matrix.os == 'ubuntu-latest') &&
         (matrix.python-version == '3.11')
       uses: codecov/codecov-action@v2
       with:
