@@ -40,3 +40,17 @@ jobs:
       - name: Test pycmtensor import
         run: |
           python -c "import pycmtensor as cmt; print(cmt.__version__)"
+
+      - name: Show Aesara config
+        run: |
+          python -c "import aesara; print(aesara.config.blas__ldflags)"
+          python -c "import aesara; print(aesara.config.gcc__cxxflags)"
+
+      - name: Main test
+        run: pytest
+
+      - name: Upload coverage to codecov.io
+        if: (matrix.os == 'ubuntu-latest') && (matrix.python-version == '3.11')
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage.xml
