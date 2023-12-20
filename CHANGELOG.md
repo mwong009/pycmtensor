@@ -1,3 +1,9 @@
+## v1.9.0 (2023-12-20)
+
+### Feat
+
+- overhaul dependencies for conda feedstock
+
 ## v1.8.1 (2023-11-28)
 
 ### Fix
