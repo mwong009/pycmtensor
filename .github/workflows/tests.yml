@@ -40,6 +40,7 @@ jobs:
       run: |
         conda env create --file environment.yml
         conda activate pycmtensor-dev
+      shell: bash
 
     ############
     # Mac OS X #
