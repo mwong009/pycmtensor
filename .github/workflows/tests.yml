@@ -31,9 +31,7 @@ jobs:
     
     - name: Add conda to path (Bash)
       run: |
-        echo "$CONDA/condabin" >> $GITHUB_PATH
-        echo "$CONDA/Library/bin" >> $GITHUB_PATH
-        echo "$CONDA/bin" >> $GITHUB_PATH
+        echo $CONDA/bin >> $GITHUB_PATH
 
     - name: Install Conda dependencies
       run: |
