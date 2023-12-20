@@ -54,6 +54,7 @@ jobs:
     ################
     - name: View version
       run: |
+        poetry install
         python -c "import pycmtensor as cmt; print(cmt.__version__)"
 
     - name: Show contents of .aesararc
