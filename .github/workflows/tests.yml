@@ -31,11 +31,15 @@ jobs:
     
     - name: Add conda to path (Bash)
       run: |
-        echo $CONDA/bin >> $GITHUB_PATH
+        echo $CONDA/condabin >> $GITHUB_PATH
+        echo $CONDA/Library/bin >> $GITHUB_PATH
+        echo CONDA_PREFIX=$CONDA >> $GITHUB_ENV
+      shell: bash
 
     - name: Install Conda dependencies
       run: |
         conda env update --file environment.yml --name base
+      shell: bash
 
     ############
     # Mac OS X #
@@ -52,6 +56,7 @@ jobs:
     - name: View version
       run: |
         python -c "import pycmtensor as cmt; print(cmt.__version__)"
+      shell: bash
 
     - name: Show contents of .aesararc
       run: |
@@ -62,6 +67,7 @@ jobs:
       run: |
         python -c "import aesara; print(aesara.config.blas__ldflags)"
         python -c "import aesara; print(aesara.config.gcc__cxxflags)"
+      shell: bash
     
     ########
     # Test #
@@ -69,6 +75,7 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+      shell: bash
       
     - name: Upload coverage to codecov.io
       if: |
