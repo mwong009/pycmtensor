@@ -34,12 +34,12 @@ jobs:
         echo $CONDA/condabin >> $GITHUB_PATH
         echo $CONDA/Library/bin >> $GITHUB_PATH
         echo CONDA_PREFIX=$CONDA >> $GITHUB_ENV
-      shell: bash
+      shell: bash -l {0}
 
     - name: Install Conda dependencies
       run: |
         conda env update --file environment.yml --name base
-      shell: bash
+      shell: bash -l {0}
 
     ############
     # Mac OS X #
