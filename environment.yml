@@ -1,0 +1,35 @@
+name: pycmtensor-dev
+channels:
+    - conda-forge
+    - defaults
+dependencies:
+    # core dependencies
+    - python=3.11
+    - aesara>=2.9.2
+    - numpy<1.26.0
+    - scipy>=1.7.1,<2.0.0
+    - pandas>=1.4.1,<2.0.0
+    - seaborn>=0.12.2,<0.13.0
+    - watermark>=2.2.0,<3.0.0
+    - poetry>=1.7.1
+    
+    # test dependencies
+    - pytest>=6.2.5
+    - pytest-cov>=3.0.0
+    
+    # dev dependencies
+    - black>=21.0.0
+    - isort>=5.9.1
+    
+    # doc dependencies
+    - mkdocs>=1.4.3
+    - mkdocs-material>=9.1.18
+    - pymdown-extensions>=10.0.1
+    - mkdocstrings>=0.15.0
+    - mknotebooks>=0.8.0,<1.0.0
+
+# run:
+# conda env create -f environment.yml && conda activate pycmtensor-dev
+
+# extra_deps:
+# pip install commitizen pre-commit ipykernel

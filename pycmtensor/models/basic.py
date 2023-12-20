@@ -146,7 +146,7 @@ class BaseModel(object):
             allow_input_downcast=True,
         )
 
-    def predict(self, dataset):
+    def predict(self, dataset) -> dict:
         """Make predictions on a given dataset.
 
         Args:

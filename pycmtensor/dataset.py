@@ -57,36 +57,53 @@ class Dataset:
         Raises:
             IndexError: If the choice variable is not found in the DataFrame columns.
         """
+        # Iterate over the keyword arguments and add them to the config
         for key, value in kwargs.items():
             config.add(key, value)
 
+        # Check if the choice is in the dataframe columns
         if choice not in df.columns:
             raise IndexError(f"{choice} not found in dataframe.")
 
+        # Convert the choice column to integer type
         df[choice] = df[choice].astype("int")
+
+        # Reset the dataframe index
         df.reset_index(drop=True, inplace=True)
+
+        # Normalize the choice column to start from 0
         while df[choice].min() > 0:
             df[choice] -= df[choice].min()
 
+        # Store the dataframe index values
         self.index = df.index.values
 
+        # Initialize the variables
         self.n = len(df)
         self.x = []
+        self.y = None
+
+        # Iterate over the dataframe columns
         for name in list(df.columns):
             if name == choice:
                 self.y = aet.ivector(name)
             else:
                 self.x.append(aet.vector(name))
 
+        # Shuffle the dataframe
         df = df.sample(frac=1.0, random_state=config.seed).reset_index(drop=True)
 
-        ds = {}
-        for name in list(df.columns):
-            ds[name] = df[name].values
+        # Create a dictionary with column names as keys and column values as values
+        ds = {name: df[name].values for name in list(df.columns)}
 
+        # Initialize the scale with variable names and 1.0 as values
         self.scale = {var.name: 1.0 for var in self.x}
+
+        # Store the choice and the dictionary
         self.choice = choice
         self.ds = ds
+
+        # Set the split fraction
         self.split_frac = 1.0
 
     def __call__(self):
@@ -104,13 +121,21 @@ class Dataset:
         Raises:
             KeyError: If the given name(s) do not match any input or output variable.
         """
+        # Check if the key is a list or tuple
         if isinstance(key, (list, tuple)):
+            # If it is, convert it to a tensor
             return self._make_tensor(key)
         else:
+            # If the key is a name of one of the x variables
             if key in [var.name for var in self.x]:
+                # Return the corresponding x variable
                 return self.x[[x.name for x in self.x].index(key)]
+
+            # If the key is the name of the y variable
             if key == self.y.name:
                 return self.y
+
+            # If the key is not found in the x or y variables
             else:
                 raise KeyError
 
@@ -171,7 +196,7 @@ class Dataset:
                 raise KeyError(f"Variable '{variable}' not found in dataset")
 
     def scale_variable(self, variable, factor) -> None:
-        """Multiply values of the `variable` by $1/\\textrm{factor}$.
+        """Multiply values of the `variable` by `1/factor`.
 
         Args:
             variable (str): the name of the variable or a list of variable names
@@ -180,7 +205,7 @@ class Dataset:
         self.ds[variable] = self.ds[variable] / factor
         self.scale[variable] = self.scale[variable] * factor
 
-    def split(self, frac):
+    def split(self, frac) -> None:
         """Method to split the dataset into training and validation subsets based on a given fraction.
 
         Args:
@@ -198,7 +223,7 @@ class Dataset:
             f"seed: {config.seed} n_train_samples:{self.n_train} n_valid_samples:{self.n_valid}"
         )
 
-    def _dataset_slice(self, tensors, index, batch_size, shift, n_index):
+    def _dataset_slice(self, tensors, index, batch_size, shift, n_index) -> list:
         """Internal method call for self.train_dataset or self.valid_dataset"""
 
         if not isinstance(tensors, list):
@@ -234,7 +259,7 @@ class Dataset:
 
         return _ds
 
-    def train_dataset(self, variables, index=None, batch_size=None, shift=None):
+    def train_dataset(self, variables, index=None, batch_size=None, shift=None) -> list:
         """Returns a slice of the (or the full) training data array with the sequence
         matching the list of variables.
 
@@ -268,7 +293,7 @@ class Dataset:
 
         return self._dataset_slice(variables, index, batch_size, shift, n_index)
 
-    def valid_dataset(self, variables, index=None, batch_size=None, shift=None):
+    def valid_dataset(self, variables, index=None, batch_size=None, shift=None) -> list:
         """Returns a slice of the (or the full) validation data array with the sequence
         matching the list of variables.
 
