@@ -38,7 +38,8 @@ jobs:
 
     - name: Install Conda dependencies
       run: |
-        conda env update --file environment.yml --name base
+        conda env create --file environment.yml
+        conda activate pycmtensor-dev
 
     ############
     # Mac OS X #
