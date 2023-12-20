@@ -38,7 +38,7 @@ jobs:
 
     - name: Install Conda dependencies
       run: |
-        conda install -c conda-forge aesara=2.9.3 numpy=1.25.2 scipy=1.11.4 pandas=1.5.3 seaborn=0.12.2 poetry=1.7.1 watermark=2.4.3 pytest=7.4.3 pytest-cov=4.1.0 -y
+        conda install -c conda-forge aesara=2.9.3 numpy=1.25.2 scipy=1.11.4 pandas=1.5.3 seaborn=0.12.2 poetry=1.7.1 watermark=2.4.3 pytest=7.4.3 pytest-cov=4.1.0 poetry=1.7.1 -y
 
     ############
     # Mac OS X #
@@ -54,7 +54,7 @@ jobs:
     ################
     - name: View version
       run: |
-        poetry run python -c "import pycmtensor as cmt; print(cmt.__version__)"
+        python -c "import pycmtensor as cmt; print(cmt.__version__)"
 
     - name: Show contents of .aesararc
       run: |
@@ -63,15 +63,15 @@ jobs:
 
     - name: Show aesara.config ldflags
       run: |
-        poetry run python -c "import aesara; print(aesara.config.blas__ldflags)"
-        poetry run python -c "import aesara; print(aesara.config.gcc__cxxflags)"
+        python -c "import aesara; print(aesara.config.blas__ldflags)"
+        python -c "import aesara; print(aesara.config.gcc__cxxflags)"
     
     ########
     # Test #
     ########
     - name: Test with pytest
       run: |
-        poetry run pytest
+        pytest
       
     - name: Upload coverage to codecov.io
       if: |
