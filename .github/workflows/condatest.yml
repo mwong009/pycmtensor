@@ -1,9 +1,9 @@
-name: Conda Test
+name: CondaTest
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  example:
     name: (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
