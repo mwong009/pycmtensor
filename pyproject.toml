@@ -25,47 +25,47 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9, <3.12"
-pandas = "^1.4.1"
-scipy = "^1.7.1"
-watermark = "^2.3.1"
-numpy = "<1.26.0"
-seaborn = "^0.12.2"
+# [tool.poetry.dependencies]
+# python = "^3.9, <3.12"
+# pandas = "^1.4.1"
+# scipy = "^1.7.1"
+# watermark = "^2.3.1"
+# numpy = "<1.26.0"
+# seaborn = "^0.12.2"
 
 
-[tool.poetry.group.test]
-optional = true
+# [tool.poetry.group.test]
+# optional = true
 
-[tool.poetry.group.test.dependencies]
-pytest = "^7.0"
-pytest-cov = "^4.1.0"
+# [tool.poetry.group.test.dependencies]
+# pytest = "^7.0"
+# pytest-cov = "^4.1.0"
 
-[tool.poetry.group.dev]
-optional = true
+# [tool.poetry.group.dev]
+# optional = true
 
-[tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-isort = "^5.9.1"
-pre-commit = "^3.3.3"
-commitizen = "^3.3.0"
-ipykernel = "^6.24.0"
-dill = "^0.3.7"
+# [tool.poetry.group.dev.dependencies]
+# black = "^23.3.0"
+# isort = "^5.9.1"
+# pre-commit = "^3.3.3"
+# commitizen = "^3.3.0"
+# ipykernel = "^6.24.0"
+# dill = "^0.3.7"
 
-[tool.poetry.group.doc]
-optional = true
+# [tool.poetry.group.doc]
+# optional = true
 
-[tool.poetry.group.doc.dependencies]
-mkdocs = "^1.4.3"
-mkdocs-material = "^9.1.18"
-pymdown-extensions = "^10.0.1"
-mkdocstrings = {extras = ["python"], version = "^0.22.0"}
-mknotebooks = "^0.8.0"
+# [tool.poetry.group.doc.dependencies]
+# mkdocs = "^1.4.3"
+# mkdocs-material = "^9.1.18"
+# pymdown-extensions = "^10.0.1"
+# mkdocstrings = {extras = ["python"], version = "^0.22.0"}
+# mknotebooks = "^0.8.0"
 
-[tool.poetry.scripts]
-run-tests = "pytest"
-run-docs = "mkdocs serve"
-run-docs-deploy = "mkdocs gh-deploy"
+# [tool.poetry.scripts]
+# run-tests = "pytest"
+# run-docs = "mkdocs serve"
+# run-docs-deploy = "mkdocs gh-deploy"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
