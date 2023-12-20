@@ -1,3 +1,10 @@
+## v1.9.1 (2023-12-20)
+
+### Fix
+
+- **workflow**: remove poetry from  tests
+- add missing poetry dependencies
+
 ## v1.9.0 (2023-12-20)
 
 ### Feat
