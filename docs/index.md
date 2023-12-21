@@ -11,28 +11,28 @@ A Tensor-based choice modelling estimation package written in Python
 
 # Welcome
 
-PyCMTensor is a tensor-based discrete choice modelling estimation Python library package.
-It has a particular focus on estimation of hybrid neural networks and Logit models, as well as on Mixed Logit models. PyCMTensor models are based on computational graphs and models estimated using generalized backpropagation algorithms.
-PyCMTensor can be used to fully specify Multinomial Logit and Mixed Logit models, perform model estimation using computational graphs and generate statistical test results for econometric analysis.
+PyCMTensor is a Python library that use tensor-based computations for discrete choice modelling and estimation. It specializes in the estimation of hybrid neural networks, Logit models, and Mixed Logit models. The models in PyCMTensor are built on computational graphs and are estimated using generalized backpropagation algorithms.
+
+This library provides the tools to fully specify and estimate Multinomial Logit and Mixed Logit models. It also enables the generation of statistical test results for comprehensive econometric analysis. With PyCMTensor, you can perform model estimation using computational graphs, making it a powerful tool for advanced statistical modelling.
 
 ## Key features
 
 **Model specification**
 
-PyCMTensor can be used to specify and customize alternative specific linear and non-linear utility functions, random variables and deep neural networks.
-PyCMTensor can keep track of model taste parameters, gradients and hessian matrices for econometric interpretability, specification testing, prediction, and elasticity analysis.
+PyCMTensor provides the ability to define and customize alternative-specific linear and non-linear utility functions, random variables, and deep neural networks. It maintains a record of model taste parameters, gradients, and Hessian matrices, facilitating econometric interpretability, specification testing, prediction, and elasticity analysis.
 
 **Cost functions**
 
-To evaluate model performance, various cost functions are available, which include (negative) log likelihood, mean squared error, and KL divergence. Model accuracy can also be evaluated using out-of-sample prediction probabilities or discrete choices (Argmax). 
+PyCMTensor offers a variety of cost functions to assess model performance, including negative log-likelihood, mean squared error, and KL divergence. It also allows for the evaluation of model accuracy using out-of-sample prediction probabilities or discrete choices (Argmax).
 
 **Data processing**
 
-Datasets can be split into different segments for training and validation easily, to prioritize different aspects of the model. Arithmetic operations and boolean expressions can be used on variables and parameters within the utility function without pre-processing the datafile. Minibatch training is possible for estimation speedup on large datasets.
+PyCMTensor simplifies the process of segmenting datasets for training and validation, allowing for a focused approach to model development. It supports arithmetic operations and boolean expressions on variables and parameters within the utility function, eliminating the need for pre-processing the data file. Additionally, it enables minibatch training for faster estimation on large datasets.
 
 **Model tuning**
 
-PyCMTensor includes a set of 1st order and 1.5th order optimization routines and learning rate schedulers for estimating choice models. 
+PyCMTensor incorporates a collection of 1st order and 1.5th order optimization routines and learning rate schedulers, designed specifically for estimating choice models. This feature aids in fine-tuning the model for optimal performance.
+
 
 ## Getting started
 
