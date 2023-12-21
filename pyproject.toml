@@ -5,13 +5,8 @@ description = "A robust and efficient Python package leveraging tensor computati
 authors = ["Melvin Wong"]
 license = "MIT"
 readme = "README.md"
-
-# homepage = ""
 repository = "https://github.com/mwong009/pycmtensor"
-# documentation = ""
-
 keywords = ["tensor", "discrete choice modelling", "transportation", "economics", "python", "data analysis", "machine learning", "artificial intelligence", "scientific computing"]
-
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -40,32 +35,6 @@ optional = true
 [tool.poetry.group.test.dependencies]
 pytest = ">=7.4.3"
 pytest-cov = ">=4.1.0"
-
-# [tool.poetry.group.dev]
-# optional = true
-
-# [tool.poetry.group.dev.dependencies]
-# black = "^23.3.0"
-# isort = "^5.9.1"
-# pre-commit = "^3.3.3"
-# commitizen = "^3.3.0"
-# ipykernel = "^6.24.0"
-# dill = "^0.3.7"
-
-# [tool.poetry.group.doc]
-# optional = true
-
-# [tool.poetry.group.doc.dependencies]
-# mkdocs = "^1.4.3"
-# mkdocs-material = "^9.1.18"
-# pymdown-extensions = "^10.0.1"
-# mkdocstrings = {extras = ["python"], version = "^0.22.0"}
-# mknotebooks = "^0.8.0"
-
-# [tool.poetry.scripts]
-# run-tests = "pytest"
-# run-docs = "mkdocs serve"
-# run-docs-deploy = "mkdocs gh-deploy"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
