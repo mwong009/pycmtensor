@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../assets/img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.3.2">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -24,10 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.30068a00.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.4b4a2bd9.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.85d0ee34.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.356b1318.min.css">
       
       
   
@@ -292,14 +292,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
+          
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
@@ -413,14 +415,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
+          
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
@@ -494,14 +498,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
+          
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
@@ -577,14 +583,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
+          
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
@@ -633,14 +641,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
         
+          
           <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
             
   
@@ -809,14 +819,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8" checked>
         
+          
           <label class="md-nav__link" for="__nav_5_2_8" id="__nav_5_2_8_label" tabindex="0">
             
   
@@ -1102,14 +1114,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
+          
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
@@ -1594,7 +1608,30 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return the number of estimated betas</p>
+      <p>Return the number of estimated betas in the Multinomial Logit model.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The number of estimated betas.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
   </div>
 
 </div>
@@ -1616,7 +1653,30 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>Return the total number of estimated parameters</p>
+      <p>Returns the number of parameters in the Multinomial Logit model.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>int</code></td>          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The number of parameters in the Multinomial Logit model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
   </div>
 
 </div>
@@ -1637,7 +1697,18 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>constructs aesara functions for cost and prediction errors</p>
+      <p>Constructs Aesara functions for calculating the cost and prediction errors of the Multinomial Logit model.</p>
+<p>Inputs:
+- None</p>
+<p>Outputs:
+- None</p>
+<p>Example Usage:
+<div class="highlight"><pre><span></span><code><span class="c1"># Create an instance of the MNL class</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Call the build_cost_fn method</span>
+<span class="n">model</span><span class="o">.</span><span class="n">build_cost_fn</span><span class="p">()</span>
+</code></pre></div></p>
 
   </div>
 
@@ -1657,7 +1728,8 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>build/rebuilt cost function with updates to the model. Creates a class function <code>MNL.cost_updates_fn(*inputs, output, lr)</code> that receives a list of input variable arrays, the output array, and a learning rate.</p>
+      <p>Build or rebuild the cost function with updates to the model.</p>
+<p>This method creates a class function <code>MNL.cost_updates_fn(*inputs, output, lr)</code> that takes a list of input variable arrays, an output array, and a learning rate as arguments.</p>
 
 
 
@@ -1679,7 +1751,7 @@ variables</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The list of tuples containing the target shared variable and the new value of the variable.</p>
+              <p>A list of tuples containing the target shared variable and the new value of the variable.</p>
             </div>
           </td>
           <td>
@@ -1707,8 +1779,42 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>constructs aesara functions for hessians and gradient vectors</p>
-<div class="admonition note">
+      <p>Constructs Aesara functions for computing the Hessian matrix and the gradient vector.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>hessian_fn</code></td>          <td>
+                <code>Aesara function</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A function that computes the Hessian matrix.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+<td><code>gradient_vector_fn</code></td>          <td>
+                <code>Aesara function</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A function that computes the gradient vector.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+      <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The hessians and gradient vector are evaluation at the maximum <strong>log likelihood</strong> estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.</p>
 </div>
@@ -1731,7 +1837,7 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>disaggregated point/cross elasticities of choice y wrt x</p>
+      <p>Calculate the disaggregated point/cross elasticities of the choice variable <code>y</code> with respect to the independent variables <code>x</code> in a Multinomial Logit model.</p>
 
 
 
@@ -1753,7 +1859,7 @@ variables</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>dataset containing the training data</p>
+              <p>Dataset containing the training data.</p>
             </div>
           </td>
           <td>
@@ -1767,7 +1873,7 @@ variables</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>alternative to evaluate the variables on</p>
+              <p>Alternative to evaluate the variables on.</p>
             </div>
           </td>
           <td>
@@ -1783,18 +1889,17 @@ variables</p>
   <table>
     <thead>
       <tr>
-        <th>Type</th>
+<th>Name</th>        <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
         <tr>
-          <td>
-                <code>dict</code>
+<td><code>dict</code></td>          <td>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the disaggregate point elasticities of x</p>
+              <p>Disaggregated point elasticities of the independent variables <code>x</code>.</p>
             </div>
           </td>
         </tr>
@@ -1837,7 +1942,7 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>returns the values of the betas</p>
+      <p>Returns the values of the betas in the model as a dictionary.</p>
 
 
 
@@ -1845,18 +1950,17 @@ variables</p>
   <table>
     <thead>
       <tr>
-        <th>Type</th>
+<th>Name</th>        <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
         <tr>
-          <td>
-                <code>dict</code>
+<td><code>dict</code></td>          <td>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>beta values</p>
+              <p>A dictionary containing the beta values, where the keys represent the beta names and the values represent their corresponding values.</p>
             </div>
           </td>
         </tr>
@@ -1874,17 +1978,14 @@ variables</p>
 
 
 <h3 id="pycmtensor.models.MNL.MNL.predict" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></code>
 
 <a href="#pycmtensor.models.MNL.MNL.predict" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
   <div class="doc doc-contents ">
   
-      <p>predicts the output of the most likely alternative given the validation dataset in <code>ds</code>. The formula is:</p>
-<div class="arithmatex">\[
-    argmax(p_n(y|x))
-\]</div>
+      <p>Predicts the output of the most likely alternative given the validation dataset.</p>
 
 
 
@@ -1906,25 +2007,11 @@ variables</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>pycmtensor dataset</p>
+              <p>A pycmtensor dataset object containing the validation data.</p>
             </div>
           </td>
           <td>
               <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>return_probabilities</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>if true, returns the probability vector instead</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
           </td>
         </tr>
     </tbody>
@@ -1943,11 +2030,10 @@ variables</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the predicted choices or the vector of probabilities</p>
+              <p>numpy.ndarray: The predicted choices or the vector of probabilities.</p>
             </div>
           </td>
         </tr>
@@ -1955,23 +2041,27 @@ variables</p>
   </table>
       <div class="admonition example">
 <p class="admonition-title">Example</p>
-<p>To return predicted choices:
-<div class="highlight"><pre><span></span><code><span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create an instance of the MNL class</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Predict the choices using the predict method</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>output:
 <div class="highlight"><pre><span></span><code><span class="go">{&#39;pred_choice&#39;: array([...])}</span>
 </code></pre></div></p>
-<p>To return probabilities:
-<div class="highlight"><pre><span></span><code><span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">return_probabilities</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Predict the probabilities using the predict method</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
-</code></pre></div></p>
+</code></pre></div>
 <p>output:
 <div class="highlight"><pre><span></span><code><span class="go">{   0: array([...]),</span>
 <span class="go">    1: array([...]),</span>
 <span class="go">    ...</span>
 <span class="go">}</span>
 </code></pre></div></p>
+<p>The expected output for <code>predictions</code> is a dictionary with the key <code>'pred_choice'</code> and an array of predicted choices as the value. The expected output for <code>probabilities</code> is a dictionary with the keys representing the alternative indices and the values being arrays of probabilities.</p>
 </div>
 
   </div>
@@ -1992,7 +2082,22 @@ variables</p>
 
   <div class="doc doc-contents ">
   
-      <p>resets the values of all parameters</p>
+      <p>Resets the values of all parameters by calling the reset_values method of the parent class.</p>
+<p>This method resets the values of all parameters to their initial values.</p>
+<p>Example Usage:
+<div class="highlight"><pre><span></span><code><span class="c1"># Create an instance of the MNL class</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MNL</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">utility</span><span class="p">,</span> <span class="n">av</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Call the reset_values method to reset the parameter values</span>
+<span class="n">model</span><span class="o">.</span><span class="n">reset_values</span><span class="p">()</span>
+</code></pre></div></p>
+<p>Inputs:
+- None</p>
+<p>Flow:
+1. The <code>reset_values</code> method is called.
+2. The method calls the <code>reset_values</code> method of the parent class <code>BaseModel</code> to reset the values of all parameters.</p>
+<p>Outputs:
+- None</p>
 
   </div>
 
@@ -2027,10 +2132,10 @@ variables</p>
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-            Back to top
-          </button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
         
       </main>
       
@@ -2072,10 +2177,11 @@ variables</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.top"], "search": "../../../../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.top"], "search": "../../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
         <script src="../../../../assets/js/extra.js"></script>
       

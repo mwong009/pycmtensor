@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../assets/img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.3.2">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -24,10 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.30068a00.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.4b4a2bd9.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.85d0ee34.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.356b1318.min.css">
       
       
   
@@ -292,14 +292,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
+          
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
@@ -413,14 +415,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
+          
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
@@ -494,14 +498,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
+          
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
@@ -577,14 +583,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
+          
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
@@ -633,14 +641,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
         
+          
           <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
             
   
@@ -787,6 +797,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.dataset.Dataset.__getitem__" class="md-nav__link">
+    __getitem__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.dataset.Dataset.drop" class="md-nav__link">
     drop()
   </a>
@@ -908,14 +925,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8" >
         
+          
           <label class="md-nav__link" for="__nav_5_2_8" id="__nav_5_2_8_label" tabindex="0">
             
   
@@ -1085,14 +1104,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
+          
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
@@ -1241,6 +1262,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pycmtensor.dataset.Dataset.__getitem__" class="md-nav__link">
+    __getitem__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pycmtensor.dataset.Dataset.drop" class="md-nav__link">
     drop()
   </a>
@@ -1319,6 +1347,8 @@
 <a href="#pycmtensor.dataset" class="headerlink" title="Permanent link">&para;</a></h2>
 
   <div class="doc doc-contents first">
+  
+      <p>The code snippet is a part of a class called <code>Dataset</code> that converts a pandas DataFrame into an xarray dataset. It initializes the dataset object with the DataFrame and the name of the choice variable. It also provides methods to access and manipulate the dataset.</p>
 
   
 
@@ -1345,18 +1375,7 @@
   <div class="doc doc-contents ">
 
   
-      <p>Base PyCMTensor Dataset class object</p>
-<p>This class stores the data in an array format, and a symbolic tensor reference
-variable object. To call the tensor variable, we invoke the label of the
-variable as an item in the Dataset class, like so:
-<div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;choice&quot;</span><span class="p">)</span>
-<span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;label_of_variable&quot;</span><span class="p">]</span>  <span class="o">-&gt;</span> <span class="n">TensorVariable</span>
-</code></pre></div></p>
-<p>To call the data array, we use the <code>train_dataset()</code> or <code>valid_dataset()</code>
-method. See method reference for info about the arguments. For example:
-<div class="highlight"><pre><span></span><code><span class="c1"># to get the data array for variable &quot;time&quot;</span>
-<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
-</code></pre></div></p>
+      <p>Initialize the Dataset object with a pandas DataFrame and the name of the choice variable.</p>
 
 
 
@@ -1378,7 +1397,7 @@ method. See method reference for info about the arguments. For example:
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the pandas dataframe object to load</p>
+              <p>The pandas DataFrame object containing the dataset.</p>
             </div>
           </td>
           <td>
@@ -1392,11 +1411,25 @@ method. See method reference for info about the arguments. For example:
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the name of the choice variable</p>
+              <p>The name of the choice variable.</p>
             </div>
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>**kwargs</code></td>
+          <td>
+                <code>optional</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to configure the dataset.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
           </td>
         </tr>
     </tbody>
@@ -1421,7 +1454,7 @@ method. See method reference for info about the arguments. For example:
           </td>
           <td>
             <div class="doc-md-description">
-              <p>total number of rows in the dataset</p>
+              <p>The number of rows in the dataset.</p>
             </div>
           </td>
         </tr>
@@ -1432,8 +1465,7 @@ method. See method reference for info about the arguments. For example:
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the full list of (input) <code>TensorVariable</code> objects
-to build the tensor expression from</p>
+              <p>The list of input TensorVariable objects.</p>
             </div>
           </td>
         </tr>
@@ -1444,7 +1476,7 @@ to build the tensor expression from</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the output (choice) <code>TensorVariable</code> object</p>
+              <p>The output TensorVariable object.</p>
             </div>
           </td>
         </tr>
@@ -1455,8 +1487,7 @@ to build the tensor expression from</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a dictionary of <code>float</code> values to store the scaling factor
-used for each variable</p>
+              <p>A dictionary of scaling factors for each variable.</p>
             </div>
           </td>
         </tr>
@@ -1467,7 +1498,7 @@ used for each variable</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the name of the choice variable</p>
+              <p>The name of the choice variable.</p>
             </div>
           </td>
         </tr>
@@ -1478,8 +1509,7 @@ used for each variable</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>a dictionary of <code>numpy.ndarray</code> to store the values of each
-variable</p>
+              <p>A dictionary of variable values.</p>
             </div>
           </td>
         </tr>
@@ -1490,32 +1520,29 @@ variable</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the factor used to split the dataset into training and
-validation datasets</p>
+              <p>The split fraction used to split the dataset.</p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>train_index</code></td>
+          <td><code>idx_train</code></td>
           <td>
                 <code>list</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the list of values of the indices of the training
-dataset</p>
+              <p>The list of indices of the training dataset.</p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>valid_index</code></td>
+          <td><code>idx_valid</code></td>
           <td>
                 <code>list</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the list of values of the indices of the validation
-dataset</p>
+              <p>The list of indices of the validation dataset.</p>
             </div>
           </td>
         </tr>
@@ -1526,7 +1553,7 @@ dataset</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the size of the training dataset</p>
+              <p>The size of the training dataset.</p>
             </div>
           </td>
         </tr>
@@ -1537,7 +1564,7 @@ dataset</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the size of the validation dataset</p>
+              <p>The size of the validation dataset.</p>
             </div>
           </td>
         </tr>
@@ -1546,17 +1573,41 @@ dataset</p>
 
 <details class="example" open>
   <summary>Example</summary>
-  <p>Example initalization of a pandas dataset:</p>
+  <p>Example initialization of a Dataset object:</p>
 <div class="highlight"><pre><span></span><code><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;datafile.csv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="n">choice</span><span class="o">=</span><span class="s2">&quot;mode&quot;</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 </code></pre></div>
-<p>Attributes can be access by invoking:
+<p>Accessing attributes:
 <div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">choice</span><span class="p">)</span>
 </code></pre></div></p>
 <p>Output:
 <div class="highlight"><pre><span></span><code><span class="s1">&#39;car&#39;</span>
 </code></pre></div></p>
 </details>
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>IndexError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If the choice variable is not found in the DataFrame columns.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
 
   
 
@@ -1569,6 +1620,103 @@ dataset</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="pycmtensor.dataset.Dataset.__getitem__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></code>
+
+<a href="#pycmtensor.dataset.Dataset.__getitem__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns the input or output variable(s) of the dataset object by their names.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>key</code></td>
+          <td>
+                <code>str or list or tuple</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The name(s) of the variable(s) to be accessed.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>TensorVariable or list of TensorVariable: The input or output variable(s) corresponding to the given name(s).</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>KeyError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If the given name(s) do not match any input or output variable.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
 
 
 <div class="doc doc-object doc-function">
@@ -1641,7 +1789,7 @@ dataset</p>
   </table>
       <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Choice variable cannot be explicity dropped.</p>
+<p>Choice variable cannot be explicitly dropped.</p>
 </div>
 
   </div>
@@ -1662,7 +1810,7 @@ dataset</p>
 
   <div class="doc doc-contents ">
   
-      <p>Multiply values of the <code>variable</code> by <span class="arithmatex">\(1/\textrm{factor}\)</span>.</p>
+      <p>Multiply values of the <code>variable</code> by <code>1/factor</code>.</p>
 
 
 
@@ -1680,7 +1828,7 @@ dataset</p>
         <tr>
           <td><code>variable</code></td>
           <td>
-                <code>str</code>
+                <code>str or list[str]</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1726,7 +1874,7 @@ dataset</p>
 
   <div class="doc doc-contents ">
   
-      <p>Method to split dataset into training and validation subsets</p>
+      <p>Method to split the dataset into training and validation subsets based on a given fraction.</p>
 
 
 
@@ -1748,7 +1896,7 @@ dataset</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>the fraction to split the dataset into the training set. The training set will be indexed from <code>0</code> to <code>frac</code> <span class="arithmatex">\(\times\)</span> <code>Dataset.n</code>. The validation dataset will be from the last index of the training set to the last row of the dataset.</p>
+              <p>The fraction to split the dataset into the training set.</p>
             </div>
           </td>
           <td>
@@ -1758,10 +1906,35 @@ dataset</p>
     </tbody>
   </table>
 
-<details class="note" open>
-  <summary>Note</summary>
-  <p>The actual splitting of the dataset is done during the training procedure,
-or when invoking the <code>train_dataset()</code> or <code>valid_dataset()</code> methods</p>
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>None</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>None</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="notes" open>
+  <summary>Notes</summary>
+  <ul>
+<li>The actual splitting of the dataset is done during the training procedure or when invoking the <code>train_dataset()</code> or <code>valid_dataset()</code> methods.</li>
+</ul>
 </details>
   </div>
 
@@ -2050,10 +2223,10 @@ index from <code>index</code> to <code>N</code> where <code>N</code> is the leng
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-            Back to top
-          </button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
         
       </main>
       
@@ -2095,10 +2268,11 @@ index from <code>index</code> to <code>N</code> where <code>N</code> is the leng
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.copy", "navigation.top"], "search": "../../../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.copy", "navigation.top"], "search": "../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
         <script src="../../../assets/js/extra.js"></script>
       

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../assets/img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.3.2">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
     
     
       
@@ -24,10 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.30068a00.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
       
       
   
@@ -294,14 +294,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
+          
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
@@ -400,7 +402,7 @@
       
         <li class="md-nav__item">
   <a href="#key-features" class="md-nav__link">
-    Key features
+    Key Features
   </a>
   
 </li>
@@ -496,14 +498,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
+          
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
@@ -577,14 +581,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
+          
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
@@ -658,14 +664,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
+          
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
@@ -712,14 +720,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
         
+          
           <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
             
   
@@ -886,14 +896,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8" >
         
+          
           <label class="md-nav__link" for="__nav_5_2_8" id="__nav_5_2_8_label" tabindex="0">
             
   
@@ -1063,14 +1075,16 @@
     
     
     
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
+          
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
@@ -1231,7 +1245,7 @@
       
         <li class="md-nav__item">
   <a href="#key-features" class="md-nav__link">
-    Key features
+    Key Features
   </a>
   
 </li>
@@ -1264,52 +1278,45 @@
 <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
 <hr />
 <h2 id="why-pycmtensor">Why PyCMTensor?<a class="headerlink" href="#why-pycmtensor" title="Permanent link">&para;</a></h2>
-<p>Writing mathematical operations and evaluating models involving choice based utility  expressions can be difficult and time-consuming, especially with alternative specific  utilities of different dimensionalities are involved or when specifying neural networks  within utility specification. 
-Typically, Python deep learning libraries such as TensorFlow, Torch, Keras, or Scikit-learn express entire datasets as products of n-dimensional arrays, without regards to the number of variables used or specification of independent taste coefficients in each part of the output choice probability equation. 
-These libraries also do not expose the underlying operations that define the  inputs of a random utility equation, making it inconvenient for hypothesis testing or  running statistical tests without cumbersome modification or ad hoc calculations. </p>
-<p>Although these advanced Python deep learning libraries can be used to evaluate choice 
-models, they are not explicitly intended to be used for estimating choice models, 
-especially more advanced versions such as mixed logit. These deep learning models are first and foremost for model prediction, and not choice model estimation where clear interpretation of utility coefficients are needed.</p>
+<p>Performing mathematical operations and evaluating models that involve choice-based utility expressions can be challenging and time-consuming. This is especially true when dealing with alternative specific utilities of varying dimensionalities or when specifying neural networks within a utility specification.</p>
+<p>Common Python deep learning libraries like TensorFlow, Torch, Keras, or Scikit-learn typically represent entire datasets as products of n-dimensional arrays. However, they often overlook the number of variables used or the specification of independent taste coefficients in each part of the output choice probability equation.
+These libraries also tend to obscure the underlying operations that define the inputs of a random utility equation. This makes it difficult to conduct hypothesis testing or run statistical tests without extensive modifications or ad hoc calculations.</p>
+<p>While these advanced Python deep learning libraries can be used to evaluate choice models, they are not explicitly designed for estimating choice models, particularly more complex ones like mixed logit. These deep learning models are primarily geared towards model prediction, not choice model estimation where clear interpretation of utility coefficients is crucial.</p>
 <h3 id="what-can-pycmtensor-do">What can PyCMTensor do?<a class="headerlink" href="#what-can-pycmtensor-do" title="Permanent link">&para;</a></h3>
-<p>PyCMTensor can be used to fully specify hybrid discrete choice models, estimate and generate statistical tests, using optimized tensor operations via <a href="https://aesara.readthedocs.io/en/latest/">Aesara</a>.
-It has a particular focus on estimation of hybrid neural networks and Logit models, as well as on Mixed Logit models.
-PyCMTensor models are based on computational graphs and models estimated using generalized backpropagation algorithms.</p>
+<p>PyCMTensor can be used for specifying, estimating, and conducting statistical tests on hybrid discrete choice models. It uses optimized tensor operations through <a href="https://aesara.readthedocs.io/en/latest/">Aesara</a>. </p>
+<p>The library is built for estimating hybrid neural networks, Logit models, and Mixed Logit models. The models in PyCMTensor are built on computational graphs and are estimated using backpropagation algorithms.</p>
 <h2 id="project-goals">Project goals<a class="headerlink" href="#project-goals" title="Permanent link">&para;</a></h2>
-<p>The goal of PyCMTensor is to combine the easy-to-interpet choice modelling syntaxes and expressions while also implementing some of the mathematical operations and computational speed-up using Aesara tensor libraries. 
-PyCMTensor focuses on specifying 'hybrid' utility expressions, and making it easy to define a deep neural network inside a choice model such as TasteNet or ResLogit model specifications. 
-The distinction of PyCMTensor from other deep learning libraries is that it focuses on  econometric modelling and statistical testing, rather than focusing purely on models  for prediction or classification.</p>
-<p>The higher level goals of this project are:</p>
+<p>PyCMTensor aims to combine the interpretability of choice modelling syntaxes and expressions with the computational efficiency of Aesara tensor libraries. It specializes in defining 'hybrid' utility expressions and simplifies the process of integrating a deep neural network into choice models such as TasteNet or ResLogit. Unlike other deep learning libraries, PyCMTensor focuses on econometric modelling and statistical testing over purely predictive or classification models.</p>
+<p>The objectives of this project include:</p>
 <ul>
-<li>Provide a flexible and customizable platform for implementing 'hybrid' neural network discrete choice model</li>
-<li>Facilitating development and introduction of deep learning algorithms and methods for choice modelling domain experts and researchers who are already somewhat familiar with neural networks</li>
-<li>Develop hybrid neural network based utility specification expressions and which are logical and consistent with other conventional choice modelling tools</li>
-<li>Increase the computational efficiency of estimating large scale choice models with machine learning algorithms and optimization methods</li>
-<li>Provide a tool for researchers with similar interests to contribute to an ecosystem for estimating hybrid discrete choice models.</li>
+<li>Offering a flexible and customizable platform for implementing 'hybrid' neural network discrete choice models.</li>
+<li>Facilitating the development and introduction of deep learning algorithms and methods for choice modelling domain experts and researchers who are already somewhat familiar with neural networks.</li>
+<li>Developing hybrid neural network-based utility specification expressions that are logical and consistent with other conventional choice modelling tools.</li>
+<li>Increasing the computational efficiency of estimating large scale choice models with machine learning algorithms and optimization methods.</li>
+<li>Providing a tool for researchers with similar interests to contribute to an ecosystem for estimating hybrid discrete choice models.</li>
 </ul>
-<h2 id="key-features">Key features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
-<p>Main features:</p>
+<h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
+<p>PyCMTensor offers the following features:</p>
 <ul>
-<li>Interpretable and customizable utility specification syntaxes</li>
-<li>Ability to specifying neural nets with weight and bias parameters inside a utility functions (e.g. TasteNet)</li>
-<li>Perform specification testing, analyze covariances, standard errors for taste parameters.</li>
-<li>Fast execution of model estimation including of simulation based methods, e.g. Mixed Logit models, using computational graph approach</li>
-<li>Model estimating tuning with 1<sup>st</sup> order (e.g. Adam, Stochastic Gradient Descent) or 1.5<sup>th</sup> order methods (e.g. Stochastic BFGS)</li>
+<li>Interpretable and customizable utility specification syntaxes.</li>
+<li>Ability to specify neural networks with weight and bias parameters inside utility functions, such as TasteNet.</li>
+<li>Tools to perform specification testing, analyze covariances, and calculate standard errors for taste parameters.</li>
+<li>Fast execution of model estimation, including simulation-based methods like Mixed Logit models, using a computational graph.</li>
+<li>Model estimation tuning with 1<sup>st</sup> order methods (e.g., Adam, Stochastic Gradient Descent) or 1.5<sup>th</sup> order methods (e.g., Stochastic BFGS).</li>
 </ul>
-<p>While other choice modelling estimation software in Python are available, e.g. Biogeme, xlogit, PyLogit, etc., PyCMTensor strives to fully implement deep learning based methods written in a simplified syntax for utility equation specification.</p>
+<p>While other choice modelling estimation software in Python are available, such as Biogeme, xlogit, and PyLogit, PyCMTensor aims to fully implement deep learning-based methods in a simplified syntax for utility equation specification.</p>
 <h2 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h2>
-<p>PyCMTensor is a work in progress, there are several proposed feature implementations that needs to be done and there are still some code maintenance, documentation writing, and testing to be performed. </p>
+<p>PyCMTensor is a work in progress. Several proposed feature implementations need to be completed, and ongoing tasks include code maintenance, documentation writing, and testing. </p>
 <p>The following are proposed major feature implementations:</p>
 <ul>
-<li>Implementation of TasteNet and ResLogit hybrid deep learning choice model</li>
-<li>Optimization algorithms:<ul>
+<li>Implementation of TasteNet and ResLogit hybrid deep learning choice models.</li>
+<li>Optimization algorithms:</li>
 <li><del>1<sup>st</sup> order estimation (Adam, RMSProp, Rprop. Adagrad)</del></li>
 <li><del>Stochastic Quasi Newton NFGS (SQN)</del></li>
 <li>Momentum-based BFGS</li>
-</ul>
-</li>
 <li>Variational inference estimation</li>
 </ul>
-<p>If you are interested in contributing to the development of PyCMTensor, please contact me.</p>
+<p>If you are interested in contributing to the development of PyCMTensor, please get in touch.</p>
 
 
 
@@ -1323,10 +1330,10 @@ The distinction of PyCMTensor from other deep learning libraries is that it focu
         </div>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
-            Back to top
-          </button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
         
       </main>
       
@@ -1368,10 +1375,11 @@ The distinction of PyCMTensor from other deep learning libraries is that it focu
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "navigation.top"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "navigation.top"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
       
         <script src="../assets/js/extra.js"></script>
       
