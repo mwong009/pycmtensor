@@ -115,15 +115,23 @@ def test_drop(lpmc_ds):
 def test_scale_variable(lpmc_ds):
     ds = copy.copy(lpmc_ds.ds)
 
+    # test single variable
     lpmc_ds.scale_variable("distance", 1000.0)
     assert lpmc_ds.scale["distance"] == 1000.0
     assert all(lpmc_ds.ds["distance"] == ds["distance"] / 1000.0)
+    lpmc_ds.scale_variable("distance", 1 / 1000.0)
 
-    lpmc_ds.scale_variable("distance", 0.1)
-    assert lpmc_ds.scale["distance"] == 100.0
-    assert all(
-        np.around(lpmc_ds.ds["distance"], 3) == np.around(ds["distance"] / 100.0, 3)
-    )
+    # test multiple variables
+    lpmc_ds.scale_variable(["distance", "cost_transit"], 10.0)
+    assert lpmc_ds.scale["distance"] == 10.0
+    assert lpmc_ds.scale["cost_transit"] == 10.0
+    assert np.abs(np.sum(lpmc_ds.ds["distance"] - ds["distance"] / 10.0)) < 1e-5
+    assert np.sum(lpmc_ds.ds["cost_transit"] - ds["cost_transit"] / 10.0) == 0.0
+    lpmc_ds.scale_variable(["distance", "cost_transit"], 1 / 10.0)
+
+    # test non-string
+    with pytest.raises(TypeError):
+        lpmc_ds.scale_variable(123, 10.0)
 
 
 def test_make_tensor(lpmc_ds):
