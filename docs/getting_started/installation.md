@@ -2,95 +2,59 @@
 
 ---
 
-## Overview
+## Prerequisites
 
-To ensure complete installation including the necessary libraries, it is recommended to first install dependencies via `conda` package manager in a virtual environment, then install PyCMTensor via `pip`.
-
-### System requirements
-- Python (3.9+)
-- Aesara (2.9+) - from conda-forge
-- Numpy - from conda-forge
-- Scipy
-- Pandas
-
-In addition, you will need:
-
-- A C compiler compatible with your OS and Python installation. Libraries can be installed from conda-forge:
-    - Linux: `gcc_linux-64` and `gxx_linux-64`
-    - Windows (7 or later): `m2w64-toolchain` and `vs2019_win-64`
-    - macOS (incl. M1): `Clang`
-- BLAS installation
-    - MKL libraries, installed through conda with `mkl-service` package
-    - Openblas, default when Numpy is installed with pip, alternatively, with conda `blas` package
-
+Before you begin, ensure you have met the following requirements:
+- You have [miniconda](https://conda.io/miniconda.html) installed on your system
 
 ## Installation
 
-1. [Install conda dependencies](#step-1-install-conda-dependencies)
-2. [Install PyCMTensor](#step-2-install-pycmtensor-using-pip)
-3. [Validate installation](#step-3-checking-your-installation)
+PyCMTensor is available on Conda Forge. You can install it using the following command:
 
+```bash
+conda install -c conda-forge pycmtensor
+```
 
+For isolated development or testing, we recommend installing PyCMTensor in a virtual environment:
 
-### Step 1: Install conda dependencies
+```bash
+conda create -n pycmtensor-dev -c conda-forge pycmtensor
+conda activate pycmtensor-dev
+```
 
-Install [Miniconda](https://conda.io/miniconda.html). Select the appropriate package for your operating system.
+You can verify your installation by checking the version of PyCMTensor:
 
-Once you have installed conda, create a virtual environment and activate it. For example:
-
-    :::bash
-    conda create -n pycmtensor python=3.11 
-    conda activate pycmtensor
-
-
-Next, install the conda dependencies inside the virtual environment:
-
-**Windows**
- 
-    :::bash
-    conda install -c conda-forge mkl-service m2w64-toolchain vs2019_win-64 blas aesara -y
-
-**macOS (incl. M1)**
-
-    :::bash
-    conda install -c conda-forge mkl-service Clang blas aesara -y
-
-**Linux**
-
-    :::bash
-    conda install -c conda-forge mkl-service gcc_linux-64 gxx_linux-64 blas aesara -y
-
-### Step 2: Install PyCMTensor using pip
-
-Once the conda packages have been installed, install the rest of the packages using `pip`, type:
-
-    :::bash
-    pip install pycmtensor
-
-
-
-### Step 3: Checking your installation
-
-If PyCMTensor was installed correctly, the following should display when you run the following code in a python console:
-
-    :::bash
-    python -c "import pycmtensor; print(pycmtensor.__version__)"
-
-
-Output:
-
-    :::bash
-    1.6.3
+```bash
+python -c "import pycmtensor as cmt; print(cmt.__version__)"
+```
 
 ## Updating PyCMTensor
 
-Update PyCMTensor by running the `pip install --upgrade pycmtensor` command
+To update PyCMTensor to the latest version, run the following command:
 
+```bash
+conda update pycmtensor
+```
 
 ## Source code
 
-Source code can be checked out from the Github repository via `git`:
+If you want to contribute to the project or prefer to build from source, you can clone the source code from the GitHub repository:
 
-    
-    :::bash
-    git clone git::/github.com/mwong009/pycmtensor
+```bash
+git clone https://github.com/mwong009/pycmtensor.git
+```
+
+Change your current directory to the cloned repository:
+
+```bash
+cd pycmtensor
+```
+
+Create a new Conda environment using the provided `environment.yml` file, and activate it:
+
+```bash
+conda env create -f environment.yml
+conda activate pycmtensor-dev
+```
+
+This will set up a development environment with all the necessary dependencies installed. You can now start contributing to PyCMTensor or build it from source.
