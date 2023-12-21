@@ -199,11 +199,18 @@ class Dataset:
         """Multiply values of the `variable` by `1/factor`.
 
         Args:
-            variable (str): the name of the variable or a list of variable names
+            variable (str or list[str]): the name of the variable or a list of variable names
             factor (float): the scaling factor
         """
-        self.ds[variable] = self.ds[variable] / factor
-        self.scale[variable] = self.scale[variable] * factor
+        if not isinstance(variable, list):
+            variable = [variable]
+
+        for var in variable:
+            if not isinstance(var, str):
+                raise TypeError(f"Variable '{var}' must be a string")
+
+            self.ds[var] = self.ds[var] / factor
+            self.scale[var] = self.scale[var] * factor
 
     def split(self, frac) -> None:
         """Method to split the dataset into training and validation subsets based on a given fraction.
