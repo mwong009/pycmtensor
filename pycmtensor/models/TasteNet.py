@@ -4,7 +4,6 @@ from time import perf_counter
 import aesara
 import aesara.tensor as aet
 import numpy as np
-from aesara import pprint
 
 import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta, Bias, Weight
@@ -21,7 +20,25 @@ from pycmtensor.utils import time_format
 
 
 class TasteNet(BaseModel):
+    """
+    TasteNet is a discrete choice model based on the TasteNetMNL model (Han et al., 2022).
+
+    Reference:
+    Han, Y., Pereira, F. C., Ben-Akiva, M., & Zegras, C. (2022). A neural-embedded discrete choice model: Learning taste representation with strengthened interpretability. Transportation Research Part B: Methodological, 163, 166-186.
+
+    """
+
     def __init__(self, ds, params, utility, av=None, **kwargs):
+        """
+        Initialize the TasteNet model with the given dataset, parameters, utility function, and availability.
+
+        Args:
+            ds: The dataset used for the model.
+            params: The parameters of the model.
+            utility: The utility function used in the model.
+            av: The availability of the alternatives. Optional.
+            kwargs: Additional keyword arguments.
+        """
         super().__init__(**kwargs)
         self.name = "TasteNet"
         self.params = []
@@ -65,45 +82,87 @@ class TasteNet(BaseModel):
 
     @property
     def n_params(self):
-        """Return the total number of estimated parameters"""
+        """
+        Get the total number of estimated parameters in the model.
+
+        Returns:
+            int: The total number of estimated parameters.
+        """
         return super().n_params
 
     @property
     def n_betas(self):
-        """Return the number of estimated Betas"""
+        """
+        Get the number of estimated Betas in the model.
+
+        Returns:
+            int: The number of estimated Betas.
+        """
         return super().n_betas
 
     @property
     def n_weights(self):
-        """Return the total number of estimated Weight parameters"""
+        """
+        Get the total number of estimated Weight parameters in the model.
+
+        Returns:
+            int: The total number of estimated Weight parameters.
+        """
         return super().n_weights
 
     @property
     def n_biases(self):
-        """Return the total number of estimated Weight parameters"""
+        """
+        Get the total number of estimated Bias parameters in the model.
+
+        Returns:
+            int: The total number of estimated Bias parameters.
+        """
         return super().n_biases
 
     def get_betas(self):
-        """Returns a dict of Beta values"""
+        """
+        Get a dictionary of Beta values.
+
+        Returns:
+            dict: A dictionary of Beta values.
+        """
         return super().get_betas()
 
     def get_weights(self):
-        """Returns a dict of Weight values"""
+        """
+        Get a dictionary of Weight values.
+
+        Returns:
+            dict: A dictionary of Weight values.
+        """
         return super().get_weights()
 
     def get_biases(self):
-        """Returns a dict of Weight values"""
+        """
+        Get a dictionary of Bias values.
+
+        Returns:
+            dict: A dictionary of Bias values.
+        """
         return super().get_biases()
 
     def reset_values(self):
-        """Resets Model parameters to their initial value"""
+        """
+        Reset all model parameters to their initial values.
+        """
         return super().reset_values()
 
     def include_params_for_convergence(self, data, index):
-        """Returns a Ordered dict of parameters values to check for convergence
+        """
+        Get an ordered dictionary of parameter values to check for convergence.
+
+        Args:
+            data: The data used for the model.
+            index: The index of the data.
 
         Returns:
-            (OrderedDict): ordered dictionary of parameter values
+            OrderedDict: An ordered dictionary of parameter values.
         """
         params = OrderedDict()
         for key, value in self.tn_betas_fn(*data, index).items():
@@ -113,7 +172,17 @@ class TasteNet(BaseModel):
         return params
 
     def build_cost_fn(self):
-        """constructs aesara functions for cost and prediction errors"""
+        """Constructs Aesara functions for calculating the cost and prediction errors of the TasteNet model.
+
+        Example Usage:
+        ```python
+        # Create an instance of the TasteNet model
+        model = TasteNet(ds, variables, utility, av=None)
+
+        # Call the build_cost_fn method
+        model.build_cost_fn()
+        ```
+        """
         self.tn_betas_fn = aesara.function(
             name="tn_params",
             inputs=self.x + [self.y, self.index],
@@ -136,7 +205,11 @@ class TasteNet(BaseModel):
         )
 
     def build_gh_fn(self):
-        """constructs aesara functions for hessians and gradient vectors
+        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+
+        Returns:
+            hessian_fn (Aesara function): A function that computes the Hessian matrix.
+            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
 
         !!! note
 
@@ -157,55 +230,72 @@ class TasteNet(BaseModel):
         )
 
     def build_cost_updates_fn(self, updates):
-        """build/rebuilt cost function with updates to the model. Creates a class function `MNL.cost_updates_fn(*inputs, output, lr)` that receives a list of input variable arrays, the output array, and a learning rate.
+        """Build or rebuild the cost function with updates to the model.
+
+        This method creates a class function `TasteNet.cost_updates_fn(*inputs, output, lr)` that takes a list of input variable arrays, an output array, and a learning rate as arguments.
 
         Args:
-            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): The list of tuples containing the target shared variable and the new value of the variable.
+            updates (List[Tuple[TensorSharedVariable, TensorVariable]]): A list of tuples containing the target shared variable and the new value of the variable.
         """
         BaseModel.build_cost_updates_fn(self, updates)
 
     def predict(self, ds):
-        """predicts the output of the most likely alternative given the validation dataset in `ds`. The formula is:
-
-        $$
-            argmax(p_n(y|x))
-        $$
+        """Predicts the output of the most likely alternative given the validation dataset.
 
         Args:
-            ds (Dataset): pycmtensor dataset
+            ds (Dataset): A pycmtensor dataset object containing the validation data.
 
         Returns:
-            (numpy.ndarray): the predicted choices or the vector of probabilities
+            numpy.ndarray: The predicted choices or the vector of probabilities.
 
         !!! example
 
-            To return predicted choices:
             ```python
+            # Create an instance of the TasteNet model
+            model = TasteNet(ds, variables, utility, av=None)
+
+            # Predict the choices using the predict method
             predictions = self.predict(ds)
             print(predictions)
             ```
 
             output:
             ```console
-            array([...])
+            {'pred_choice': array([...])}
             ```
+
+            ```python
+            # Predict the probabilities using the predict method
+            prob = self.predict(ds)
+            print(prob)
+            ```
+
+            output:
+            ```console
+            {   0: array([...]),
+                1: array([...]),
+                ...
+            }
+            ```
+
+            The expected output for `predictions` is a dictionary with the key `'pred_choice'` and an array of predicted choices as the value. The expected output for `probabilities` is a dictionary with the keys representing the alternative indices and the values being arrays of probabilities.
         """
         return BaseModel.predict(self, ds)
 
     def elasticities(self, ds, wrt_choice):
-        """disaggregate point/cross elasticities of choice y wrt x
+        """Calculate the disaggregated point/cross elasticities of the choice variable `y` with respect to the independent variables `x` in a choice model.
 
         Args:
-            ds (pycmtensor.Dataset): dataset containing the training data
-            wrt_choice (int): alternative to evaluate the variables on
+            ds (pycmtensor.Dataset): Dataset containing the training data.
+            wrt_choice (int): Alternative to evaluate the variables on.
 
         Returns:
-            (dict): the disaggregate point elasticities of x
+            dict: Disaggregated point elasticities of the independent variables `x`.
 
         !!! example
 
             To calculate the elasticity of the choosing alternative 1 w.r.t. (represented by `wrt_choice`) w.r.t. to variable x.
-            :
+
             ```python
             disag_elas = self.elasticities(ds, wrt_choice=1)
             ```
@@ -229,6 +319,7 @@ class TasteNet(BaseModel):
 
     @staticmethod
     def extract_tn_outputs(params):
+        """Extracts the output from the layers of the model"""
         tn_betas = []
         if isinstance(params, dict):
             params = [v for _, v in params.items()]
@@ -240,6 +331,7 @@ class TasteNet(BaseModel):
 
     @staticmethod
     def extract_layer_params(params):
+        """Extracts the parameters from the layers of the model"""
         layer_params = []
         if isinstance(params, dict):
             params = [v for _, v in params.items()]

@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from pycmtensor import compute
 from pycmtensor.dataset import Dataset
 from pycmtensor.expressions import Beta
-from pycmtensor.models import MNL, compute
+from pycmtensor.models import MNL
 
 
 @pytest.fixture
