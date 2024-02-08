@@ -141,6 +141,10 @@ class Results(object):
         stats.loc["Akaike Information Criterion"] = f"{self.AIC():.2f}"
         stats.loc["Bayesian Information Criterion"] = f"{self.BIC():.2f}"
         stats.loc["Final gradient norm"] = f"{self.gnorm:.3e}"
+        stats.loc[
+            "Maximum epochs reached"
+        ] = f"{'Yes' if self.best_epoch == self.config.max_epochs else 'No'}"
+        stats.loc["Best result at epoch"] = f"{self.best_epoch:d}"
         return stats
 
     def beta_statistics(self):
@@ -177,7 +181,7 @@ class Results(object):
 
         for key, value in self.betas.items():
             if value.shape != ():
-                stats.at[key + " (sd)", "value"] = value.std()
+                stats.at[key + " (sd)", "value"] = round(value.std(), 3)
 
         stats = stats.sort_index().fillna("-").astype("O")
         return stats
