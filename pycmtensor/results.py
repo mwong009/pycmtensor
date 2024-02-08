@@ -115,7 +115,7 @@ class Results(object):
             (pandas.DataFrame): Summary of the model performance benchmark
         """
         stats = pd.DataFrame(columns=["value"])
-        stats.loc["Seed"] = self.seed
+        stats.loc["Seed"] = self.config.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
         stats.loc["epochs per sec"] = f"{self.epochs_per_sec} epoch/s"
