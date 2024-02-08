@@ -4,57 +4,54 @@
 
 ## Why PyCMTensor?
 
-Writing mathematical operations and evaluating models involving choice based utility  expressions can be difficult and time-consuming, especially with alternative specific  utilities of different dimensionalities are involved or when specifying neural networks  within utility specification. 
-Typically, Python deep learning libraries such as TensorFlow, Torch, Keras, or Scikit-learn express entire datasets as products of n-dimensional arrays, without regards to the number of variables used or specification of independent taste coefficients in each part of the output choice probability equation. 
-These libraries also do not expose the underlying operations that define the  inputs of a random utility equation, making it inconvenient for hypothesis testing or  running statistical tests without cumbersome modification or ad hoc calculations. 
+Performing mathematical operations and evaluating models that involve choice-based utility expressions can be challenging and time-consuming. This is especially true when dealing with alternative specific utilities of varying dimensionalities or when specifying neural networks within a utility specification.
 
-Although these advanced Python deep learning libraries can be used to evaluate choice 
-models, they are not explicitly intended to be used for estimating choice models, 
-especially more advanced versions such as mixed logit. These deep learning models are first and foremost for model prediction, and not choice model estimation where clear interpretation of utility coefficients are needed.
+Common Python deep learning libraries like TensorFlow, Torch, Keras, or Scikit-learn typically represent entire datasets as products of n-dimensional arrays. However, they often overlook the number of variables used or the specification of independent taste coefficients in each part of the output choice probability equation.
+These libraries also tend to obscure the underlying operations that define the inputs of a random utility equation. This makes it difficult to conduct hypothesis testing or run statistical tests without extensive modifications or ad hoc calculations.
+
+While these advanced Python deep learning libraries can be used to evaluate choice models, they are not explicitly designed for estimating choice models, particularly more complex ones like mixed logit. These deep learning models are primarily geared towards model prediction, not choice model estimation where clear interpretation of utility coefficients is crucial.
 
 ### What can PyCMTensor do?
-PyCMTensor can be used to fully specify hybrid discrete choice models, estimate and generate statistical tests, using optimized tensor operations via [Aesara](https://aesara.readthedocs.io/en/latest/).
-It has a particular focus on estimation of hybrid neural networks and Logit models, as well as on Mixed Logit models.
-PyCMTensor models are based on computational graphs and models estimated using generalized backpropagation algorithms.
+
+PyCMTensor can be used for specifying, estimating, and conducting statistical tests on hybrid discrete choice models. It uses optimized tensor operations through [Aesara](https://aesara.readthedocs.io/en/latest/). 
+
+The library is built for estimating hybrid neural networks, Logit models, and Mixed Logit models. The models in PyCMTensor are built on computational graphs and are estimated using backpropagation algorithms.
 
 ## Project goals
 
-The goal of PyCMTensor is to combine the easy-to-interpet choice modelling syntaxes and expressions while also implementing some of the mathematical operations and computational speed-up using Aesara tensor libraries. 
-PyCMTensor focuses on specifying 'hybrid' utility expressions, and making it easy to define a deep neural network inside a choice model such as TasteNet or ResLogit model specifications. 
-The distinction of PyCMTensor from other deep learning libraries is that it focuses on  econometric modelling and statistical testing, rather than focusing purely on models  for prediction or classification.
+PyCMTensor aims to combine the interpretability of choice modelling syntaxes and expressions with the computational efficiency of Aesara tensor libraries. It specializes in defining 'hybrid' utility expressions and simplifies the process of integrating a deep neural network into choice models such as TasteNet or ResLogit. Unlike other deep learning libraries, PyCMTensor focuses on econometric modelling and statistical testing over purely predictive or classification models.
 
+The objectives of this project include:
 
-The higher level goals of this project are:
+- Offering a flexible and customizable platform for implementing 'hybrid' neural network discrete choice models.
+- Facilitating the development and introduction of deep learning algorithms and methods for choice modelling domain experts and researchers who are already somewhat familiar with neural networks.
+- Developing hybrid neural network-based utility specification expressions that are logical and consistent with other conventional choice modelling tools.
+- Increasing the computational efficiency of estimating large scale choice models with machine learning algorithms and optimization methods.
+- Providing a tool for researchers with similar interests to contribute to an ecosystem for estimating hybrid discrete choice models.
 
-- Provide a flexible and customizable platform for implementing 'hybrid' neural network discrete choice model
-- Facilitating development and introduction of deep learning algorithms and methods for choice modelling domain experts and researchers who are already somewhat familiar with neural networks
-- Develop hybrid neural network based utility specification expressions and which are logical and consistent with other conventional choice modelling tools
-- Increase the computational efficiency of estimating large scale choice models with machine learning algorithms and optimization methods
-- Provide a tool for researchers with similar interests to contribute to an ecosystem for estimating hybrid discrete choice models.
+## Key Features
 
-## Key features
+PyCMTensor offers the following features:
 
-Main features:
+- Interpretable and customizable utility specification syntaxes.
+- Ability to specify neural networks with weight and bias parameters inside utility functions, such as TasteNet.
+- Tools to perform specification testing, analyze covariances, and calculate standard errors for taste parameters.
+- Fast execution of model estimation, including simulation-based methods like Mixed Logit models, using a computational graph.
+- Model estimation tuning with 1st order methods (e.g., Adam, Stochastic Gradient Descent) or 1.5th order methods (e.g., Stochastic BFGS).
 
-- Interpretable and customizable utility specification syntaxes
-- Ability to specifying neural nets with weight and bias parameters inside a utility functions (e.g. TasteNet)
-- Perform specification testing, analyze covariances, standard errors for taste parameters.
-- Fast execution of model estimation including of simulation based methods, e.g. Mixed Logit models, using computational graph approach
-- Model estimating tuning with 1st order (e.g. Adam, Stochastic Gradient Descent) or 1.5th order methods (e.g. Stochastic BFGS)
-
-While other choice modelling estimation software in Python are available, e.g. Biogeme, xlogit, PyLogit, etc., PyCMTensor strives to fully implement deep learning based methods written in a simplified syntax for utility equation specification.
+While other choice modelling estimation software in Python are available, such as Biogeme, xlogit, and PyLogit, PyCMTensor aims to fully implement deep learning-based methods in a simplified syntax for utility equation specification.
 
 ## Roadmap
 
-PyCMTensor is a work in progress, there are several proposed feature implementations that needs to be done and there are still some code maintenance, documentation writing, and testing to be performed. 
+PyCMTensor is a work in progress. Several proposed feature implementations need to be completed, and ongoing tasks include code maintenance, documentation writing, and testing. 
 
 The following are proposed major feature implementations:
 
-  -  Implementation of TasteNet and ResLogit hybrid deep learning choice model
-  -  Optimization algorithms:
-    - ~~1st order estimation (Adam, RMSProp, Rprop. Adagrad)~~
-    - ~~Stochastic Quasi Newton NFGS (SQN)~~
-    - Momentum-based BFGS
-  - Variational inference estimation
+- Implementation of TasteNet and ResLogit hybrid deep learning choice models.
+- Optimization algorithms:
+  - ~~1st order estimation (Adam, RMSProp, Rprop. Adagrad)~~
+  - ~~Stochastic Quasi Newton NFGS (SQN)~~
+  - Momentum-based BFGS
+- Variational inference estimation
 
-If you are interested in contributing to the development of PyCMTensor, please contact me.
+If you are interested in contributing to the development of PyCMTensor, please get in touch.

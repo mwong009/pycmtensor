@@ -147,14 +147,17 @@ class BaseModel(object):
         )
 
     def predict(self, dataset) -> dict:
-        """Make predictions on a given dataset.
+        """
+        Generates predictions on a provided dataset.
 
         Args:
-            dataset: The dataset on which predictions are to be made.
+            dataset (Dataset): The dataset for which predictions are to be generated.
 
         Returns:
-            A dictionary containing the predicted choices, true choices, and choice probabilities
-            for each data point in the dataset.
+            dict: A dictionary containing the following key-value pairs:
+                '[choice_index]' (list): The model's predicted probabilities for each alternative.
+                'pred_[choice_label]' (list): The model's predicted choices.
+                'true_[choice_label]' (list): The actual choices from the dataset.
         """
         if not "choice_probabilities_fn" in dir(self):
             self.choice_probabilities_fn = function(
@@ -174,16 +177,18 @@ class BaseModel(object):
         }
         return result
 
-    def elasticities(self, dataset, wrt_choice):
+    def elasticities(self, dataset, wrt_choice: int):
         """
-        Calculate the elasticities of the model based on the given dataset and choice.
+        Calculates the elasticities of the model for a specific choice, using a provided dataset.
 
         Args:
-            dataset: The dataset used to calculate the elasticities.
-            wrt_choice: The choice with respect to which the elasticities are calculated.
+            dataset (Dataset): The dataset to be used in the elasticity calculations.
+            wrt_choice (int): The index of the choice for which the elasticities are to be calculated. This index should correspond to a valid choice in the dataset.
 
         Returns:
-            The elasticities of the model based on the given dataset and choice.
+            dict: A dictionary where each key-value pair represents an explanatory variable and its corresponding calculated elasticity. The keys are the names of the explanatory variables, and the values are the calculated elasticities for the specified choice across the dataset.
+
+
         """
         p_y_given_x = self.p_y_given_x[self.y, ..., self.index]
         for _ in range(p_y_given_x.ndim - 1):
@@ -416,7 +421,7 @@ def train(model, ds, **kwargs):
     model.results.n_train = n_train
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
-    model.results.seed = model.config.seed
+    model.results.config = model.config
 
     params_prev = [p.get_value() for p in model.params if isinstance(p, Beta)]
 
@@ -492,9 +497,15 @@ def train(model, ds, **kwargs):
                     info_print = True
 
                 if info_print:
-                    info(
-                        f"Train (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e}, {hf(iteration)}/{hf(patience)})"
-                    )
+                    try:
+                        delay = np.floor(perf_counter() - t_info_print)
+                    except:
+                        delay = 1
+                    if delay >= 1:
+                        info(
+                            f"Train {hf(iteration)}/{hf(patience)} (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e})"
+                        )
+                        t_info_print = perf_counter()
                     info_print = False
 
                 # acceptance of new best results
@@ -536,7 +547,7 @@ def train(model, ds, **kwargs):
             # secondary condition for convergence
             if (iteration > patience) or converged:
                 info(
-                    f"Train (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e}, {hf(iteration-1)}/{hf(patience)})"
+                    f"Train {hf(iteration-1)}/{hf(patience)} (epoch={hf(epoch)}, LL={log_likelihood:.2f}, error={valid_error*100:.2f}%, gnorm={gnorm:.3e})"
                 )
 
                 done_looping = True  # break loop if convergence reached

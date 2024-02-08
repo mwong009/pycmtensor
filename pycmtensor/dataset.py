@@ -15,12 +15,13 @@ __all__ = ["Dataset"]
 
 
 class Dataset:
-    def __init__(self, df, choice, **kwargs):
+    def __init__(self, df, choice, shuffle=True, **kwargs):
         """Initialize the Dataset object with a pandas DataFrame and the name of the choice variable.
 
         Args:
             df (pandas.DataFrame): The pandas DataFrame object containing the dataset.
             choice (str): The name of the choice variable.
+            shuffle (bool): Whether to shuffle the dataset. Default is True.
             **kwargs (optional): Additional keyword arguments to configure the dataset.
 
         Attributes:
@@ -91,7 +92,8 @@ class Dataset:
                 self.x.append(aet.vector(name))
 
         # Shuffle the dataframe
-        df = df.sample(frac=1.0, random_state=config.seed).reset_index(drop=True)
+        if shuffle:
+            df = df.sample(frac=1.0, random_state=config.seed).reset_index(drop=True)
 
         # Create a dictionary with column names as keys and column values as values
         ds = {name: df[name].values for name in list(df.columns)}
@@ -199,26 +201,43 @@ class Dataset:
         """Multiply values of the `variable` by `1/factor`.
 
         Args:
-            variable (str): the name of the variable or a list of variable names
+            variable (str or list[str]): the name of the variable or a list of variable names
             factor (float): the scaling factor
         """
-        self.ds[variable] = self.ds[variable] / factor
-        self.scale[variable] = self.scale[variable] * factor
+        if not isinstance(variable, list):
+            variable = [variable]
 
-    def split(self, frac) -> None:
+        for var in variable:
+            if not isinstance(var, str):
+                raise TypeError(f"Variable '{var}' must be a string")
+
+            self.ds[var] = self.ds[var] / factor
+            self.scale[var] = self.scale[var] * factor
+
+    def split(self, frac=None, count=None) -> None:
         """Method to split the dataset into training and validation subsets based on a given fraction.
 
         Args:
             frac (float): The fraction to split the dataset into the training set.
+            count (int): The number of samples to split the dataset into the training set.
 
         Returns:
             None
 
         Notes:
             - The actual splitting of the dataset is done during the training procedure or when invoking the `train_dataset()` or `valid_dataset()` methods.
+            - Either frac or count must be specified. If both are specified, count is ignored.
         """
+        if frac is None and count is None:
+            raise ValueError("Either frac or count must be specified")
+        if frac is not None and count is not None:
+            debug("count is ignored")
+        if frac is not None:
+            self.split_frac = frac
+        else:
+            self.split_frac = count / self.n
+            assert self.split_frac <= 1.0
 
-        self.split_frac = frac
         info(
             f"seed: {config.seed} n_train_samples:{self.n_train} n_valid_samples:{self.n_valid}"
         )

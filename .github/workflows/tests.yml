@@ -7,80 +7,52 @@ on:
       - "**-beta"
 
 jobs:
-  build-install-test:
+  pycmtensor-test:
+    name: (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       matrix:
-        os: ["ubuntu-latest"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.11"]
-    runs-on: ${{ matrix.os }}
+    
     steps:
-    - uses: actions/checkout@v3
-    
-    #########
-    # Setup #
-    #########
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Display Python version and OS
-      run: |
-        python --version
-        python -c "import sys; print(sys.platform)"
-    
-    - name: Add conda to path (Bash)
-      run: |
-        echo "$CONDA/condabin" >> $GITHUB_PATH
-        echo "$CONDA/Library/bin" >> $GITHUB_PATH
-        echo "CONDA_PREFIX=$CONDA" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Install Conda dependencies
-      run: |
-        conda install -c conda-forge aesara=2.9.3 numpy=1.25.2 scipy=1.11.4 pandas=1.5.3 seaborn=0.12.2 watermark=2.4.3 poetry=1.7.1 pytest>=6.2.5 pytest-cov>=3.0.0 -y
-      shell: bash
-
-    ############
-    # Mac OS X #
-    ############
-    - name: Xcode check (macos)
-      if: matrix.os == 'macos-latest'
-      run: |
-        clang --version
-        xcrun --show-sdk-path
-    
-    ################
-    # Set up tests #
-    ################
-    - name: View version
-      run: |
-        python -c "import pycmtensor as cmt; print(cmt.__version__)"
-      shell: bash
-
-    - name: Show contents of .aesararc
-      run: |
-        cat ~/.aesararc
-      shell: bash
-
-    - name: Show aesara.config ldflags
-      run: |
-        python -c "import aesara; print(aesara.config.blas__ldflags)"
-        python -c "import aesara; print(aesara.config.gcc__cxxflags)"
-      shell: bash
-    
-    ########
-    # Test #
-    ########
-    - name: Test with pytest
-      run: |
-        pytest
-      shell: bash
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Display Conda packages
+        run: |
+          conda info
+          conda list
+        
+      - name: Xcode check (macos)
+        if: matrix.os == 'macos-latest'
+        run: |
+          clang -- version
+          xcrun --show-sdk-path
       
-    - name: Upload coverage to codecov.io
-      if: |
-        (matrix.os == 'ubuntu-latest') &&
-        (matrix.python-version == '3.11')
-      uses: codecov/codecov-action@v2
-      with:
-        files: coverage.xml
+      - name: Test pycmtensor import
+        run: |
+          python -c "import pycmtensor as cmt; print(cmt.__version__)"
+          cat ~/.aesararc
+
+      - name: Show Aesara config
+        run: |
+          python -c "import aesara; print(aesara.config.blas__ldflags)"
+          python -c "import aesara; print(aesara.config.gcc__cxxflags)"
+
+      - name: Main test
+        run: pytest
+
+      - name: Upload coverage to codecov.io
+        if: (matrix.os == 'ubuntu-latest') && (matrix.python-version == '3.11')
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml

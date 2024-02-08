@@ -140,13 +140,13 @@ class StepLR(Scheduler):
         Args:
             lr (float): initial learning rate
             factor (float): percentage reduction to the learning rate
-            drop_every (int): step down the learning rate after every n steps
+            drop_every (int): step down the learning rate after every n epochs
         """
         super().__init__(lr)
         self.name = "StepLR"
         self._factor = factor
         self._drop_every = drop_every
-        self._min_lr = 0.01 * lr
+        self._min_lr = 1e-6 * lr
 
         if factor >= 1.0:
             raise ValueError(f"factor is greater than 1.")

@@ -31,10 +31,13 @@ import pycmtensor.defaultconfig as defaultconfig
 import pycmtensor.optimizers as optimizers
 import pycmtensor.scheduler as scheduler
 
+# shortcuts for importing commonly used classes
+from pycmtensor.dataset import Dataset
+from pycmtensor.regularizers import Regularizers
+
 config = defaultconfig.config
 
 # aesara configs
-
 aesara.config.on_unused_input = "ignore"
 aesara.config.mode = "Mode"
 aesara.config.allow_gc = False
