@@ -1,3 +1,10 @@
+## v1.9.2 (2024-02-08)
+
+### Fix
+
+- **dataset**: added split via n-count and added option for pre-shuffle
+- **dataset**: updated scale_variable method to handle both single variables and lists of variables
+
 ## v1.9.1 (2023-12-20)
 
 ### Fix

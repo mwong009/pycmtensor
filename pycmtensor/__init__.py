@@ -22,7 +22,7 @@ The code snippet does not produce any outputs directly. It sets the default conf
 """
 
 __author__ = """Melvin Wong"""
-__version__ = "1.9.1"
+__version__ = "1.9.2"
 
 import aesara
 from watermark import watermark
