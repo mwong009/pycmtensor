@@ -34,6 +34,7 @@ import pycmtensor.scheduler as scheduler
 # shortcuts for importing commonly used classes
 from pycmtensor.dataset import Dataset
 from pycmtensor.regularizers import Regularizers
+from pycmtensor.run import compute, train
 
 config = defaultconfig.config
 
