@@ -223,7 +223,8 @@ def train(model, ds, **kwargs):
                         info_print = True
                 else:
                     accept = valid_error < best_error
-                    info_print = True
+                    if valid_error < (best_error - 0.0001):
+                        info_print = True
 
                 if (gnorm < (gnorm_min / 5.0)) or ((epoch % (max_epochs // 10)) == 0):
                     info_print = True
