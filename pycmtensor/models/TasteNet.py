@@ -336,6 +336,6 @@ class TasteNet(BaseModel):
         if isinstance(params, dict):
             params = [v for _, v in params.items()]
         for p in params:
-            if isinstance(p, layers.DenseLayer):
+            if isinstance(p, layers.Layer):
                 layer_params.extend(p.params)
         return layer_params
