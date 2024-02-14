@@ -566,3 +566,46 @@ class Weight(Param):
 
     def __repr__(self):
         return f"Weight({self.name}, {self.shape})"
+
+
+class Gamma(Param):
+    def __init__(self, name, size):
+        """Class object for Gamma parameter
+
+        Args:
+            name (str): The name of the parameter.
+            size (Union[tuple,list]): The size of the parameter.
+        """
+        Param.__init__(self, name)
+        value = np.ones(size, dtype=FLOATX)
+
+        self._init_value = value
+        self._param_type = "Gamma"
+        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+
+    @property
+    def T(self):
+        return self.shared_var.T
+
+    @property
+    def init_type(self):
+        return self._param_type
+
+    def __repr__(self):
+        return f"Gamma({self.name}, {self.shape})"
+
+    def __rmul__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            g = aet.atleast_Nd(self(), n=other.ndim, left=False)
+            return g * other
+
+        else:
+            return super().__rmul__(other)
+
+    def __mul__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            g = aet.atleast_Nd(self(), n=other.ndim, left=False)
+            return g * other
+
+        else:
+            return super().__mul__(other)
