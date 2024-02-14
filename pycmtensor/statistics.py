@@ -3,14 +3,21 @@
 This module contains methods for calculating the statistics of the estimated parameters.
 
 Functions:
-- variance_covariance(hessian): Computes the variance covariance matrix given the Hessian.
-- rob_variance_covariance(hessian, bhhh): Computes the robust variance covariance matrix given the Hessian and BHHH matrices.
-- t_test(stderr, params): Computes the statistical t-test of the estimated parameters and the standard errors.
-- p_value(stderr, params): Computes the p-value (statistical significance) of the estimated parameters using the two-tailed normal distribution.
-- stderror(hessian, params): Calculates the standard error of the estimated parameters given the Hessian matrix.
-- rob_stderror(hessian, bhhh, params): Calculates the robust standard error of the estimated parameters given the Hessian and BHHH matrices.
+- variance_covariance(hessian): Computes the variance covariance matrix given the 
+  Hessian.
+- rob_variance_covariance(hessian, bhhh): Computes the robust variance covariance 
+  matrix given the Hessian and BHHH matrices.
+- t_test(stderr, params): Computes the statistical t-test of the estimated parameters 
+  and the standard errors.
+- p_value(stderr, params): Computes the p-value (statistical significance) of the 
+  estimated parameters using the two-tailed normal distribution.
+- stderror(hessian, params): Calculates the standard error of the estimated parameters 
+  given the Hessian matrix.
+- rob_stderror(hessian, bhhh, params): Calculates the robust standard error of the 
+  estimated parameters given the Hessian and BHHH matrices.
 - correlation_matrix(hessian): Computes the correlation matrix from the Hessian matrix.
-- rob_correlation_matrix(hessian, bhhh): Computes the robust correlation matrix from the Hessian and BHHH matrices.
+- rob_correlation_matrix(hessian, bhhh): Computes the robust correlation matrix from  
+  the Hessian and BHHH matrices.
 """
 import numpy as np
 from scipy import stats
@@ -37,7 +44,9 @@ def variance_covariance(hessian):
 
     !!! notes
 
-        The variance covariance matrix is calculated by taking the inverse of the (negative) hessian matrix. If the inverse is undefined, returns a zero or a large finite number.
+        The variance covariance matrix is calculated by taking the inverse of the
+        (negative) hessian matrix. If the inverse is undefined, returns a zero or a
+        large finite number.
 
         $$
         varcovar = -H^{-1}
@@ -47,7 +56,8 @@ def variance_covariance(hessian):
 
 
 def rob_variance_covariance(hessian, bhhh):
-    """computes the robust variance covariance matrix given the Hessian and the BHHH matrices
+    """computes the robust variance covariance matrix given the Hessian and the BHHH
+       matrices
 
     Args:
         hessian (numpy.ndarray): the hessian matrix
@@ -83,7 +93,9 @@ def t_test(stderr, params):
 
 
 def p_value(stderr, params):
-    """computes the p-value (statistical significance) of the estimated parameter using the two-tailed normal distribution, where p-value=$2(1-\\phi(|t|)$, $\\phi$ is the cdf of the normal distribution
+    """computes the p-value (statistical significance) of the estimated parameter using
+       the two-tailed normal distribution, where p-value=$2(1-\\phi(|t|)$, $\\phi$ is
+       the cdf of the normal distribution
 
     Args:
         stderr (pandas.Series): standard errors
@@ -128,7 +140,8 @@ def stderror(hessian, params):
 
 
 def rob_stderror(hessian, bhhh, params):
-    """calculates the robust standard error of the estimated parameter given the hessian and the bhhh matrices
+    """calculates the robust standard error of the estimated parameter given the
+       hessian and the bhhh matrices
 
     Args:
         hessian (numpy.ndarray): the hessian matrix

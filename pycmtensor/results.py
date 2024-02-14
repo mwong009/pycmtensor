@@ -37,7 +37,8 @@ class Results(object):
             bhhh_matrix (numpy.ndarray): the 3-D bhhh matrix where the 1st dimension is
                 the length of the dataset and the last 2 dimensions are the matrix for
                 each data observation
-            statistics_graph (dict): a dictionary containing the learning_rate, training, and validation statistics
+            statistics_graph (dict): a dictionary containing the learning_rate,
+                training, and validation statistics
             betas (dict): a dictionary containing the Beta coefficients
             params (dict): a dictionary containing all model coefficients
         """
@@ -99,7 +100,8 @@ class Results(object):
         return 2.0 * (k - self.best_loglikelihood)
 
     def BIC(self):
-        """Bayesian information criterion, adjusted for the number of parameters and number of training samples
+        """Bayesian information criterion, adjusted for the number of parameters and
+           number of training samples
 
         Returns:
             (float): the BIC of the model
