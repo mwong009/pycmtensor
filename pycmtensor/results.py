@@ -229,11 +229,12 @@ class Results(object):
 
         return mat.round(3)
 
-    def show_training_plot(self, sample_intervals=1):
+    def show_training_plot(self, sample_intervals=1, offset=0):
         """Displays the statistics graph as a line plot
 
         Args:
             sample_intervals (int): plot only the n-th point from the statistics
+            offset (int): start plotting from the n-th point
 
         Returns:
             (pandas.DataFrame): The statistics as a pandas dataframe
@@ -254,19 +255,19 @@ class Results(object):
 
         statistics = statistics[::sample_intervals]
         sns.lineplot(
-            data=statistics["train_error"] * 100,
+            data=statistics["train_error"][offset:] * 100,
             ax=ax1,
             color=color[0],
             label="Train Error",
         )
         sns.lineplot(
-            data=statistics["valid_error"] * 100,
+            data=statistics["valid_error"][offset:] * 100,
             ax=ax1,
             color=color[1],
             label="Valid Error",
         )
         sns.lineplot(
-            data=statistics["train_ll"],
+            data=statistics["train_ll"][offset:],
             color=color[2],
             ax=ax2,
             label="Train Loglikelihood",
