@@ -146,7 +146,7 @@ Output:
 ## Estimating the model
 
 ```python
-from pycmtensor.models import train
+from pycmtensor import train
 from pycmtensor.optimizers import Adam
 from pycmtensor.scheduler import ConstantLR
 
@@ -348,7 +348,7 @@ U = [U_walk, U_cycle, U_pt, U_drive]
 mymodel = pycmtensor.models.MNL(ds=ds, params=locals(), utility=U, av=None)
 
 
-from pycmtensor.models import train
+from pycmtensor import train
 from pycmtensor.optimizers import Adam
 from pycmtensor.scheduler import ConstantLR
 

@@ -75,6 +75,42 @@ class Layer(TensorExpressions):
                 p.set_value(value)
 
 
+class LayerNorm(Layer):
+    def __init__(self, name, input, **kwargs):
+        Layer.__init__(self, name, input, **kwargs)
+        from pycmtensor.expressions import Gamma
+
+        self.n_in = input.n_out
+        self.n_out = input.n_out
+
+        # layer parameters
+        g = Gamma(f"{name}_g", (self.n_out,))
+        b = Bias(f"{name}_b", (self.n_out,))
+
+        self._g = g
+        self._b = b
+        self._params = [self.g, self.b]
+
+        mean_k = aet.mean(self.input, axis=0, keepdims=True)
+        var_k = aet.var(self.input, axis=0, keepdims=True)
+        input_norm = (self.input - mean_k) / aet.sqrt(var_k + 1e-8)
+        self._output = input_norm * g + b
+
+    def __repr__(self):
+        return f"LayerNorm({self.name}, {self.output}; {self.params})"
+
+    def __call__(self):
+        return Layer.__call__(self)
+
+    @property
+    def g(self):
+        return self._g
+
+    @property
+    def b(self):
+        return self._b
+
+
 class DenseLayer(Layer):
     def __init__(
         self, name, input, n_in, n_out, init_type=None, activation=None, **kwargs

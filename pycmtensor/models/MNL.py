@@ -18,7 +18,7 @@ from pycmtensor.utils import time_format
 
 class MNL(BaseModel):
     def __init__(self, ds, variables, utility, av=None, **kwargs):
-        """Defines a Multinomial Logit model
+        """Initialize the Multinomial Logit model with the given dataset, variables, utility function, and availability.
 
         Args:
             ds (pycmtensor.Data): the database object
@@ -135,12 +135,6 @@ class MNL(BaseModel):
 
     def build_cost_fn(self):
         """Constructs Aesara functions for calculating the cost and prediction errors of the Multinomial Logit model.
-
-        Inputs:
-        - None
-
-        Outputs:
-        - None
 
         Example Usage:
         ```python

@@ -1,5 +1,10 @@
 """
-The code snippet is a part of the PyCMTensor expressions module. It defines a base class for parsing and manipulating Aesara tensor expressions. The class provides methods for parsing a tensor expression to remove parentheses and tensor operators, and returns a clean list of keywords found in the expression. It also defines a base class for expression objects, which includes overloaded operators for tensor operations such as addition, subtraction, multiplication, division, and comparison.
+The code snippet is a part of the PyCMTensor expressions module. It defines a base 
+class for parsing and manipulating Aesara tensor expressions. The class provides 
+methods for parsing a tensor expression to remove parentheses and tensor operators, and 
+returns a clean list of keywords found in the expression. It also defines a base class 
+for expression objects, which includes overloaded operators for tensor operations such 
+as addition, subtraction, multiplication, division, and comparison.
 """
 from typing import Union
 
@@ -51,7 +56,8 @@ class ExpressionParser(object):
         """Base class for parsing and manipulating Aesara tensor expressions.
 
         Args:
-            expression (TensorVariable, optional): The tensor expression to parse. Defaults to None.
+            expression (TensorVariable, optional): The tensor expression to parse.
+            Defaults to None.
         """
         if expression is not None:
             self.expression = str(pprint(expression))
@@ -153,7 +159,7 @@ class TensorExpressions:
             return self() * other()
         else:
             raise TypeError(
-                f"__mul__ {other} must be a TensorVariable or TensorShared Variable object"
+                f"__mul__ {other} must be a TensorVariable or TensorShared Variable"
             )
 
     def __rmul__(self, other):
@@ -399,8 +405,10 @@ class RandomDraws(TensorExpressions):
 
         Args:
             name (str): The name of the RandomDraw object.
-            draw_type (str): The distribution of the draw. Can be "normal", "lognormal", "gumbel", "exponential", "gamma", or "poisson".
-            n_draws (int): The number of draws, which determines the size of the shared tensor.
+            draw_type (str): The distribution of the draw. Can be "normal",
+            "lognormal", "gumbel", "exponential", "gamma", or "poisson".
+            n_draws (int): The number of draws, which determines the size of the shared
+            tensor.
 
         Raises:
             NotImplementedError: If an unsupported draw_type is provided.
@@ -447,7 +455,8 @@ class Bias(Param):
         Args:
             name (str): The name of the parameter.
             size (Union[tuple,list]): The size of the array in 1 dimension.
-            value (numpy.ndarray): The initial values of the parameter. If `None` is given, it defaults to `0`.
+            value (numpy.ndarray): The initial values of the parameter. If `None` is
+            given, it defaults to `0`.
         """
         Param.__init__(self, name, lb=None, ub=None)
 
@@ -496,7 +505,8 @@ class Weight(Param):
         Args:
             name (str): name of the parameter
             size (Union[tuple,list]): size of the array
-            value (numpy.ndarray): initial values of the parameter. Defaults to `random.uniform(-0.1, 0.1, size)`
+            value (numpy.ndarray): initial values of the parameter. Defaults to `random.
+            uniform(-0.1, 0.1, size)`
             init_type (str): initialization type, see notes
 
         Note:
@@ -510,8 +520,14 @@ class Weight(Param):
             * `"glorot"`: initialization method that maintains the variance for
               symmetric activation functions, e.g. sigm, tanh [^2]
 
-            [^1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
-            [^2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
+            [^1] He, K., Zhang, X., Ren, S. and Sun, J., 2015. Delving deep into
+            rectifiers: Surpassing human-level performance on imagenet classification.
+            In Proceedings of the IEEE international conference on computer vision (pp.
+            1026-1034).
+            [^2] Glorot, X. and Bengio, Y., 2010, March. Understanding the difficulty
+            of training deep feedforward neural networks. In Proceedings of the
+            thirteenth international conference on artificial intelligence and
+            statistics (pp. 249-256). JMLR Workshop and Conference Proceedings.
 
         !!! example
             Specifying a weight array:
@@ -566,3 +582,46 @@ class Weight(Param):
 
     def __repr__(self):
         return f"Weight({self.name}, {self.shape})"
+
+
+class Gamma(Param):
+    def __init__(self, name, size):
+        """Class object for Gamma parameter
+
+        Args:
+            name (str): The name of the parameter.
+            size (Union[tuple,list]): The size of the parameter.
+        """
+        Param.__init__(self, name)
+        value = np.ones(size, dtype=FLOATX)
+
+        self._init_value = value
+        self._param_type = "Gamma"
+        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+
+    @property
+    def T(self):
+        return self.shared_var.T
+
+    @property
+    def init_type(self):
+        return self._param_type
+
+    def __repr__(self):
+        return f"Gamma({self.name}, {self.shape})"
+
+    def __rmul__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            g = aet.atleast_Nd(self(), n=other.ndim, left=False)
+            return g * other
+
+        else:
+            return super().__rmul__(other)
+
+    def __mul__(self, other):
+        if isinstance(other, (TensorVariable, TensorSharedVariable)):
+            g = aet.atleast_Nd(self(), n=other.ndim, left=False)
+            return g * other
+
+        else:
+            return super().__mul__(other)

@@ -18,7 +18,8 @@ warning("This is a warning message")
 ```
 
 ## Inputs
-- `level` (int): The level of the logger to be set. It can be one of the predefined levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
+- `level` (int): The level of the logger to be set. It can be one of the predefined 
+  levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
 
 ## Outputs
 - None
