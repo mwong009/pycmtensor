@@ -256,19 +256,19 @@ class Results(object):
         ax2 = ax1.twinx()
 
         statistics = statistics[::sample_intervals]
-        sns.lineplot(
+        ln1 = sns.lineplot(
             data=statistics["train_error"][offset:] * 100,
             ax=ax1,
             color=color[0],
             label="Train Error",
         )
-        sns.lineplot(
+        ln2 = sns.lineplot(
             data=statistics["valid_error"][offset:] * 100,
             ax=ax1,
             color=color[1],
             label="Valid Error",
         )
-        sns.lineplot(
+        ln3 = sns.lineplot(
             data=statistics["train_ll"][offset:],
             color=color[2],
             ax=ax2,
@@ -276,10 +276,19 @@ class Results(object):
         )
 
         ax1.set(ylabel="Error (%)", xlabel="Epoch")
-        ax1.legend(loc="upper right", bbox_to_anchor=(0.4, -0.1))
         ax2.set(ylabel="Loglikelihood")
         ax2.ticklabel_format(axis="y", style="sci", scilimits=(2, 3))
-        ax2.legend(loc="upper left", bbox_to_anchor=(0.6, -0.1))
+
+        h1, l1 = ln1.get_legend_handles_labels()
+        h3, l3 = ln3.get_legend_handles_labels()
+        ax1.legend(
+            handles=h1 + h3,
+            labels=l1 + l3,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=3,
+        )
+        ax2.get_legend().remove()
         plt.tight_layout()
         plt.show()
 
