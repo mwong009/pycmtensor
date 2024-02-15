@@ -30,6 +30,14 @@ class Config:
 
     def __init__(self):
         self.descriptions = {}
+        self.ACCEPT_LOGLIKE = [
+            1,
+            "loglike",
+            "loglikelihood",
+            "likelihood",
+            "max_loglikelihood",
+            "max loglikelihood",
+        ]
 
     def __repr__(self):
         msg = "PyCMTensor configuration\n"

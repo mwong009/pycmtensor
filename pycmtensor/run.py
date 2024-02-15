@@ -217,7 +217,7 @@ def train(model, ds, **kwargs):
                 best_loglikelihood = model.results.best_loglikelihood
                 best_error = model.results.best_valid_error
 
-                if acceptance_method == 1:
+                if acceptance_method in model.config.ACCEPT_LOGLIKE:
                     accept = log_likelihood > best_loglikelihood
                     if log_likelihood > (best_loglikelihood / likelihood_threshold):
                         info_print = True
@@ -274,7 +274,7 @@ def train(model, ds, **kwargs):
                     [
                         gnorm < convergence_threshold,
                         iteration > patience,
-                        (acceptance_method != 1)
+                        (acceptance_method not in model.config.ACCEPT_LOGLIKE)
                         and (
                             valid_error
                             > (model.results.best_valid_error * validation_threshold)
