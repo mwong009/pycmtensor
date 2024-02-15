@@ -1,3 +1,17 @@
+## v1.10.0 (2024-02-15)
+
+### Feat
+
+- **layers.py**: added new layer type `LayerNorm`
+- **expression.py**: added new parameter type Gamma
+- **results.py**: add argument offset to show_training_plot
+- **run**: moved train and compute to pycmtensor.run for cleaniness
+
+### Fix
+
+- **TasteNet.py**: changed instance check type from .DenseLayer to .Layer
+- **run.py**: add limit for verbosity
+
 ## v1.9.2 (2024-02-08)
 
 ### Fix
