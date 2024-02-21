@@ -37,46 +37,47 @@ A simple Multinomial logit model. Dataset: [Swissmetro](http://transp-or.epfl.ch
 
 ```python
 import pandas as pd
+from pycmtensor import train
 from pycmtensor.dataset import Dataset
 from pycmtensor.expressions import Beta
-from pycmtensor.models import MNL, train
+from pycmtensor.models import MNL
 import pycmtensor.optimizers as optim
 
 def mnl_model(filename='http://transp-or.epfl.ch/data/swissmetro.dat'):
-	# Load the CSV file into a DataFrame
-	df = pd.read_csv(filename, sep='\t')
+    # Load the CSV file into a DataFrame
+    df = pd.read_csv(filename, sep='\t')
 
-	# Load the DataFrame into a Dataset object
-	ds = Dataset(df, choice="CHOICE")
-	ds.scale_variable("TRAIN_TT", 100)
-	ds.scale_variable("SM_TT", 100)
-	ds.scale_variable("CAR_TT", 100)
-	ds.scale_variable("TRAIN_CO", 100)
-	ds.scale_variable("SM_CO", 100)
-	ds.scale_variable("CAR_CO", 100)
-	ds.split(0.8)
+    # Load the DataFrame into a Dataset object
+    ds = Dataset(df, choice="CHOICE")
+    ds.scale_variable("TRAIN_TT", 100)
+    ds.scale_variable("SM_TT", 100)
+    ds.scale_variable("CAR_TT", 100)
+    ds.scale_variable("TRAIN_CO", 100)
+    ds.scale_variable("SM_CO", 100)
+    ds.scale_variable("CAR_CO", 100)
+    ds.split(0.8)
 
-	# Define the alternative specific constants (ASCs) for each mode of transport
+    # Define the alternative specific constants (ASCs) for each mode of transport
     ASC_TRAIN = Beta("ASC_TRAIN", 0., None, None, 0)
-	ASC_SM = Beta("ASC_SM", 0., None, None, 0)
-	ASC_CAR = Beta("ASC_CAR", 0., None, None, 1)
-	B_COST = Beta("B_COST", -1., None, None, 1)
-	B_TIME_TRAIN = Beta("B_TIME_TRAIN", 0., None, None, 0)
-	B_TIME_SM = Beta("B_TIME_SM", 0., None, None, 0)
-	B_TIME_CAR = Beta("B_TIME_CAR", 0., None, None, 0)
-	B_SEAT = Beta("B_SEAT", 0., None, None, 0)
+    ASC_SM = Beta("ASC_SM", 0., None, None, 0)
+    ASC_CAR = Beta("ASC_CAR", 0., None, None, 1)
+    B_COST = Beta("B_COST", -1., None, None, 1)
+    B_TIME_TRAIN = Beta("B_TIME_TRAIN", 0., None, None, 0)
+    B_TIME_SM = Beta("B_TIME_SM", 0., None, None, 0)
+    B_TIME_CAR = Beta("B_TIME_CAR", 0., None, None, 0)
+    B_SEAT = Beta("B_SEAT", 0., None, None, 0)
 
-	# Define the utility functions for each mode of transport
-	V_TRAIN = ASC_TRAIN + B_TIME_TRAIN * ds["TRAIN_TT"] + B_COST * ds["TRAIN_CO"]
-	V_SM = ASC_SM + B_TIME_SM * ds["SM_TT"] + B_COST * ds["SM_CO"] + B_SEAT * ds["SM_SEATS"]
-	V_CAR = ASC_CAR + B_TIME_CAR * ds["CAR_TT"] + B_COST * ds["CAR_CO"]
+    # Define the utility functions for each mode of transport
+    V_TRAIN = ASC_TRAIN + B_TIME_TRAIN * ds["TRAIN_TT"] + B_COST * ds["TRAIN_CO"]
+    V_SM = ASC_SM + B_TIME_SM * ds["SM_TT"] + B_COST * ds["SM_CO"] + B_SEAT * ds["SM_SEATS"]
+    V_CAR = ASC_CAR + B_TIME_CAR * ds["CAR_TT"] + B_COST * ds["CAR_CO"]
 
-	# Define the model
-	U = [V_TRAIN, V_SM, V_CAR]
-	AV = [ds["TRAIN_AV"], ds["SM_AV"], ds["CAR_AV"]]
-	model = MNL(ds, locals(), utility=U, av=AV)
-	
-	return model, ds
+    # Define the model
+    U = [V_TRAIN, V_SM, V_CAR]
+    AV = [ds["TRAIN_AV"], ds["SM_AV"], ds["CAR_AV"]]
+    model = MNL(ds, locals(), utility=U, av=AV)
+    
+    return model, ds
 
 # Train model
 model, ds = mnl_model()

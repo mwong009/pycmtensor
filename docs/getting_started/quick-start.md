@@ -193,7 +193,7 @@ train(
     batch_size=0,  # optional 
     base_learning_rate=1.,  # optional 
     convergence_threshold=0.0001,  # optional 
-    max_steps=200,  # optional
+    max_epochs=200,  # optional
     lr_scheduler=ConstantLR,  # optional
 )
 ```
@@ -211,7 +211,7 @@ The other arguments `**kwargs` are optional, and they can be set when calling th
 The additional arguments, denoted as `**kwargs`, are optional and can be specified either when invoking the `train()` function or during the model definition. These optional parameters, known as *hyperparameters*, alter the training process.
 
 !!! note
-    A step in `max_step` refers to a complete traversal of the training dataset. An iteration is a single model update operation, typically performed on every mini-batch (when `batch_size` != 0).
+    An epoch in `max_epochs` refers to a complete traversal of the training dataset. An iteration is a single model update operation, typically performed on every mini-batch (when `batch_size` != 0).
 
 !!! tip
     The hyperparameters can also be set with the `pycmtensor.config` module before the training function is called.
