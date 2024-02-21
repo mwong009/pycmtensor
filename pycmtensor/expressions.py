@@ -6,6 +6,7 @@ returns a clean list of keywords found in the expression. It also defines a base
 for expression objects, which includes overloaded operators for tensor operations such 
 as addition, subtraction, multiplication, division, and comparison.
 """
+
 from typing import Union
 
 import aesara

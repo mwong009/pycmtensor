@@ -19,6 +19,7 @@ Functions:
 - rob_correlation_matrix(hessian, bhhh): Computes the robust correlation matrix from  
   the Hessian and BHHH matrices.
 """
+
 import numpy as np
 from scipy import stats
 

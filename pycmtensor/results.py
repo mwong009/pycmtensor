@@ -7,7 +7,6 @@ import platform
 
 import numpy as np
 import pandas as pd
-import psutil
 from numpy import nan_to_num as nan2num
 
 from pycmtensor.logger import error
@@ -124,10 +123,11 @@ class Results(object):
         import pycmtensor
 
         cpu_spec = importlib.util.find_spec("cpuinfo")
+        mem_spec = importlib.util.find_spec("psutil")
 
         sys_version = platform.system() + " " + platform.version()
         stats = pd.DataFrame(columns=["value"])
-        mem = str(round(psutil.virtual_memory().total / (1024.0**3), 2)) + " GB"
+
         stats.loc["Platform"] = sys_version
         if cpu_spec is not None:
             import cpuinfo
@@ -135,7 +135,11 @@ class Results(object):
             stats.loc["Processor"] = cpuinfo.get_cpu_info()["brand_raw"]
         else:
             stats.loc["Processor"] = platform.processor().split(" ")[0]
-        stats.loc["RAM"] = mem
+        if mem_spec is not None:
+            import psutil
+
+            mem = str(round(psutil.virtual_memory().total / (1024.0**3), 2)) + " GB"
+            stats.loc["RAM"] = mem
         stats.loc["Python version"] = platform.python_version()
         stats.loc["PyCMTensor version"] = pycmtensor.__version__
         stats.loc["Seed"] = self.config.seed
