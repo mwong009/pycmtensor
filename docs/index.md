@@ -9,6 +9,8 @@
 
 A Tensor-based choice modelling estimation package written in Python
 
+**2024-02-21**: [PyCMTensor 1.10.0 on conda-forge](news.md#2024-02-21)
+
 # Welcome
 
 PyCMTensor is a Python library that use tensor-based computations for discrete choice modelling and estimation. It specializes in the estimation of hybrid neural networks, Logit models, and Mixed Logit models. The models in PyCMTensor are built on computational graphs and are estimated using generalized backpropagation algorithms.
@@ -38,7 +40,7 @@ PyCMTensor incorporates a collection of 1st order and 1.5th order optimization r
 
 * [**Introduction**](getting_started/index.md) - A brief introduction of the project and its features
 * [**Installing PyCMTensor**](getting_started/installation.md) - Instructions to install PyCMTensor
-* [**Overview**](getting_started/overview.md) - A short 5-minute quick start to estimating your first model
+* [**Quick start guide**](getting_started/quick-start.md) - A short 5-minute quick start to estimating your first model
 * [**Troubleshooting and tips**](getting_started/troubleshooting.md) - Some tips for common problems and fixes
 
 ## Examples

@@ -113,7 +113,8 @@ class BaseModel(object):
         """dummy method for additional regularizers into the cost function
 
         Args:
-            *args (None): overloaded arguments
+            *regularizers (pycmtensor.regularizers.Regularizers): regularizers to
+                include in the cost function
 
         Returns:
             (list[TensorVariable]): a list of symbolic variables that specify additional regualrizers to minimize against
@@ -128,9 +129,6 @@ class BaseModel(object):
 
         Args:
             updates (dict): A dictionary of updates for the model.
-
-        Returns:
-            None
         """
         inputs = self.x + [self.y, self.learning_rate, self.index]
         outputs = self.cost
@@ -151,7 +149,7 @@ class BaseModel(object):
             dataset (Dataset): The dataset for which predictions are to be generated.
 
         Returns:
-            dict: A dictionary containing the following key-value pairs:
+            (dict): A dictionary containing the following key-value pairs:
                 '[choice_index]' (list): The model's predicted probabilities for each alternative.
                 'pred_[choice_label]' (list): The model's predicted choices.
                 'true_[choice_label]' (list): The actual choices from the dataset.
@@ -183,7 +181,7 @@ class BaseModel(object):
             wrt_choice (int): The index of the choice for which the elasticities are to be calculated. This index should correspond to a valid choice in the dataset.
 
         Returns:
-            dict: A dictionary where each key-value pair represents an explanatory variable and its corresponding calculated elasticity. The keys are the names of the explanatory variables, and the values are the calculated elasticities for the specified choice across the dataset.
+            (dict): A dictionary where each key-value pair represents an explanatory variable and its corresponding calculated elasticity. The keys are the names of the explanatory variables, and the values are the calculated elasticities for the specified choice across the dataset.
 
 
         """

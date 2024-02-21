@@ -55,7 +55,7 @@ class Scheduler:
         """Returns a string representation of the Scheduler object.
 
         Returns:
-            str: String representation of the Scheduler object.
+            (str): String representation of the Scheduler object.
         """
         return f"{self.name}"
 
@@ -63,7 +63,7 @@ class Scheduler:
         """Returns a string representation of the Scheduler object with its attributes.
 
         Returns:
-            str: String representation of the Scheduler object with its attributes.
+            (str): String representation of the Scheduler object with its attributes.
         """
         msg = f"{self.name}("
         attrs = [d for d in dir(self) if not d.startswith("_")]
@@ -82,7 +82,7 @@ class Scheduler:
             epoch (int): The epoch number.
 
         Returns:
-            float: The current learning rate.
+            (float): The current learning rate.
         """
         self.record(self.lr)
         return self.lr
@@ -92,7 +92,7 @@ class Scheduler:
         """Property that returns the base learning rate.
 
         Returns:
-            float: The base learning rate.
+            (float): The base learning rate.
         """
         return self._base_lr
 
@@ -105,7 +105,7 @@ class Scheduler:
         """Property that returns the learning rate history.
 
         Returns:
-            list: The learning rate history.
+            (list): The learning rate history.
         """
         return self._history
 
@@ -116,7 +116,7 @@ class Scheduler:
             lr (float): The learning rate.
 
         Returns:
-            float: The current learning rate.
+            (float): The current learning rate.
         """
         self.history.append(lr)
         return lr

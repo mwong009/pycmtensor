@@ -48,16 +48,12 @@ class Optimizer:
         """Returns a string representation of the optimizer object.
 
         Returns:
-            str: A string representation of the optimizer object, including its name and parameters.
+            (str): A string representation of the optimizer object, including its name and parameters.
         """
         return f"{self.name}"
 
     def update(self, **kwargs):
-        """Update parameters for aesara function calls
-
-        Returns:
-            None
-        """
+        """Update parameters for aesara function calls"""
         raise NotImplementedError("Subclasses must implement the `update` method.")
 
 
@@ -69,7 +65,7 @@ class Adam(Optimizer):
             params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
-            **kwargs: Additional keyword arguments.
+            **kwargs (None): Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -143,7 +139,7 @@ class AdamW(Adam):
             params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
-            **kwargs: Additional keyword arguments.
+            **kwargs (None): Additional keyword arguments.
 
         Example:
             params = [...] # list of parameters
@@ -193,7 +189,7 @@ class Nadam(Adam):
             params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
-            **kwargs: Additional keyword arguments.
+            **kwargs (None): Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -249,7 +245,7 @@ class Adamax(Adam):
             params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
-            **kwargs: Additional keyword arguments.
+            **kwargs (None): Additional keyword arguments.
 
         Attributes:
             t (TensorSharedVariable): time step
@@ -685,7 +681,7 @@ def clip(param, min, max):
         max (float): The maximum value that the parameter can take.
 
     Returns:
-        float: The clipped value of the parameter.
+        (float): The clipped value of the parameter.
     """
     if any([min, max]) and (config.beta_clipping):
         if min is None:

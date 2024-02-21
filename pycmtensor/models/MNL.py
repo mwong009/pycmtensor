@@ -86,7 +86,7 @@ class MNL(BaseModel):
         Returns the number of parameters in the Multinomial Logit model.
 
         Returns:
-            int: The number of parameters in the Multinomial Logit model.
+            (int): The number of parameters in the Multinomial Logit model.
         """
         return super().n_params
 
@@ -95,7 +95,7 @@ class MNL(BaseModel):
         """Return the number of estimated betas in the Multinomial Logit model.
 
         Returns:
-            int: The number of estimated betas.
+            (int): The number of estimated betas.
         """
         return super().n_betas
 
@@ -103,7 +103,7 @@ class MNL(BaseModel):
         """Returns the values of the betas in the model as a dictionary.
 
         Returns:
-            dict: A dictionary containing the beta values, where the keys represent the beta names and the values represent their corresponding values.
+            (dict): A dictionary containing the beta values, where the keys represent the beta names and the values represent their corresponding values.
         """
         return super().get_betas()
 
@@ -201,7 +201,7 @@ class MNL(BaseModel):
             ds (Dataset): A pycmtensor dataset object containing the validation data.
 
         Returns:
-            numpy.ndarray: The predicted choices or the vector of probabilities.
+            (numpy.ndarray): The predicted choices or the vector of probabilities.
 
         !!! example
 
@@ -245,7 +245,7 @@ class MNL(BaseModel):
             wrt_choice (int): Alternative to evaluate the variables on.
 
         Returns:
-            dict: Disaggregated point elasticities of the independent variables `x`.
+            (dict): Disaggregated point elasticities of the independent variables `x`.
 
         !!! example
 
