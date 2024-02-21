@@ -15,19 +15,31 @@ classifiers = [
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.9",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.9,<3.13"
 aesara = "2.9.3"
-numpy = "1.25.2"
-scipy = "1.11.4"
-pandas = "1.5.3"
-seaborn = "0.12.2"
+numpy = "<1.26.0"
+scipy = "<1.12.0"
+pandas = "<2.1.0"
+seaborn = "<0.14.0"
 watermark = "2.4.3" 
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = ">=1.4.3"
+mkdocs-material = ">=9.1.0"
+pymdown-extensions = ">=10.0.1"
+mkdocstrings = ">=0.15.0"
+mkdocstrings-python = ">=0.15.0"
+mknotebooks = "<1.0.0" 
 
 [tool.poetry.group.test]
 optional = true
@@ -42,6 +54,8 @@ optional = true
 [tool.poetry.group.lint.dependencies]
 black = ">=22.1.0"
 isort = ">=5.9.3"
+commitizen = ">=3.0.0"
+pre-commit = ">=3.4.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
