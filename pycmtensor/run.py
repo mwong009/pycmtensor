@@ -8,6 +8,8 @@ from pycmtensor.logger import debug, info, warning
 from pycmtensor.utils import human_format as hf
 from pycmtensor.utils import time_format
 
+IS_TRAINING = 1
+
 
 def compute(model, ds, update=False, **params):
     """Function for manual computation of model by specifying parameters as arguments
@@ -53,7 +55,7 @@ def compute(model, ds, update=False, **params):
             gamma=model.config.lr_ExpRangeCLR_gamma,
         )
         learning_rate = lr_scheduler(0)
-        model.cost_updates_fn(*train_data, learning_rate, t_index)
+        model.cost_updates_fn(*train_data, learning_rate, t_index, IS_TRAINING)
 
     t_log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     t_error = model.prediction_error_fn(*train_data)
@@ -187,7 +189,7 @@ def train(model, ds, **kwargs):
 
         for i in range(n_train_batches):
             index = np.arange(len(batch_data[i][-1]))
-            model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
+            model.cost_updates_fn(*batch_data[i], learning_rate, index, IS_TRAINING)
 
             if iteration % validation_freq == 0:
                 # training loglikelihood

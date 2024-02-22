@@ -22,17 +22,21 @@ class BaseModel(object):
             config (pycmtensor.Config): pycmtensor config object
             rng (numpy.random.Generator): random number generator
             params (list): list of model parameters (`betas` & `weights`)
-            betas (list): list of model scalar betas
-            sigmas (list): list of model scalar sigmas
-            weights (list): list of model weight matrices
-            biases (list): list of model vector biases
             updates (list): list of (param, update) tuples
-            learning_rate (TensorVariable): symbolic reference to the learning rate
+            learning_rate (TensorVariable): learning rate scalar value
+            index (TensorVariable): for indexing the dataset
+            is_training (TensorVariable): training mode flag
             results (Results): stores the results of the model estimation
         """
-        self.config = config
-        self.rng = np.random.default_rng(config.seed)
-        self.results = Results()
+        self.name = ""  # name of the model
+        self.config = config  # pycmtensor config object
+        self.rng = np.random.default_rng(config.seed)  # random number generator
+        self.params = []  # list of model parameters (`betas` & `weights`)
+        self.updates = []  # list of (param, update) tuples
+        self.learning_rate = aet.scalar("learning_rate")  # learning rate scalar value
+        self.index = aet.ivector("index")  # for indexing the dataset
+        self.is_training = aet.iscalar("is_training")  # training mode flag
+        self.results = Results()  # stores the results of the model estimation
 
         for key, value in kwargs.items():
             self.config.add(key, value)
@@ -130,7 +134,7 @@ class BaseModel(object):
         Args:
             updates (dict): A dictionary of updates for the model.
         """
-        inputs = self.x + [self.y, self.learning_rate, self.index]
+        inputs = self.x + [self.y, self.learning_rate, self.index, self.is_training]
         outputs = self.cost
 
         self.cost_updates_fn = function(
