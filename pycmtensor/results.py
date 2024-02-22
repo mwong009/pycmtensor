@@ -168,9 +168,9 @@ class Results(object):
         stats.loc["Akaike Information Criterion"] = f"{self.AIC():.2f}"
         stats.loc["Bayesian Information Criterion"] = f"{self.BIC():.2f}"
         stats.loc["Final gradient norm"] = f"{self.gnorm:.3e}"
-        stats.loc[
-            "Maximum epochs reached"
-        ] = f"{'Yes' if self.best_epoch == self.config.max_epochs else 'No'}"
+        stats.loc["Maximum epochs reached"] = "No"
+        if self.best_epoch == self.config.max_epochs:
+            stats.loc["Maximum epochs reached"] = "Yes"
         stats.loc["Best result at epoch"] = f"{self.best_epoch:d}"
         return stats
 

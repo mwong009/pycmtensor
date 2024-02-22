@@ -29,38 +29,26 @@ class MNL(BaseModel):
             **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration.md) in the user guide for details on possible options
 
         Attributes:
-            x (List[TensorVariable]): symbolic variable objects for independent
-                variables
+            name (str): name of the model
             y (TensorVariable): symbolic variable object for the choice variable
-            xy (List[TensorVariable]): concatenated list of x and y
-            betas (List[Beta]): model beta variables
-            cost (TensorVariable): symbolic cost tensor variable function
             p_y_given_x (TensorVariable): probability tensor variable function
             ll (TensorVariable): loglikelihood tensor variable function
+            cost (TensorVariable): symbolic cost tensor variable function
             pred (TensorVariable): prediction tensor variable function
+            params (list): list of model parameters (`betas`)
+            betas (List[Beta]): model beta variables
+            x (List[TensorVariable]): symbolic variable objects for independent
+                variables
+            xy (List[TensorVariable]): concatenated list of x and y
         """
 
         BaseModel.__init__(self, **kwargs)
         self.name = "MNL"
-        self.params = []  # keep track of all the Params
-        self.betas = []  # keep track of the Betas
-        self.updates = []  # keep track of the updates
-        self.index = aet.ivector("index")  # indices of the dataset
-        self.learning_rate = aet.scalar("learning_rate")  # learning rate tensor
-
-        self.y = ds.y  # Definition of the symbolic choice output (tensor)
-
-        self.p_y_given_x = logit(utility, av)  # expression for the choice probability
-
-        # expression for the likelihood
+        self.y = ds.y
+        self.p_y_given_x = logit(utility, av)
         self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
-
-        self.cost = -self.ll  # expression for the cost
-
-        self.pred = aet.argmax(
-            self.p_y_given_x, axis=0
-        )  # expression for the prediction
-
+        self.cost = -self.ll
+        self.pred = aet.argmax(self.p_y_given_x, axis=0)
         self.params = self.extract_params(self.cost, variables)
         self.betas = [p for p in self.params if isinstance(p, Beta)]
 
@@ -82,8 +70,7 @@ class MNL(BaseModel):
 
     @property
     def n_params(self):
-        """
-        Returns the number of parameters in the Multinomial Logit model.
+        """Returns the number of parameters in the Multinomial Logit model.
 
         Returns:
             (int): The number of parameters in the Multinomial Logit model.
