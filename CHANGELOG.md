@@ -1,3 +1,9 @@
+## v1.11.1 (2024-02-29)
+
+### Fix
+
+- **pyproject.toml**: fix incorrect bump message
+
 ## v1.11.0 (2024-02-29)
 
 ### Feat
