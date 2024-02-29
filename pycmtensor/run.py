@@ -8,6 +8,8 @@ from pycmtensor.logger import debug, info, warning
 from pycmtensor.utils import human_format as hf
 from pycmtensor.utils import time_format
 
+IS_TRAINING = 1
+
 
 def compute(model, ds, update=False, **params):
     """Function for manual computation of model by specifying parameters as arguments
@@ -53,7 +55,7 @@ def compute(model, ds, update=False, **params):
             gamma=model.config.lr_ExpRangeCLR_gamma,
         )
         learning_rate = lr_scheduler(0)
-        model.cost_updates_fn(*train_data, learning_rate, t_index)
+        model.cost_updates_fn(*train_data, learning_rate, t_index, IS_TRAINING)
 
     t_log_likelihood = model.log_likelihood_fn(*train_data, t_index)
     t_error = model.prediction_error_fn(*train_data)
@@ -143,6 +145,7 @@ def train(model, ds, **kwargs):
     t_index = np.arange(len(train_data[-1]))
 
     log_likelihood = model.log_likelihood_fn(*train_data, t_index)
+    null_loglikelihood = model.null_log_likelihood_fn(*train_data, t_index)
     train_error = model.prediction_error_fn(*train_data)
 
     if set(ds.idx_train) != set(ds.idx_valid):
@@ -155,8 +158,8 @@ def train(model, ds, **kwargs):
     model.results.best_train_error = train_error
     model.results.best_epoch = 0
     model.results.gnorm = np.nan
-
-    model.results.null_loglikelihood = log_likelihood
+    model.results.init_loglikelihood = log_likelihood
+    model.results.null_loglikelihood = null_loglikelihood
     model.results.n_train = n_train
     model.results.n_valid = n_valid
     model.results.n_params = model.n_params
@@ -179,7 +182,7 @@ def train(model, ds, **kwargs):
 
     start_time = perf_counter()
     info(
-        f"Start (n={n_train}, epoch={epoch}, LL={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
+        f"Start (n={n_train}, epoch={epoch}, NLL={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
     )
 
     while (epoch < max_epochs) and (not done_looping):
@@ -187,7 +190,7 @@ def train(model, ds, **kwargs):
 
         for i in range(n_train_batches):
             index = np.arange(len(batch_data[i][-1]))
-            model.cost_updates_fn(*batch_data[i], learning_rate, index)  # update model
+            model.cost_updates_fn(*batch_data[i], learning_rate, index, IS_TRAINING)
 
             if iteration % validation_freq == 0:
                 # training loglikelihood
@@ -217,7 +220,7 @@ def train(model, ds, **kwargs):
                 best_loglikelihood = model.results.best_loglikelihood
                 best_error = model.results.best_valid_error
 
-                if acceptance_method == 1:
+                if acceptance_method in model.config.ACCEPT_LOGLIKE:
                     accept = log_likelihood > best_loglikelihood
                     if log_likelihood > (best_loglikelihood / likelihood_threshold):
                         info_print = True
@@ -274,7 +277,7 @@ def train(model, ds, **kwargs):
                     [
                         gnorm < convergence_threshold,
                         iteration > patience,
-                        (acceptance_method != 1)
+                        (acceptance_method not in model.config.ACCEPT_LOGLIKE)
                         and (
                             valid_error
                             > (model.results.best_valid_error * validation_threshold)

@@ -2,14 +2,15 @@ site_name: PyCMTensor - Documentation
 
 nav:
   - Home: index.md
+  - News: news.md
   - Getting started: 
     - Introduction: getting_started/index.md
     - Installation: getting_started/installation.md
-    - Overview: getting_started/overview.md
+    - Quick start guide: getting_started/quick-start.md
     - Troubleshooting & tips: getting_started/troubleshooting.md
-  - Examples: 
-    - Multnomial logit: examples/mnl.ipynb
-    - Mixed logit: examples/mixed_mnl.ipynb
+  # - Examples: 
+  #   - Multnomial logit: examples/mnl.ipynb
+  #   - Mixed logit: examples/mixed_mnl.ipynb
   - User guide:
     - User guide: user_guide/index.md
     - Configuration: user_guide/configuration.md

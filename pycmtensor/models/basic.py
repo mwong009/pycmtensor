@@ -6,6 +6,7 @@ from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import ExpressionParser, Param
+from pycmtensor.functions import errors
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
@@ -22,17 +23,21 @@ class BaseModel(object):
             config (pycmtensor.Config): pycmtensor config object
             rng (numpy.random.Generator): random number generator
             params (list): list of model parameters (`betas` & `weights`)
-            betas (list): list of model scalar betas
-            sigmas (list): list of model scalar sigmas
-            weights (list): list of model weight matrices
-            biases (list): list of model vector biases
             updates (list): list of (param, update) tuples
-            learning_rate (TensorVariable): symbolic reference to the learning rate
+            learning_rate (TensorVariable): learning rate scalar value
+            index (TensorVariable): for indexing the dataset
+            is_training (TensorVariable): training mode flag
             results (Results): stores the results of the model estimation
         """
-        self.config = config
-        self.rng = np.random.default_rng(config.seed)
-        self.results = Results()
+        self.name = ""  # name of the model
+        self.config = config  # pycmtensor config object
+        self.rng = np.random.default_rng(config.seed)  # random number generator
+        self.params = []  # list of model parameters (`betas` & `weights`)
+        self.updates = []  # list of (param, update) tuples
+        self.learning_rate = aet.scalar("learning_rate")  # learning rate scalar value
+        self.index = aet.ivector("index")  # for indexing the dataset
+        self.is_training = aet.iscalar("is_training")  # training mode flag
+        self.results = Results()  # stores the results of the model estimation
 
         for key, value in kwargs.items():
             self.config.add(key, value)
@@ -113,7 +118,8 @@ class BaseModel(object):
         """dummy method for additional regularizers into the cost function
 
         Args:
-            *args (None): overloaded arguments
+            *regularizers (pycmtensor.regularizers.Regularizers): regularizers to
+                include in the cost function
 
         Returns:
             (list[TensorVariable]): a list of symbolic variables that specify additional regualrizers to minimize against
@@ -123,16 +129,50 @@ class BaseModel(object):
             for reg in regularizers:
                 self.cost += reg
 
+    def build_cost_fn(self):
+        """Constructs Aesara functions for calculating the cost and prediction errors.
+
+        Example Usage:
+        ```python
+        # Create an instance of the MNL model
+        model = MNL(ds, variables, utility, av=None)
+
+        # Call the build_cost_fn method
+        model.build_cost_fn()
+        ```
+        """
+        self.log_likelihood_fn = function(
+            name="log_likelihood",
+            inputs=self.x + [self.y, self.index],
+            outputs=self.ll,
+            allow_input_downcast=True,
+        )
+
+        self.null_log_likelihood_fn = function(
+            name="null_log_likelihood",
+            inputs=self.x + [self.y, self.index],
+            outputs=self.ll,
+            allow_input_downcast=True,
+            givens={
+                param.shared_var: aet.zeros_like(param.init_value)
+                for param in self.params
+            },
+        )
+
+        self.prediction_error_fn = function(
+            name="prediction_error",
+            inputs=self.x + [self.y],
+            outputs=errors(self.p_y_given_x, self.y),
+            allow_input_downcast=True,
+        )
+
     def build_cost_updates_fn(self, updates):
         """Builds a function that calculates the cost updates for a model.
 
         Args:
             updates (dict): A dictionary of updates for the model.
-
-        Returns:
-            None
         """
-        inputs = self.x + [self.y, self.learning_rate, self.index]
+        inputs = self.x + [self.y, self.learning_rate, self.index, self.is_training]
         outputs = self.cost
 
         self.cost_updates_fn = function(
@@ -151,7 +191,7 @@ class BaseModel(object):
             dataset (Dataset): The dataset for which predictions are to be generated.
 
         Returns:
-            dict: A dictionary containing the following key-value pairs:
+            (dict): A dictionary containing the following key-value pairs:
                 '[choice_index]' (list): The model's predicted probabilities for each alternative.
                 'pred_[choice_label]' (list): The model's predicted choices.
                 'true_[choice_label]' (list): The actual choices from the dataset.
@@ -183,7 +223,7 @@ class BaseModel(object):
             wrt_choice (int): The index of the choice for which the elasticities are to be calculated. This index should correspond to a valid choice in the dataset.
 
         Returns:
-            dict: A dictionary where each key-value pair represents an explanatory variable and its corresponding calculated elasticity. The keys are the names of the explanatory variables, and the values are the calculated elasticities for the specified choice across the dataset.
+            (dict): A dictionary where each key-value pair represents an explanatory variable and its corresponding calculated elasticity. The keys are the names of the explanatory variables, and the values are the calculated elasticities for the specified choice across the dataset.
 
 
         """

@@ -12,6 +12,7 @@ Before you begin, ensure you have met the following requirements:
 PyCMTensor is available on Conda Forge. You can install it using the following command:
 
 ```bash
+conda update -n base -c defaults conda
 conda install -c conda-forge pycmtensor
 ```
 
@@ -20,6 +21,14 @@ For isolated development or testing, we recommend installing PyCMTensor in a vir
 ```bash
 conda create -n pycmtensor-dev -c conda-forge pycmtensor
 conda activate pycmtensor-dev
+```
+
+### Optional packages
+
+The following are optional and can be installed alongside PyCMTensor:
+
+```bash
+conda install -c conda-forge py-cpuinfo ipykernel
 ```
 
 You can verify your installation by checking the version of PyCMTensor:
@@ -52,9 +61,12 @@ cd pycmtensor
 
 Create a new Conda environment using the provided `environment.yml` file, and activate it:
 
-```bash
+```powershell
 conda env create -f environment.yml
 conda activate pycmtensor-dev
+
+conda install ipykernel poetry
+poetry install --with docs,test,lint
 ```
 
 This will set up a development environment with all the necessary dependencies installed. You can now start contributing to PyCMTensor or build it from source.

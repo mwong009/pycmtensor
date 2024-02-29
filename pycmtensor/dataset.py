@@ -91,6 +91,8 @@ class Dataset:
             else:
                 self.x.append(aet.vector(name))
 
+        self.xy = self.x + [self.y]
+
         # Shuffle the dataframe
         if shuffle:
             df = df.sample(frac=1.0, random_state=config.seed).reset_index(drop=True)
@@ -118,7 +120,10 @@ class Dataset:
             key (str or list or tuple): The name(s) of the variable(s) to be accessed.
 
         Returns:
-            TensorVariable or list of TensorVariable: The input or output variable(s) corresponding to the given name(s).
+            (list[TensorVariable]): The input or output variable(s)
+                corresponding to the given name(s), or
+            (TensorVariable): The input or output variable
+                corresponding to the given name.
 
         Raises:
             KeyError: If the given name(s) do not match any input or output variable.

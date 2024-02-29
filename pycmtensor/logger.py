@@ -24,6 +24,7 @@ warning("This is a warning message")
 ## Outputs
 - None
 """
+
 import logging
 
 __all__ = [

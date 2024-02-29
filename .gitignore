@@ -1,5 +1,6 @@
 docs/_static*
 sandbox/*
+test-reports/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

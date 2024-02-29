@@ -6,6 +6,7 @@ returns a clean list of keywords found in the expression. It also defines a base
 for expression objects, which includes overloaded operators for tensor operations such 
 as addition, subtraction, multiplication, division, and comparison.
 """
+
 from typing import Union
 
 import aesara
@@ -57,7 +58,7 @@ class ExpressionParser(object):
 
         Args:
             expression (TensorVariable, optional): The tensor expression to parse.
-            Defaults to None.
+                Defaults to None.
         """
         if expression is not None:
             self.expression = str(pprint(expression))
@@ -70,7 +71,7 @@ class ExpressionParser(object):
             expression (TensorVariable): The symbolic tensor object to parse.
 
         Returns:
-            list: The clean list of keywords found in the expression.
+            (list): The clean list of keywords found in the expression.
         """
         stdout = ExpressionParser._get_stdout(expression)
         stdout = ExpressionParser._remove_parentheses(stdout)
@@ -406,15 +407,12 @@ class RandomDraws(TensorExpressions):
         Args:
             name (str): The name of the RandomDraw object.
             draw_type (str): The distribution of the draw. Can be "normal",
-            "lognormal", "gumbel", "exponential", "gamma", or "poisson".
+                "lognormal", "gumbel", "exponential", "gamma", or "poisson".
             n_draws (int): The number of draws, which determines the size of the shared
-            tensor.
+                tensor.
 
         Raises:
             NotImplementedError: If an unsupported draw_type is provided.
-
-        Returns:
-            None. The method initializes the object and creates a shared variable.
         """
         self._name = name
         self.n_draws = n_draws
@@ -456,7 +454,7 @@ class Bias(Param):
             name (str): The name of the parameter.
             size (Union[tuple,list]): The size of the array in 1 dimension.
             value (numpy.ndarray): The initial values of the parameter. If `None` is
-            given, it defaults to `0`.
+                given, it defaults to `0`.
         """
         Param.__init__(self, name, lb=None, ub=None)
 
@@ -506,7 +504,7 @@ class Weight(Param):
             name (str): name of the parameter
             size (Union[tuple,list]): size of the array
             value (numpy.ndarray): initial values of the parameter. Defaults to `random.
-            uniform(-0.1, 0.1, size)`
+                uniform(-0.1, 0.1, size)`
             init_type (str): initialization type, see notes
 
         Note:

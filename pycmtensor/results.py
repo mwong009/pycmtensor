@@ -3,6 +3,8 @@
 
 This module provides the results of the estimated model and output formatting
 """
+import platform
+
 import numpy as np
 import pandas as pd
 from numpy import nan_to_num as nan2num
@@ -116,7 +118,30 @@ class Results(object):
         Returns:
             (pandas.DataFrame): Summary of the model performance benchmark
         """
+        import importlib
+
+        import pycmtensor
+
+        cpu_spec = importlib.util.find_spec("cpuinfo")
+        mem_spec = importlib.util.find_spec("psutil")
+
+        sys_version = platform.system() + " " + platform.version()
         stats = pd.DataFrame(columns=["value"])
+
+        stats.loc["Platform"] = sys_version
+        if cpu_spec is not None:
+            import cpuinfo
+
+            stats.loc["Processor"] = cpuinfo.get_cpu_info()["brand_raw"]
+        else:
+            stats.loc["Processor"] = platform.processor().split(" ")[0]
+        if mem_spec is not None:
+            import psutil
+
+            mem = str(round(psutil.virtual_memory().total / (1024.0**3), 2)) + " GB"
+            stats.loc["RAM"] = mem
+        stats.loc["Python version"] = platform.python_version()
+        stats.loc["PyCMTensor version"] = pycmtensor.__version__
         stats.loc["Seed"] = self.config.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
@@ -133,7 +158,8 @@ class Results(object):
         stats.loc["Number of training samples used"] = f"{self.n_train:d}"
         stats.loc["Number of validation samples used"] = f"{self.n_valid:d}"
         stats.loc["Number of estimated parameters in the model"] = f"{self.n_params:d}"
-        stats.loc["Null. log likelihood"] = f"{self.null_loglikelihood:.2f}"
+        stats.loc["Null log likelihood"] = f"{self.null_loglikelihood:.2f}"
+        stats.loc["Init. log likelihood"] = f"{self.init_loglikelihood:.2f}"
         stats.loc["Final log likelihood"] = f"{self.best_loglikelihood:.2f}"
         stats.loc["Validation Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
         stats.loc["Training Accuracy"] = f"{100*(1-self.best_train_error):.2f}%"
@@ -143,9 +169,9 @@ class Results(object):
         stats.loc["Akaike Information Criterion"] = f"{self.AIC():.2f}"
         stats.loc["Bayesian Information Criterion"] = f"{self.BIC():.2f}"
         stats.loc["Final gradient norm"] = f"{self.gnorm:.3e}"
-        stats.loc[
-            "Maximum epochs reached"
-        ] = f"{'Yes' if self.best_epoch == self.config.max_epochs else 'No'}"
+        stats.loc["Maximum epochs reached"] = "No"
+        if self.best_epoch == self.config.max_epochs:
+            stats.loc["Maximum epochs reached"] = "Yes"
         stats.loc["Best result at epoch"] = f"{self.best_epoch:d}"
         return stats
 
@@ -231,12 +257,13 @@ class Results(object):
 
         return mat.round(3)
 
-    def show_training_plot(self, sample_intervals=1, offset=0):
+    def show_training_plot(self, offset=0, cutoff=None, sample_intervals=1):
         """Displays the statistics graph as a line plot
 
         Args:
-            sample_intervals (int): plot only the n-th point from the statistics
             offset (int): start plotting from the n-th point
+            cutoff (int): end plotting at the n-th point
+            sample_intervals (int): plot only the n-th point from the statistics
 
         Returns:
             (pandas.DataFrame): The statistics as a pandas dataframe
@@ -255,31 +282,40 @@ class Results(object):
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
 
-        statistics = statistics[::sample_intervals]
-        sns.lineplot(
-            data=statistics["train_error"][offset:] * 100,
+        statistics = statistics[offset:cutoff:sample_intervals]
+        ln1 = sns.lineplot(
+            data=statistics["train_error"] * 100,
             ax=ax1,
             color=color[0],
             label="Train Error",
         )
-        sns.lineplot(
-            data=statistics["valid_error"][offset:] * 100,
+        ln2 = sns.lineplot(
+            data=statistics["valid_error"] * 100,
             ax=ax1,
             color=color[1],
             label="Valid Error",
         )
-        sns.lineplot(
-            data=statistics["train_ll"][offset:],
+        ln3 = sns.lineplot(
+            data=statistics["train_ll"],
             color=color[2],
             ax=ax2,
             label="Train Loglikelihood",
         )
 
         ax1.set(ylabel="Error (%)", xlabel="Epoch")
-        ax1.legend(loc="upper right", bbox_to_anchor=(0.4, -0.1))
         ax2.set(ylabel="Loglikelihood")
         ax2.ticklabel_format(axis="y", style="sci", scilimits=(2, 3))
-        ax2.legend(loc="upper left", bbox_to_anchor=(0.6, -0.1))
+
+        h1, l1 = ln1.get_legend_handles_labels()
+        h3, l3 = ln3.get_legend_handles_labels()
+        ax1.legend(
+            handles=h1 + h3,
+            labels=l1 + l3,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=3,
+        )
+        ax2.get_legend().remove()
         plt.tight_layout()
         plt.show()
 
