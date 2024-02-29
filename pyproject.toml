@@ -93,7 +93,7 @@ exclude = '''
 name = "cz_conventional_commits"
 version = "1.10.0"
 tag_format = "v$version"
-bump_message = "Bump version: {current_version} → {new_version}"
+bump_message = "Bump version: $current_version → $new_version"
 version_files = [
     "pyproject.toml:version",
     "pycmtensor/__init__.py",
