@@ -91,6 +91,8 @@ class Dataset:
             else:
                 self.x.append(aet.vector(name))
 
+        self.xy = self.x + [self.y]
+
         # Shuffle the dataframe
         if shuffle:
             df = df.sample(frac=1.0, random_state=config.seed).reset_index(drop=True)

@@ -6,6 +6,7 @@ from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import ExpressionParser, Param
+from pycmtensor.functions import errors
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
@@ -127,6 +128,43 @@ class BaseModel(object):
         if len(regularizers) > 0:
             for reg in regularizers:
                 self.cost += reg
+
+    def build_cost_fn(self):
+        """Constructs Aesara functions for calculating the cost and prediction errors.
+
+        Example Usage:
+        ```python
+        # Create an instance of the MNL model
+        model = MNL(ds, variables, utility, av=None)
+
+        # Call the build_cost_fn method
+        model.build_cost_fn()
+        ```
+        """
+        self.log_likelihood_fn = function(
+            name="log_likelihood",
+            inputs=self.x + [self.y, self.index],
+            outputs=self.ll,
+            allow_input_downcast=True,
+        )
+
+        self.null_log_likelihood_fn = function(
+            name="null_log_likelihood",
+            inputs=self.x + [self.y, self.index],
+            outputs=self.ll,
+            allow_input_downcast=True,
+            givens={
+                param.shared_var: aet.zeros_like(param.init_value)
+                for param in self.params
+            },
+        )
+
+        self.prediction_error_fn = function(
+            name="prediction_error",
+            inputs=self.x + [self.y],
+            outputs=errors(self.p_y_given_x, self.y),
+            allow_input_downcast=True,
+        )
 
     def build_cost_updates_fn(self, updates):
         """Builds a function that calculates the cost updates for a model.
