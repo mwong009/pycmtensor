@@ -1,3 +1,20 @@
+## v1.11.0 (2024-02-29)
+
+### Feat
+
+- **run**: added `is_training` flag
+
+### Fix
+
+- added `null_log_likelihood_fn` to basic.py
+- **results**: add argument for max cutoff in `show_training_plot`
+- **results.py**: fixed legend placement on training plot
+- **run.py**: add option for acceptance_method argument
+
+### Refactor
+
+- minor refactorization
+
 ## v1.10.0 (2024-02-15)
 
 ### Feat
