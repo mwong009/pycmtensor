@@ -41,9 +41,18 @@ def relu(x, alpha=0.0):
         return f1 * x + f2 * aet.abs(x)
 
 
-def neg_relu(x, alpha=0.0):
-    """negative variant of relu"""
-    return -relu(x, alpha)
+def gelu(x, mean=0, sd=1):
+    """Compute the Gaussian Error Linear Unit (GELU) activation function.
+
+    Args:
+        x (TensorVariable): The input symbolic tensor.
+        mean (float): The mean of the Gaussian distribution. Default is 0.
+        sd (float): The standard deviation of the Gaussian distribution. Default is 1.
+
+    Returns:
+        (TensorVariable): The element-wise GELU activation function applied to `x`.
+    """
+    return 0.5 * x * (1 + aet.erf((x - mean) / (sd * aet.sqrt(2.0))))
 
 
 def exp_mov_average(batch_avg, moving_avg, alpha=0.1):

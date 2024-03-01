@@ -19,6 +19,17 @@ def test_relu():
     assert functions.relu(x, alpha=1.0).eval({x: -3.0}) == -3.0
 
 
+def test_gelu():
+    x = aet.scalar("x")
+
+    # test gelu
+    assert np.round(functions.gelu(x, mean=0.0, sd=1.0).eval({x: 0.6}), 3) == 0.435
+    assert np.round(functions.gelu(x, mean=0.0, sd=1.0).eval({x: -0.8}), 3) == -0.169
+    assert np.round(functions.gelu(x, mean=0.5, sd=0.5).eval({x: 0.6}), 3) == 0.348
+    assert np.round(functions.gelu(x, mean=0.5, sd=0.5).eval({x: -0.8}), 3) == -0.004
+    assert np.round(functions.gelu(x, mean=0.5, sd=0.5).eval({x: 0.0}), 3) == 0.0
+
+
 def test_exp_mov_average():
     batch_avg = aet.vector("batch_avg")
     moving_avg = aet.scalar("moving_avg")
