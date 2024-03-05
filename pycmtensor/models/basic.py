@@ -6,7 +6,7 @@ from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import ExpressionParser, Param
-from pycmtensor.functions import errors
+from pycmtensor.functions import errors, first_order_derivative, second_order_derivative
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.models.layers import Layer
 from pycmtensor.results import Results
@@ -180,6 +180,31 @@ class BaseModel(object):
             inputs=inputs,
             outputs=outputs,
             updates=updates,
+            allow_input_downcast=True,
+        )
+
+    def build_gh_fn(self):
+        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+
+        Returns:
+            hessian_fn (Aesara function): A function that computes the Hessian matrix.
+            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
+
+        !!! note
+
+            The hessians and gradient vector are evaluation at the maximum **log likelihood** estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.
+        """
+        self.hessian_fn = function(
+            name="hessian",
+            inputs=self.x + [self.y, self.index],
+            outputs=second_order_derivative(self.ll, self.all_betas),
+            allow_input_downcast=True,
+        )
+
+        self.gradient_vector_fn = function(
+            name="gradient_vector",
+            inputs=self.x + [self.y, self.index],
+            outputs=first_order_derivative(self.ll, self.all_betas),
             allow_input_downcast=True,
         )
 
