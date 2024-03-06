@@ -9,29 +9,39 @@ from pycmtensor.dataset import Dataset
 
 
 @pytest.fixture
-def lpmc_ds():
+def df():
     df = pd.read_csv("data/lpmc.dat", sep="\t")
     df = df[df["travel_year"] == 2015]
+    return df
+
+
+@pytest.fixture
+def lpmc_ds(df):
     ds = Dataset(df=df, choice="travel_mode")
     ds.split(0.8)
     return ds
 
 
-def test_choice_error():
-    df = pd.read_csv("data/lpmc.dat", sep="\t")
-    df = df[df["travel_year"] == 2015]
+def test_add_config_value(df):
+    Dataset(df=df, choice="travel_mode", batch_size=32)
 
+
+def test_choice_error(df):
     with pytest.raises(IndexError):
         Dataset(df=df, choice="not_travel_mode")
-
     ds = Dataset(df=df, choice="travel_mode")
     with pytest.raises(KeyError):
         ds["not_travel_mode"]
 
 
-def test_split_frac_one():
-    df = pd.read_csv("data/lpmc.dat", sep="\t")
-    df = df[df["travel_year"] == 2015]
+def test_split_count(df):
+    ds = Dataset(df=df, choice="travel_mode")
+    ds.split(frac=None, count=100)
+    assert len(ds.idx_train) == 100
+    assert len(ds.idx_valid) == len(df) - 100
+
+
+def test_split_frac_one(df):
     ds = Dataset(df=df, choice="travel_mode")
 
     len_dataset = len(ds.ds["travel_mode"])
@@ -79,6 +89,10 @@ def test_train_dataset(lpmc_ds):
         assert all(i == j)
 
     set4 = ds.train_dataset(["cost_transit"], index=5, batch_size=32)
+    set4a = ds.train_dataset(["cost_transit"], index=5)
+
+    assert len(set4[0]) == 32
+    assert len(set4a[0]) == 1
 
     with pytest.raises(TypeError):
         set5 = ds.train_dataset([ds["dur_walking"], "dur_driving", "dur_pt_rail"])
@@ -144,4 +158,4 @@ def test_make_tensor(lpmc_ds):
     assert tensors1.ndim == tensors2.ndim
 
     with pytest.raises(TypeError):
-        tensors3 = ds[[ds["cost_transit"], "cost_driving_ccharge"]]
+        tensors3 = ds[ds["cost_transit"], "cost_driving_ccharge", np.ones((3, 2))]

@@ -81,6 +81,15 @@ class TasteNet(BaseModel):
         info(f"Build time = {self.results.build_time}")
 
     @property
+    def all_betas(self):
+        """Return all the beta parameters in the model.
+
+        Returns:
+            List[Beta]: A list of all beta parameters in the model.
+        """
+        return self.betas + self.tn_betas
+
+    @property
     def n_params(self):
         """
         Get the total number of estimated parameters in the model.
@@ -203,19 +212,7 @@ class TasteNet(BaseModel):
 
             The hessians and gradient vector are evaluation at the maximum **log likelihood** estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.
         """
-        self.hessian_fn = aesara.function(
-            name="hessian",
-            inputs=self.x + [self.y, self.index],
-            outputs=second_order_derivative(self.ll, self.betas + self.tn_betas),
-            allow_input_downcast=True,
-        )
-
-        self.gradient_vector_fn = aesara.function(
-            name="gradient_vector",
-            inputs=self.x + [self.y, self.index],
-            outputs=first_order_derivative(self.ll, self.betas + self.tn_betas),
-            allow_input_downcast=True,
-        )
+        BaseModel.build_gh_fn(self)
 
     def build_cost_updates_fn(self, updates):
         """Build or rebuild the cost function with updates to the model.
