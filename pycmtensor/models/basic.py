@@ -154,7 +154,7 @@ class BaseModel(object):
             outputs=self.ll,
             allow_input_downcast=True,
             givens={
-                param.shared_var: aet.zeros_like(param.init_value)
+                param.shared_var: np.zeros_like(param.init_value)
                 for param in self.params
             },
         )
