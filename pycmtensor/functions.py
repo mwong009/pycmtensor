@@ -83,6 +83,34 @@ def exp_mov_average(batch_avg, moving_avg, alpha=0.1):
     return ema
 
 
+def list_to_tensor_variable(lst):
+    """Converts a list of arrays to a tensor.
+
+    Args:
+        lst (Union[list, tuple, TensorVariable]): A list of arrays.
+
+    Returns:
+        (TensorVariable): A tensor representation of the list of arrays.
+    """
+
+    for n, l in enumerate(lst):
+        # convert l to tensor representation if u is an expression
+        if isinstance(l, Param):
+            lst[n] = aet.as_tensor_variable(l())
+
+    # get maximum ndim from the list of tensors
+    max_ndim = max([l.ndim for l in lst])
+
+    # pad tensors to the left to have the same number of dimensions
+    tnsrs = [aet.atleast_Nd(l, n=max_ndim) for l in lst]
+
+    # broadcast tensors across each other before stacking
+    tnsrs = aet.broadcast_arrays(*tnsrs)
+
+    # stack list of tensors to into a max_ndim+1 tensor
+    return aet.stack(tnsrs)
+
+
 def logit(utility, avail=None):
     """Computes the Logit function, with availability conditions.
 
@@ -103,25 +131,8 @@ def logit(utility, avail=None):
             msg = f"{utility} must have the same length as {avail}"
             raise ValueError(msg)
 
-        _utility = utility
-        for n, u in enumerate(_utility):
-            # convert u to tensor representation if u is an expression
-            if isinstance(u, Param):
-                utility[n] = aet.as_tensor_variable(u())
+        U = list_to_tensor_variable(utility)
 
-        # get maximum ndim from set of utlity equations
-        max_ndim = max([u.ndim for u in utility])
-
-        # pad tensors to the left to have the same number of dimensions
-        utility = [aet.atleast_Nd(u, n=max_ndim) for u in utility]
-
-        # broadcast tensors across each other before stacking
-        utility = aet.broadcast_arrays(*utility)
-
-        # stack list of tensors to into a max_ndim+1 tensor
-        U = aet.stack(utility)
-
-    # use the utility inputs as is if given as a TensorVariable
     else:
         U = utility
 
