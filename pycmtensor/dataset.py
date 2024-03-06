@@ -146,12 +146,16 @@ class Dataset:
             else:
                 raise KeyError
 
-    def _make_tensor(self, keys):
-        # if tensor inputs are list of strings, convert them to tensors
-        if all(isinstance(k, str) for k in keys):
-            keys = [self[k] for k in keys]
-        else:
-            raise TypeError(f"Multiple types found in {keys}.")
+    def _make_tensor(self, k):
+        # if the input is a string, convert it to a tensor then add it to the list
+        keys = []
+        for i in k:
+            if isinstance(i, str):
+                keys.append(self[i])
+            elif isinstance(i, TensorVariable):
+                keys.append(i)
+            else:
+                raise TypeError(f"Type {type(i)} not supported")
         return aet.as_tensor_variable(keys)
 
     @property
