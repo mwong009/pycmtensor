@@ -237,11 +237,15 @@ class Dataset:
             raise ValueError("Either frac or count must be specified")
         if frac is not None and count is not None:
             debug("count is ignored")
-        if frac is not None:
-            self.split_frac = frac
-        else:
+        # check if either frac or count is not None, if not raise an error
+        if frac is None and count is None:
+            raise ValueError("Either frac or count must be specified")
+        if count is not None:
+            assert 0 < count < self.n
             self.split_frac = count / self.n
-            assert self.split_frac <= 1.0
+        if frac is not None:
+            assert 0 < frac < 1
+            self.split_frac = frac
 
         info(
             f"seed: {config.seed} n_train_samples:{self.n_train} n_valid_samples:{self.n_valid}"
