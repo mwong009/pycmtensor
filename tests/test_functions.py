@@ -268,6 +268,7 @@ def test_derivative():
     asc1 = Beta("asc1", value=0.05)
     b1 = Beta("b1", value=0.1)
     b2 = Beta("b2", value=-0.25)
+    b2.output = None
 
     U_1 = b1 * x + asc1
     U_2 = b2 * x

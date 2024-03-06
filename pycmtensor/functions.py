@@ -362,8 +362,7 @@ def second_order_derivative(cost, params):
     for p in params:
         if isinstance(p, Beta):
             param = p()
-            if "output" in dir(p):
-                param.name = p.name
+            param.name = p.name
             wrt_params.append(param)
 
     grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
@@ -399,8 +398,7 @@ def first_order_derivative(cost, params):
     for p in params:
         if isinstance(p, Beta):
             param = p()
-            if "output" in dir(p):
-                param.name = p.name
+            param.name = p.name
             wrt_params.append(param)
 
     grads = aet.grad(cost, wrt_params, disconnected_inputs="ignore")
