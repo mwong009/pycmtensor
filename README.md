@@ -4,11 +4,9 @@
 
 [![Licence](https://img.shields.io/badge/Licence-MIT-blue)](about/licence.md)
 ![](https://img.shields.io/pypi/pyversions/pycmtensor) 
-[![PyPI version](https://badge.fury.io/py/pycmtensor.svg)](https://badge.fury.io/py/pycmtensor) 
+![Conda Version](https://img.shields.io/conda/vn/conda-forge/pycmtensor)
 ![Conda-Forge|downloads](https://img.shields.io/conda/d/conda-forge/pycmtensor)
-
 [![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor) 
-[![Downloads](https://static.pepy.tech/personalized-badge/pycmtensor?period=month&units=international_system&left_color=grey&right_color=orange&left_text=downloads/month)](https://pepy.tech/project/pycmtensor) 
 [![DOI](https://zenodo.org/badge/460802394.svg)](https://zenodo.org/badge/latestdoi/460802394)
 
 *Advanced Tensor-based Choice Modelling Python package*
