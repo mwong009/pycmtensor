@@ -14,7 +14,7 @@ jobs:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.11"]
         include:
-          - os: ["self-hosted", "ARM64", "Linux"]
+          - os: [["self-hosted", "ARM64", "Linux"]]
             python-version: ["3.11"]
     
     runs-on: ${{ matrix.os }}
