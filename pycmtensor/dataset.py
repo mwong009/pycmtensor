@@ -276,7 +276,7 @@ class Dataset:
             i = n_index
         else:
             if batch_size is None:
-                batch_size = len(n_index)
+                batch_size = 1
             if shift is None:
                 shift = 0
             start = index * batch_size + min(batch_size, shift)
