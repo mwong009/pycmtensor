@@ -158,4 +158,4 @@ def test_make_tensor(lpmc_ds):
     assert tensors1.ndim == tensors2.ndim
 
     with pytest.raises(TypeError):
-        tensors3 = ds[[ds["cost_transit"], "cost_driving_ccharge"]]
+        tensors3 = ds[ds["cost_transit"], "cost_driving_ccharge", np.ones((3, 2))]
