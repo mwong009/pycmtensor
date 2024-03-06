@@ -1,8 +1,16 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+name = "pycmtensor"
+version = "1.12.0"
+requires-python = ">=3.9,<3.13"
+
 [tool.poetry]
 name = "pycmtensor"
 version = "1.12.0"
 description = "A robust and efficient Python package leveraging tensor computations for advanced discrete choice modelling."
-requires-python = ">=3.9,<3.13"
 authors = ["Melvin Wong"]
 license = "MIT"
 readme = "README.md"
@@ -57,10 +65,6 @@ black = ">=22.1.0"
 isort = ">=5.9.3"
 commitizen = ">=3.0.0"
 pre-commit = ">=3.4.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
