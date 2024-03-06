@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   black:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ARM64, Linux]
     steps:
       - uses: actions/checkout@v3
       - uses: psf/black@stable
@@ -13,7 +13,7 @@ jobs:
           version: "23.11.0"
 
   isort:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ARM64, Linux]
     steps:
       - uses: actions/checkout@v3
       - uses: isort/isort-action@v1

@@ -56,14 +56,14 @@ jobs:
       - name: Main test
         run: pytest
 
-      # - name: Upload coverage to codecov.io
-      #   if: (matrix.os == 'ubuntu-latest') && (matrix.python-version == '3.11')
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     files: coverage.xml
+      - name: Upload coverage to codecov.io
+        if: (matrix.os == 'ubuntu-latest') && (matrix.python-version == '3.11')
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
   
   pycmtensor-arm64:
-    name: (3.11, arm64)
+    name: (3.11, Linux, ARM64, self-hosted)
     runs-on: [self-hosted, ARM64, Linux]
     defaults:
       run:
@@ -82,8 +82,3 @@ jobs:
       
       - name: Main test
         run: pytest
-      
-      - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@v3
-        with:
-          files: coverage.xml
