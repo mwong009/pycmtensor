@@ -1,3 +1,21 @@
+## v1.12.0 (2024-03-06)
+
+### Feat
+
+- **functions.py**: added `gelu` function
+
+### Fix
+
+- **basic.py**: fix bug in `null_log_likelihood_fn` for givens
+- **dataset.py**: fixed slice call when no `batch_size` argument is used
+- **dataset.py**: fixed the `split` method to accept `None` as argument
+
+### Refactor
+
+- **functions.py**: refactored method to covert list of utilities to tensor variables
+- **dataset.py**: accept mixed `str` and `TensorVariable` types in `_make_tensor`
+- **basic.py**: moved `build_gh_fn()` to `BaseModel`
+
 ## v1.11.1 (2024-02-29)
 
 ### Fix
