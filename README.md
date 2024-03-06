@@ -2,7 +2,7 @@
 
 ![PyCMTensor](docs/assets/img/logo.jpg)
 
-[![Conda Forge](https://img.shields.io/conda/vn/conda-forge/pycmtensor?logo=condaforge)](https://anaconda.org/conda-forge/pycmtensor/labels)
+[![Conda Forge](https://img.shields.io/conda/vn/conda-forge/pycmtensor?logo=condaforge)](https://anaconda.org/conda-forge/pycmtensor)
 ![Python Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmwong009%2Fpycmtensor%2Fmaster%2Fpyproject.toml&query=tool.poetry.dependencies.python&label=Python)
 ![Conda-Forge|downloads](https://img.shields.io/conda/d/conda-forge/pycmtensor)
 ![Codecov](https://img.shields.io/codecov/c/github/mwong009/pycmtensor)
