@@ -9,14 +9,18 @@ on:
 jobs:
   pycmtensor-test:
     name: (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -el {0}
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.11"]
+        include:
+          - os: ["self-hosted", "ARM64", "Linux"]
+            python-version: ["3.11"]
+    
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     
     steps:
       - uses: actions/checkout@v4
