@@ -122,6 +122,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise KeyError",
     "raise ValueError",
+    "raise TypeError",
     "debug",
     "if 0:",
     "if __name__ == .__main__.:",
