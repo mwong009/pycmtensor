@@ -3,7 +3,7 @@
 ![PyCMTensor](docs/assets/img/logo.jpg)
 
 [![Licence](https://img.shields.io/badge/Licence-MIT-blue)](about/licence.md)
-![PyPI - Version](https://img.shields.io/pypi/v/pycmtensor)
+![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fmwong009%2Fpycmtensor%2Fmaster%2Fpyproject.toml)
 ![Conda Version](https://img.shields.io/conda/vn/conda-forge/pycmtensor)
 ![Conda-Forge|downloads](https://img.shields.io/conda/d/conda-forge/pycmtensor)
 [![codecov](https://codecov.io/gh/mwong009/pycmtensor/branch/master/graph/badge.svg?token=LFwgggDyjS)](https://codecov.io/gh/mwong009/pycmtensor) 
