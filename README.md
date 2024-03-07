@@ -45,4 +45,4 @@ PyCMTensor sets itself apart from other Python based choice modelling estimation
 
 Examples:
 - Swissmetro dataset
-  - Multinomial logit ([Example/]())
+  - Multinomial logit ([Example/](examples/swissmetro_mnl.ipynb))
