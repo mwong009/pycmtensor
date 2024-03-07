@@ -21,8 +21,8 @@ from pycmtensor.utils import time_format
 
 
 class ResLogit(BaseModel):
-    def __init__(self, ds, params, utility, av=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, ds, variables, utility, av=None, **kwargs):
+        BaseModel.__init__(self, ds, variables, utility, av, **kwargs)
         self.name = "ResLogit"
         self.params = []
         self.weights = []
@@ -40,8 +40,8 @@ class ResLogit(BaseModel):
 
         start_time = perf_counter()
 
-        self.layer_params = self.extract_layer_params(params)
-        self.params = self.extract_params(self.cost, params)
+        self.layer_params = self.extract_layer_params(variables)
+        self.params = self.extract_params(self.cost, variables)
         self.params += self.layer_params
         self.betas = [p for p in self.params if isinstance(p, Beta)]
         self.weights = [p for p in self.params if isinstance(p, Weight)]

@@ -28,38 +28,46 @@ class TasteNet(BaseModel):
 
     """
 
-    def __init__(self, ds, params, utility, av=None, **kwargs):
+    def __init__(self, ds, variables, utility, av=None, **kwargs):
         """
         Initialize the TasteNet model with the given dataset, parameters, utility function, and availability.
 
         Args:
-            ds: The dataset used for the model.
-            params: The parameters of the model.
-            utility: The utility function used in the model.
-            av: The availability of the alternatives. Optional.
-            kwargs: Additional keyword arguments.
+            ds (pycmtensor.Data): the database object
+            variables (dict): dictionary containing Param objects or a dictionary of python variables
+            utility (Union[list[TensorVariable], TensorVariable]): the vector of utility functions
+            av (List[TensorVariable]): list of availability conditions. If `None`, all
+                availability is set to 1
+            **kwargs (dict): Optional keyword arguments for modifying the model configuration settings. See [configuration](../../../user_guide/configuration.md) in the user guide for details on possible options
+
+        Attributes:
+            name (str): name of the model
+            y (TensorVariable): symbolic variable object for the choice variable
+            p_y_given_x (TensorVariable): probability tensor variable function
+            ll (TensorVariable): loglikelihood tensor variable function
+            cost (TensorVariable): symbolic cost tensor variable function
+            pred (TensorVariable): prediction tensor variable function
+            params (list): list of model parameters (`betas` + `tn_betas`)
+            betas (List[Beta]): model beta variables
+            weights (List[Weight]): model weight variables
+            biases (List[Bias]): model bias variables
+            x (List[TensorVariable]): symbolic variable objects for independent
+                variables
+            xy (List[TensorVariable]): concatenated list of x and y
         """
         BaseModel.__init__(self, ds, variables, utility, av, **kwargs)
-        self.name = "TasteNet"
-        self.params = []
-        self.weights = []
-        self.biases = []
-        self.betas = []
-        self.updates = []
-        self.index = aet.ivector("index")
-        self.learning_rate = aet.scalar("learning_rate")
+        start_time = perf_counter()
 
+        self.name = "TasteNet"
         self.y = ds.y
         self.p_y_given_x = logit(utility, av)
         self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
         self.cost = -self.ll
         self.pred = aet.argmax(self.p_y_given_x, axis=0)
 
-        start_time = perf_counter()
-
-        self.layer_params = self.extract_layer_params(params)
-        self.tn_betas = self.extract_tn_outputs(params)
-        self.params = self.extract_params(self.cost, params)
+        self.layer_params = self.extract_layer_params(variables)
+        self.tn_betas = self.extract_tn_outputs(variables)
+        self.params = self.extract_params(self.cost, variables)
         self.params += self.layer_params
         self.betas = [p for p in self.params if isinstance(p, Beta)]
         self.weights = [p for p in self.params if isinstance(p, Weight)]
