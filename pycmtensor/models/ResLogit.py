@@ -1,15 +1,11 @@
-from collections import OrderedDict
 from time import perf_counter
 
 import aesara
 import aesara.tensor as aet
-import numpy as np
-from aesara import pprint
 
 import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta, Bias, Weight
 from pycmtensor.functions import (
-    errors,
     first_order_derivative,
     log_likelihood,
     logit,
@@ -23,22 +19,14 @@ from pycmtensor.utils import time_format
 class ResLogit(BaseModel):
     def __init__(self, ds, variables, utility, av=None, **kwargs):
         BaseModel.__init__(self, ds, variables, utility, av, **kwargs)
-        self.name = "ResLogit"
-        self.params = []
-        self.weights = []
-        self.biases = []
-        self.betas = []
-        self.updates = []
-        self.index = aet.ivector("index")
-        self.learning_rate = aet.scalar("learning_rate")
+        start_time = perf_counter()
 
+        self.name = "ResLogit"
         self.y = ds.y
         self.p_y_given_x = logit(utility, av)
         self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
         self.cost = -self.ll
         self.pred = aet.argmax(self.p_y_given_x, axis=0)
-
-        start_time = perf_counter()
 
         self.layer_params = self.extract_layer_params(variables)
         self.params = self.extract_params(self.cost, variables)
@@ -47,19 +35,17 @@ class ResLogit(BaseModel):
         self.weights = [p for p in self.params if isinstance(p, Weight)]
         self.biases = [p for p in self.params if isinstance(p, Bias)]
 
+        # drop unused variables from dataset
         drop_unused = self.drop_unused_variables(self.cost, self.params, ds())
         ds.drop(drop_unused)
 
         self.x = ds.x
         self.xy = self.x + [self.y]
-        info(f"choice: {self.y}")
-        info(f"inputs in {self.name}: {self.x}")
 
         self.build_cost_fn()
-
         build_time = round(perf_counter() - start_time, 3)
-
         self.results.build_time = time_format(build_time)
+        info(f"inputs in {self.name}: {self.x}")
         info(f"Build time = {self.results.build_time}")
 
     @property

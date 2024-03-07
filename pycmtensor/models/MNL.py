@@ -1,16 +1,9 @@
 from time import perf_counter
 
-import aesara
 import aesara.tensor as aet
 
 from pycmtensor.expressions import Beta
-from pycmtensor.functions import (
-    errors,
-    first_order_derivative,
-    log_likelihood,
-    logit,
-    second_order_derivative,
-)
+from pycmtensor.functions import log_likelihood, logit
 from pycmtensor.logger import info
 from pycmtensor.models.basic import BaseModel
 from pycmtensor.utils import time_format
@@ -51,6 +44,7 @@ class MNL(BaseModel):
         self.ll = log_likelihood(self.p_y_given_x, self.y, self.index)
         self.cost = -self.ll
         self.pred = aet.argmax(self.p_y_given_x, axis=0)
+
         self.params = self.extract_params(self.cost, variables)
         self.betas = [p for p in self.params if isinstance(p, Beta)]
 
@@ -60,14 +54,11 @@ class MNL(BaseModel):
 
         self.x = ds.x
         self.xy = self.x + [self.y]
-        info(f"choice: {self.y}")
-        info(f"inputs in {self.name}: {self.x}")
 
-        start_time = perf_counter()
         self.build_cost_fn()
         build_time = round(perf_counter() - start_time, 3)
-
         self.results.build_time = time_format(build_time)
+        info(f"inputs in {self.name}: {self.x}")
         info(f"Build time = {self.results.build_time}")
 
     @property

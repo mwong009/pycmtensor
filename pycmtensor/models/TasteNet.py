@@ -7,13 +7,7 @@ import numpy as np
 
 import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta, Bias, Weight
-from pycmtensor.functions import (
-    errors,
-    first_order_derivative,
-    log_likelihood,
-    logit,
-    second_order_derivative,
-)
+from pycmtensor.functions import log_likelihood, logit
 from pycmtensor.logger import info
 from pycmtensor.models.basic import BaseModel
 from pycmtensor.utils import time_format
@@ -73,19 +67,17 @@ class TasteNet(BaseModel):
         self.weights = [p for p in self.params if isinstance(p, Weight)]
         self.biases = [p for p in self.params if isinstance(p, Bias)]
 
+        # drop unused variables from dataset
         drop_unused = self.drop_unused_variables(self.cost, self.params, ds())
         ds.drop(drop_unused)
 
         self.x = ds.x
         self.xy = self.x + [self.y]
-        info(f"choice: {self.y}")
-        info(f"inputs in {self.name}: {self.x}")
 
         self.build_cost_fn()
-
         build_time = round(perf_counter() - start_time, 3)
-
         self.results.build_time = time_format(build_time)
+        info(f"inputs in {self.name}: {self.x}")
         info(f"Build time = {self.results.build_time}")
 
     @property
