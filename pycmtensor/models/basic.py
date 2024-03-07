@@ -15,7 +15,7 @@ config = defaultconfig.config
 
 
 class BaseModel(object):
-    def __init__(self, **kwargs):
+    def __init__(self, ds, variables, utility, av, **kwargs):
         """Basic model class object
 
         Attributes:
@@ -43,6 +43,12 @@ class BaseModel(object):
             self.config.add(key, value)
 
         debug(f"Building model...")
+
+        # check if # items in utility is equal to the number of choices
+        if set(ds.ds[ds.choice]).issubset(set(range(len(utility)))) is False:
+            raise ValueError(
+                f"Number of choices in utility function does not match the number of choices in the dataset. Expected {set(range(len(utility)))}, but got {set(ds.ds[ds.choice])}."
+            )
 
     @property
     def n_params(self):

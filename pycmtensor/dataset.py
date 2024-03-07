@@ -75,6 +75,7 @@ class Dataset:
         # Normalize the choice column to start from 0
         while df[choice].min() > 0:
             df[choice] -= df[choice].min()
+        info(f"{choice}: {df[choice].value_counts().sort_index().to_dict()}")
 
         # Store the dataframe index values
         self.index = df.index.values

@@ -167,8 +167,7 @@ def log_likelihood(prob, y, index=None):
     Args:
         prob (TensorVariable): choice probabilites tensor
         y (TensorVariable): choice variable tensor
-        index (TensorVariable): index tensor, if `None`, dynamically get the same of the
-            `y` tensor
+        index (TensorVariable): index tensor, if `None`, get the same of the `y` tensor
 
     Returns:
         (TensorVariable): a symbolic tensor of the log likelihood
@@ -177,10 +176,10 @@ def log_likelihood(prob, y, index=None):
         The 0-th dimension is the numbering of alternatives, the N-th dimension is the size of the input (# rows).
     """
     # calculate the log probabilitiy over axis 0
-    if not index is None:
-        logprob = aet.log(prob)[y, ..., index]
-    else:
-        logprob = aet.log(prob)[y, ..., aet.arange(y.shape[0])]
+    if index is None:
+        index = aet.arange(y.shape[0])
+
+    logprob = aet.log(prob)[y, ..., index]
 
     # take the average over all other non choice, non-n axes
     while logprob.ndim > 1:

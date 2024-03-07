@@ -39,7 +39,7 @@ class TasteNet(BaseModel):
             av: The availability of the alternatives. Optional.
             kwargs: Additional keyword arguments.
         """
-        super().__init__(**kwargs)
+        BaseModel.__init__(self, ds, variables, utility, av, **kwargs)
         self.name = "TasteNet"
         self.params = []
         self.weights = []

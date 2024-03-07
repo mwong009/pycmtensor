@@ -42,7 +42,9 @@ class MNL(BaseModel):
             xy (List[TensorVariable]): concatenated list of x and y
         """
 
-        BaseModel.__init__(self, **kwargs)
+        BaseModel.__init__(self, ds, variables, utility, av, **kwargs)
+        start_time = perf_counter()
+
         self.name = "MNL"
         self.y = ds.y
         self.p_y_given_x = logit(utility, av)
