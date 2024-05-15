@@ -196,7 +196,7 @@ class Results(object):
             index=self.betas,
             data=[np.percentile(value, 50) for _, value in self.betas.items()],
             columns=["value"],
-        ).round(3)
+        ).round(4)
 
         stats["std err"] = stderror(h, self.betas)
         stats["t-test"] = t_test(stats["std err"], self.betas)
@@ -205,7 +205,7 @@ class Results(object):
         stats["rob. std err"] = rob_stderror(h, bh, self.betas)
         stats["rob. t-test"] = t_test(stats["rob. std err"], self.betas)
         stats["rob. p-value"] = p_value(stats["rob. std err"], self.betas)
-        stats = stats.round(3)
+        stats.loc[:, "std err":] = stats.loc[:, "std err":].round(3)
 
         for key, value in self.betas.items():
             if value.shape != ():
