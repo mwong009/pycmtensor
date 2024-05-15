@@ -549,6 +549,8 @@ class Weight(Param):
         if value is None:
             if init_type == "zeros":
                 value = np.zeros(size, dtype=FLOATX)
+            elif init_type == "ones":
+                value = np.ones(size, dtype=FLOATX)
             elif init_type == "he":
                 value = rng.normal(0, 1, size=size) * np.sqrt(2 / n_in)
             elif init_type == "glorot":
