@@ -62,23 +62,3 @@ jobs:
         with:
           files: coverage.xml
   
-  pycmtensor-arm64:
-    name: (3.11, Linux, ARM64, self-hosted)
-    runs-on: [self-hosted, ARM64, Linux]
-    defaults:
-      run:
-        shell: bash -el {0}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          auto-activate-base: false
-          environment-file: environment.yml
-          python-version: 3.11
-      
-      - name: Install pytest suite
-        run: conda install pytest pytest-cov
-      
-      - name: Main test
-        run: pytest
