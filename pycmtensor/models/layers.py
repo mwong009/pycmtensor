@@ -7,7 +7,7 @@ import numpy as np
 import pycmtensor.functions as functions
 from pycmtensor.expressions import Beta, Bias, TensorExpressions, Weight
 
-init_types = ["he", "zeros", "glorot"]
+init_types = ["he", "zeros", "glorot", "ones"]
 
 
 class Layer(TensorExpressions):

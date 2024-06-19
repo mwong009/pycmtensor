@@ -24,8 +24,9 @@ The code snippet does not produce any outputs directly. It sets the default conf
 __author__ = """Melvin Wong"""
 __version__ = "1.12.0"
 
+import importlib
+
 import aesara
-from watermark import watermark
 
 import pycmtensor.defaultconfig as defaultconfig
 import pycmtensor.optimizers as optimizers
@@ -117,10 +118,24 @@ config.add(
 
 def about():
     """Returns a `watermark.watermark` of various system information for debugging"""
-    return watermark(
-        python=True,
-        datename=True,
-        updated=True,
-        packages="pycmtensor,aesara,numpy,scipy",
-        machine=True,
-    )
+
+    def import_watermark():
+        try:
+            importlib.import_module("watermark")
+            return True
+        except ImportError:
+            return False
+
+    if import_watermark():
+        from watermark import watermark
+
+        return watermark(
+            python=True,
+            datename=True,
+            updated=True,
+            packages="pycmtensor,aesara,numpy,scipy",
+            machine=True,
+        )
+    else:
+        print("{0:11}: {1}".format("pycmtensor", __version__))
+        print("{0:11}: {1}".format("aesara", aesara.__version__))

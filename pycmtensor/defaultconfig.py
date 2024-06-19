@@ -42,7 +42,7 @@ class Config:
     def __repr__(self):
         msg = "PyCMTensor configuration\n"
         for key, val in self.__dict__.items():
-            if key != "descriptions":
+            if (key != "descriptions") and (not isinstance(val, list)):
                 msg += f"{key}\n"
                 msg += f"    Value:  {val} {type(val)}\n"
 
