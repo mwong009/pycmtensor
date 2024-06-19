@@ -1,3 +1,20 @@
+## v1.13.0 (2024-06-19)
+
+### Feat
+
+- add `ones` init type to `Weight`
+
+### Fix
+
+- make watermark package optional
+- changed precision to 4
+- fix incorrect text display for model.config
+- added assert checks for incorrect choice set numbering in dataset
+
+### Refactor
+
+- fix argument name inconsistency
+
 ## v1.12.0 (2024-03-06)
 
 ### Feat
