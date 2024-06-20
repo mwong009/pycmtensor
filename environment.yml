@@ -10,7 +10,6 @@ dependencies:
     - scipy<1.12.0
     - pandas<2.1.0
     - seaborn<0.14.0
-    - watermark=2.4.3
     
     # testing
     - pytest>=7.4.3
