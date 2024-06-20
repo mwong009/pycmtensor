@@ -2,6 +2,21 @@
 
 ---
 
+## 2024-06-20
+
+**PyCMTensor 1.13.0**
+
+Version 1.13.0 released.
+
+### Changelog
+
+- add `ones` init type to `Weight`
+- make watermark package optional
+- changed precision to 4
+- fix incorrect text display for model.config
+- added assert checks for incorrect choice set numbering in dataset
+- fix argument name inconsistency
+
 ## 2024-02-21
 
 **PyCMTensor 1.10.0 on conda-forge**
