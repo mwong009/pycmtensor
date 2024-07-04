@@ -5,7 +5,7 @@ import numpy as np
 from aesara import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
-from pycmtensor.expressions import ExpressionParser, Param
+from pycmtensor.expressions import Beta, ExpressionParser, Param
 from pycmtensor.functions import errors, first_order_derivative, second_order_derivative
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.models.layers import Layer
@@ -71,6 +71,52 @@ class BaseModel(object):
         if "biases" in dir(self):
             return np.sum([np.prod(b.shape) for b in self.biases])
         return 0
+
+    def save_beta_params(self, data, index):
+        """Saves the results of the model estimation"""
+        for p in self.params:
+            self.results.params[p.name] = p.get_value()
+            if isinstance(p, Beta):
+                self.results.betas[p.name] = p.get_value()
+        if "tn_betas_fn" in dir(self):
+            for key, value in self.tn_betas_fn(*data, index).items():
+                self.results.betas[key] = value
+
+    def save_statistics(
+        self,
+        epoch,
+        iteration,
+        log_likelihood,
+        valid_error,
+        train_error,
+        gnorm,
+        elapsed_time=0,
+    ):
+        self.results.best_epoch = epoch
+        self.results.best_iteration = iteration
+        self.results.best_loglikelihood = log_likelihood
+        self.results.best_valid_error = valid_error
+        self.results.best_train_error = train_error
+        self.results.gnorm = gnorm
+
+    def save_hessian_data(self, n_train, train_data):
+        debug(f"Evaluating full hessian and bhhh matrix")
+        for p in self.params:
+            p.set_value(self.results.params[p.name])
+
+        n_betas = len(self.results.betas)
+        gradient_vector = np.zeros((n_train, n_betas))
+        for n in range(n_train):
+            data = [[d[n]] for d in train_data]
+            gradient_vector[n, :] = self.gradient_vector_fn(*data, np.array([0]))
+
+        bhhh = np.sum(gradient_vector[:, :, None] * gradient_vector[:, None, :], axis=0)
+
+        index = np.arange(len(train_data[-1]))
+        hessian = self.hessian_fn(*train_data, index)
+
+        self.results.bhhh_matrix = bhhh
+        self.results.hessian_matrix = hessian
 
     def get_weights(self):
         """returns the values of the weights

@@ -38,6 +38,7 @@ class Config:
             "max_loglikelihood",
             "max loglikelihood",
         ]
+        self.TIME_COUNTER = 0
 
     def __repr__(self):
         msg = "PyCMTensor configuration\n"
