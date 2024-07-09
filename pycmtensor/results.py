@@ -46,6 +46,7 @@ class Results(object):
         """
         self.build_time = None
         self.train_time = None
+        self.accept_time = None
         self.epochs_per_sec = None
         self.n_params = None
         self.n_train = None
@@ -145,6 +146,7 @@ class Results(object):
         stats.loc["Seed"] = self.config.seed
         stats.loc["Model build time"] = self.build_time
         stats.loc["Model train time"] = self.train_time
+        stats.loc["Optimal train time"] = self.accept_time
         stats.loc["epochs per sec"] = f"{self.epochs_per_sec} epoch/s"
         return stats
 

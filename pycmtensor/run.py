@@ -284,6 +284,10 @@ def accept_condition(model, i, ll, error):
         max_patience = max(model.patience, i * model.config.patience_increase)
         model.patience = int(min(max_patience, model.config.max_iterations))
 
+        now = perf_counter()
+        accept_time = round(now - model.results.start_time, 3)
+        model.results.accept_time = time_format(accept_time)
+
     return accept
 
 
