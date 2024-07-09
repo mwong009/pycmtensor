@@ -261,6 +261,17 @@ def gnorm_func(model, train_data, t_index, params_prev):
 
 
 def accept_condition(model, i, ll, error):
+    """Determines if the current iteration meets the acceptance criteria based on model configuration.
+
+    Args:
+        model (pycmtensor.models.BaseModel): The model being evaluated.
+        i (int): The current iteration number.
+        ll (float): The log likelihood of the model at the current iteration.
+        error (float): The prediction error of the model at the current iteration.
+
+    Returns:
+        bool: Whether the current iteration meets the acceptance criteria.
+    """
     accept = False
     acceptance_method = model.config.acceptance_method
 
