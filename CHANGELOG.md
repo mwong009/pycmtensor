@@ -1,3 +1,14 @@
+## v1.13.1 (2024-07-11)
+
+### Fix
+
+- added optimal acceptance time recording to results
+- remove watermark dependencies
+
+### Refactor
+
+- refactored run.py
+
 ## v1.13.0 (2024-06-19)
 
 ### Feat
