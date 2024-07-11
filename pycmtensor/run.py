@@ -98,7 +98,7 @@ def train(model, ds, **kwargs):
     n_train_batches = n_train // batch_size
     model.config.BFGS_warmup = model.config.BFGS_warmup * n_train_batches
 
-    model.patience = max(model.config.patience, n_train_batches)
+    model.patience = model.config.patience
     validation_freq = n_train_batches
     max_epochs = model.config.max_epochs
     model.config.max_iterations = max_epochs * n_train_batches
