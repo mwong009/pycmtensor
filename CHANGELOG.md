@@ -1,3 +1,10 @@
+## v1.13.2 (2024-08-09)
+
+### Fix
+
+- changed results output SD on the same row as param
+- update model patience config option
+
 ## v1.13.1 (2024-07-11)
 
 ### Fix
