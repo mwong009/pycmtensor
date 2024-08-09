@@ -211,7 +211,9 @@ class Results(object):
 
         for key, value in self.betas.items():
             if value.shape != ():
-                stats.at[key + " (sd)", "value"] = round(value.std(), 3)
+                if "SD" not in stats.columns:
+                    stats["SD"] = np.nan
+                stats.at[key, "SD"] = round(value.std(), 3)
 
         stats = stats.sort_index().fillna("-").astype("O")
         return stats
