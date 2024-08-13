@@ -10,6 +10,7 @@ dependencies:
     - scipy<1.12.0
     - pandas<2.1.0
     - seaborn<0.14.0
+    - scikit-learn<1.6.0
     
     # testing
     - pytest>=7.4.3

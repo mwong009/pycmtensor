@@ -10,7 +10,6 @@
 ### Fix
 
 - added optimal acceptance time recording to results
-- remove watermark dependencies
 
 ### Refactor
 
@@ -24,6 +23,7 @@
 
 ### Fix
 
+- remove watermark dependencies
 - make watermark package optional
 - changed precision to 4
 - fix incorrect text display for model.config
@@ -53,10 +53,6 @@
 
 ## v1.11.1 (2024-02-29)
 
-### Fix
-
-- **pyproject.toml**: fix incorrect bump message
-
 ## v1.11.0 (2024-02-29)
 
 ### Feat
@@ -65,6 +61,7 @@
 
 ### Fix
 
+- **pyproject.toml**: fix incorrect bump message
 - added `null_log_likelihood_fn` to basic.py
 - **results**: add argument for max cutoff in `show_training_plot`
 - **results.py**: fixed legend placement on training plot
@@ -177,8 +174,6 @@
 - **basic.py**: include choice label(s) as a dictionary for `predict()`
 - moved elasticities from statistics to model
 
-## v1.6.2 (2023-08-10)
-
 ## v1.6.1 (2023-08-10)
 
 ### Fix
@@ -192,7 +187,7 @@
 - **basic.py**: refactoring common model functions into BaseModel
 - syntax and naming changes
 
-## v1.6.0 (2023-08-07)
+## v1.5.0 (2023-07-26)
 
 ### Feat
 
@@ -200,6 +195,8 @@
 - **functions.py**: speed up computation and compilation by using static indexing in `log_likelihood` function
 - **functions.py**: add `relu()` function (source taken from Theano 0.7.1)
 - **basic.py**: new function include_params_for_convergence
+- **dataset.py**: use `as_tensor_variable` to construct tensor vector from dataset[[item1, item2,...]]
+- **dataset.py**: added list(`str`) as tensor arguments for `train_dataset()` and `valid_dataset()`
 
 ### Fix
 
@@ -211,27 +208,14 @@
 - **expressions.py**: fix base class inheritence and use `config.seed` for seed value
 - **expressions.py**: include `self` in overloaded operators if `other` instance is of similar type as `self`
 - **basic.py**: fix incorrect saved params in `train()`
-
-### Refactor
-
-- **results.py**: updates results calculations for beta vectors
-- **expressions.py**: add set_value in `Param` base class
-
-## v1.5.0 (2023-07-26)
-
-### Feat
-
-- **dataset.py**: use `as_tensor_variable` to construct tensor vector from dataset[[item1, item2,...]]
-- **dataset.py**: added list(`str`) as tensor arguments for `train_dataset()` and `valid_dataset()`
-
-### Fix
-
 - **expressions.py**: clip lower and upper bounds when updating `Betas`
 - **expressions.py**: fixed `Weights` and `Bias` mathematical operations
 - **config.py**: renamed config.py to defaultconfig.py to avoid name conflicts
 
 ### Refactor
 
+- **results.py**: updates results calculations for beta vectors
+- **expressions.py**: add set_value in `Param` base class
 - **optimizers.py**: removed unused imports
 
 ## v1.4.0 (2023-07-16)
@@ -358,8 +342,6 @@
 
 - **config**: misc optimization changes
 
-## v1.0.7 (2022-08-12)
-
 ## v1.0.6 (2022-08-12)
 
 ### Fix
@@ -389,8 +371,6 @@
 - **pycmtensor.py**: remove warnings for max_iter<patience
 
 ## v1.0.3 (2022-05-12)
-
-## v1.0.2 (2022-05-12)
 
 ## v1.0.1 (2022-05-12)
 
