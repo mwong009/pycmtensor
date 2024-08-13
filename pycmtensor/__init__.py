@@ -22,7 +22,7 @@ The code snippet does not produce any outputs directly. It sets the default conf
 """
 
 __author__ = """Melvin Wong"""
-__version__ = "1.13.2"
+__version__ = "1.13.3"
 
 import importlib
 

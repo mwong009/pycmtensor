@@ -1,3 +1,9 @@
+## v1.13.3 (2024-08-13)
+
+### Fix
+
+- added f1 score to list of output statistics
+
 ## v1.13.2 (2024-08-09)
 
 ### Fix
