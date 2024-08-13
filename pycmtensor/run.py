@@ -2,8 +2,10 @@ from collections import OrderedDict
 from time import perf_counter
 
 import numpy as np
+import pandas as pd
 
 from pycmtensor.expressions import Beta
+from pycmtensor.functions import f1_score
 from pycmtensor.logger import debug, info, warning
 from pycmtensor.utils import human_format as hf
 from pycmtensor.utils import time_format
@@ -209,7 +211,7 @@ def train(model, ds, **kwargs):
         epoch += 1  # increment epoch
 
     # post training process
-    model = post_training(model, epoch, i)
+    model = post_training(model, epoch, i, ds)
 
     # Save hessian data
     model.save_hessian_data(n_train, train_data)
@@ -330,7 +332,7 @@ def early_stopping(model, gnorm, i):
     return [False, "0"]
 
 
-def post_training(model, epoch, i):
+def post_training(model, epoch, i, dataset):
     now = perf_counter()
     train_time = round(now - model.results.start_time, 3)
     model.results.train_time = time_format(train_time)
@@ -342,6 +344,13 @@ def post_training(model, epoch, i):
     else:
         info(f"Max iters reached: {hf(i-1)}/{hf(model.patience)} (t={train_time})")
 
+    # compute F1 score
+    prob_df = model.predict(dataset)
+    model.results.f1_score = f1_score(
+        true=prob_df[f"true_{dataset.choice}"], pred=prob_df[f"pred_{dataset.choice}"]
+    )
+
+    # save statistics
     for key, value in model.results.statistics_graph.items():
         model.results.statistics_graph[key] = np.array(value).tolist()
     model.results.statistics_graph["learning_rate"] = model.lr_scheduler.history

@@ -166,6 +166,7 @@ class Results(object):
         stats.loc["Validation Accuracy"] = f"{100*(1-self.best_valid_error):.2f}%"
         stats.loc["Training Accuracy"] = f"{100*(1-self.best_train_error):.2f}%"
         stats.loc["Likelihood ratio test"] = f"{self.loglikelihood_ratio_test():.2f}"
+        stats.loc["F1"] = f"{self.f1_score:.3f}"
         stats.loc["Rho square"] = f"{self.rho_square():.3f}"
         stats.loc["Rho square bar"] = f"{self.rho_square_bar():.3f}"
         stats.loc["Akaike Information Criterion"] = f"{self.AIC():.2f}"

@@ -3,6 +3,7 @@
 import aesara.tensor as aet
 import aesara.tensor.nlinalg as nlinalg
 import numpy as np
+import sklearn.metrics as skm
 
 from pycmtensor.expressions import Beta, Param
 
@@ -19,6 +20,20 @@ __all__ = [
     "second_order_derivative",
     "first_order_derivative",
 ]
+
+
+def f1_score(true, pred, average="weighted"):
+    """Computes the F1 score of a dataset.
+
+    Args:
+        dataset (pycmtensor.Dataset): The dataset to compute the F1 score.
+        average (str): The averaging strategy to apply.
+
+    Returns:
+        (float): The F1 score of the valid dataset.
+    """
+    f1 = skm.f1_score(true, pred, average=average)
+    return f1.round(4)
 
 
 def relu(x, alpha=0.0):
