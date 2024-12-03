@@ -24,6 +24,8 @@ class Results(object):
                 stage
             train_time (str): string formatted time stamp of the duration of the
                 training stage
+            accept_time (str): string formatted time stamp of the duration of the
+                training stage when the best solution was found
             epochs_per_sec (float): number of epochs of the training dataset per
                 second, benchmark for calculation speed
             n_params (int): total number of parameters, used for calculating statistics

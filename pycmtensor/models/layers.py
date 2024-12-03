@@ -184,14 +184,13 @@ class DenseLayer(Layer):
 
 
 class TNBetaLayer(DenseLayer, Beta):
-    def __init__(self, name, input, init_type=None, activation=None, **kwargs):
+    def __init__(self, name, input, init_type="glorot", activation=None, **kwargs):
         """TNBeta layer is a dense layer with a output dimension of 1
 
         Args:
             name (str): name of the layer
             input (TensorVariable): symbolic variable of the layer input
-            init_type (str): initialization type, possible options: `"zeros"`, `"he"`,
-                `"glorot"`, `None` (defaut)
+            init_type (str): initialization type, possible options: `None`, `"zeros"`, `"he"`, `"glorot"` (defaut)
             activation (str): activation function $f$, possible options: `"tanh"`,
                 `"relu"`, `"sigmoid"`, `"softplus"`, `None` (defaut)
             kwargs(dict): additional keyword arguments:
