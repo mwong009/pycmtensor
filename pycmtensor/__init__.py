@@ -26,7 +26,7 @@ __version__ = "1.13.3"
 
 import importlib
 
-import aesara
+import pytensor
 
 import pycmtensor.defaultconfig as defaultconfig
 import pycmtensor.optimizers as optimizers
@@ -39,10 +39,10 @@ from pycmtensor.run import compute, train
 
 config = defaultconfig.config
 
-# aesara configs
-aesara.config.on_unused_input = "ignore"
-aesara.config.mode = "Mode"
-aesara.config.allow_gc = False
+# pytensor configs
+pytensor.config.on_unused_input = "ignore"
+pytensor.config.mode = "Mode"
+pytensor.config.allow_gc = False
 
 # model default configs
 
@@ -133,9 +133,9 @@ def about():
             python=True,
             datename=True,
             updated=True,
-            packages="pycmtensor,aesara,numpy,scipy",
+            packages="pycmtensor,pytensor,numpy,scipy",
             machine=True,
         )
     else:
         print("{0:12s}: {1}".format("PyCMTensor", __version__))
-        print("{0:12s}: {1}".format("Aesara", aesara.__version__))
+        print("{0:12s}: {1}".format("PyTensor", pytensor.__version__))

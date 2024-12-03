@@ -10,9 +10,9 @@ The entire model is build as a computational graph with nodes representing inter
 The graph is then manipulated internally and optimized during compilation.
 When an input is provided to certain tensors, the graph computes the values for other symbols in the graph. 
 
-The core API library, Aesara, gives us a set of tools that takes the defined symbolic tensors, constructs a computational graph and optimizes the mathematical operations around it.
+The core API library, pytensor, gives us a set of tools that takes the defined symbolic tensors, constructs a computational graph and optimizes the mathematical operations around it.
 
-As a developer, you define or extend a new model by creating new tensor variable objects from primitive tensors. For instance, take a basic linear equation, $y = bx +c$. The variables $y$, $x$, and $c$ are symbolic tensors making up a computational graph, and $b$ is a shared variable consisting of a mutable defined value. When we call `train(y)`, an Aesara function is executed on the equation and an update value is passed to $b$.
+As a developer, you define or extend a new model by creating new tensor variable objects from primitive tensors. For instance, take a basic linear equation, $y = bx +c$. The variables $y$, $x$, and $c$ are symbolic tensors making up a computational graph, and $b$ is a shared variable consisting of a mutable defined value. When we call `train(y)`, an pytensor function is executed on the equation and an update value is passed to $b$.
 
 A PyCMTensor model is composed of 
 
@@ -28,7 +28,7 @@ This symbolic approach does add complexity, however, the tradeoffs are that a. m
 
 ### `Beta`
 
-A `Beta` variable is the main data object when estimate a PyCMTensor model. `Beta` inherits the `TensorExpression` class which adds Aesara tensor operations to the data object. A `Beta` is defined as such:
+A `Beta` variable is the main data object when estimate a PyCMTensor model. `Beta` inherits the `TensorExpression` class which adds pytensor tensor operations to the data object. A `Beta` is defined as such:
 
 ```python
 Beta(name, value, lb, ub, status)
@@ -40,7 +40,7 @@ In mathematical operations, for instance:
 
 ```python
 from pycmtensor.expressions import Beta
-import aesara.tensor as aet
+import pytensor.tensor as aet
 import numpy as np 
 beta_cost = Beta("beta_cost", 2.)
 train_cost = aet.vector("train_cost") 

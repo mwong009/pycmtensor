@@ -1,8 +1,8 @@
 # layers.py
 """Model layers"""
 
-import aesara.tensor as aet
 import numpy as np
+import pytensor.tensor as aet
 
 import pycmtensor.functions as functions
 from pycmtensor.expressions import Beta, Bias, TensorExpressions, Weight

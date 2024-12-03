@@ -1,8 +1,8 @@
 # functions.py
 """PyCMTensor functions module"""
-import aesara.tensor as aet
-import aesara.tensor.nlinalg as nlinalg
 import numpy as np
+import pytensor.tensor as aet
+import pytensor.tensor.nlinalg as nlinalg
 import sklearn.metrics as skm
 
 from pycmtensor.expressions import Beta, Param

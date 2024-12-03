@@ -1,13 +1,13 @@
 # test_expressions.py
 from copy import copy
 
-import aesara
-import aesara.tensor as aet
 import numpy as np
+import pytensor
+import pytensor.tensor as aet
 import pytest
-from aesara import function
-from aesara.tensor.math import tanh
-from aesara.tensor.sharedvar import TensorSharedVariable
+from pytensor import function
+from pytensor.tensor.math import tanh
+from pytensor.tensor.sharedvar import TensorSharedVariable
 
 from pycmtensor.expressions import (
     Beta,
@@ -79,8 +79,8 @@ def test_bias_add():
     x = aet.vector("x")
     bias_layer1 = Bias("bias_layer1", size=(5,))
 
-    g = aesara.shared(np.random.normal(size=(3, 5)))
-    x = aesara.shared(np.random.normal(size=(3, 100)))
+    g = pytensor.shared(np.random.normal(size=(3, 5)))
+    x = pytensor.shared(np.random.normal(size=(3, 100)))
     # add TensorVariable and Bias object
     y = (g.T @ x) + bias_layer1
 

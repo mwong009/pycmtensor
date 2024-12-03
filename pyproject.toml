@@ -26,10 +26,10 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-aesara = "2.9.3"
-numpy = "<1.26.0"
-scipy = "<1.12.0"
-pandas = "<2.1.0"
+pytensor = "<2.27.0"
+numpy = "<1.27.0"
+scipy = "<1.15.0"
+pandas = "<2.3.0"
 seaborn = "<0.14.0"
 scikit-learn = "<1.6.0"
 

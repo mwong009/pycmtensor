@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from aesara.tensor.sharedvar import TensorSharedVariable
+from pytensor.tensor.sharedvar import TensorSharedVariable
 
 from pycmtensor.dataset import Dataset
 from pycmtensor.expressions import Beta
@@ -49,13 +49,13 @@ def test_betas_bounds():
 
 
 def test_beta_add_subtract(lpmc_ds):
-    import aesara
+    import pytensor
 
     ds = lpmc_ds
     B_COST = Beta("B_COST", 1.0, None, None, 0.0)
     x_cost_transit = ds["cost_transit"]
 
-    fn_add = aesara.function(
+    fn_add = pytensor.function(
         inputs=[x_cost_transit],
         outputs=B_COST + x_cost_transit,
         on_unused_input="ignore",
@@ -68,7 +68,7 @@ def test_beta_add_subtract(lpmc_ds):
 
     x_cost_driving_fuel = ds["cost_driving_fuel"]
 
-    fn_muladd = aesara.function(
+    fn_muladd = pytensor.function(
         inputs=[x_cost_transit, x_cost_driving_fuel],
         outputs=B_COST * (x_cost_driving_fuel + x_cost_transit),
         on_unused_input="ignore",
@@ -81,13 +81,13 @@ def test_beta_add_subtract(lpmc_ds):
 
 
 def test_beta_multiplication(lpmc_ds):
-    import aesara
+    import pytensor
 
     ds = lpmc_ds
     B_COST = Beta("B_COST", 0.0, None, None, 0.0)
     x_cost_transit = ds["cost_transit"]
 
-    fn_mul = aesara.function(
+    fn_mul = pytensor.function(
         inputs=[x_cost_transit],
         outputs=B_COST * x_cost_transit + x_cost_transit * B_COST,
         on_unused_input="ignore",
@@ -101,15 +101,15 @@ def test_beta_multiplication(lpmc_ds):
 
 
 def test_variable_boolean(lpmc_ds):
-    import aesara
-    import aesara.tensor as aet
+    import pytensor
+    import pytensor.tensor as aet
 
     ds = lpmc_ds
 
     DL = aet.eq(ds["driving_license"], 1)
     data = ds.train_dataset(["driving_license"])
 
-    fn_bool = aesara.function(inputs=[ds["driving_license"]], outputs=DL)
+    fn_bool = pytensor.function(inputs=[ds["driving_license"]], outputs=DL)
 
     output = fn_bool(*data)
 

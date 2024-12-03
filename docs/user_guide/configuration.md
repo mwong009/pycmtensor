@@ -150,14 +150,14 @@ pycmtensor.config.add('seed', 100)
 
 	Default: `True`
 
-## Aesara config
+## pytensor config
 
-PyCMTensor uses the `aesara` library, which has its own set of configurations. We use the following by default:
+PyCMTensor uses the `pytensor` library, which has its own set of configurations. We use the following by default:
 
-`aesara.config.on_unused_input = "ignore"`
+`pytensor.config.on_unused_input = "ignore"`
 
-`aesara.config.mode = "Mode"`
+`pytensor.config.mode = "Mode"`
 
-`aesara.config.allow_gc = False`
+`pytensor.config.allow_gc = False`
 
-Refer to https://aesara.readthedocs.io/en/latest/config.html for other options. 
+Refer to https://pytensor.readthedocs.io/en/latest/config.html for other options. 

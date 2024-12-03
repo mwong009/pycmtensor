@@ -1,6 +1,6 @@
 """
 The code snippet is a part of the PyCMTensor expressions module. It defines a base 
-class for parsing and manipulating Aesara tensor expressions. The class provides 
+class for parsing and manipulating pytensor tensor expressions. The class provides 
 methods for parsing a tensor expression to remove parentheses and tensor operators, and 
 returns a clean list of keywords found in the expression. It also defines a base class 
 for expression objects, which includes overloaded operators for tensor operations such 
@@ -9,18 +9,18 @@ as addition, subtraction, multiplication, division, and comparison.
 
 from typing import Union
 
-import aesara
-import aesara.tensor as aet
 import numpy as np
-from aesara import pprint
-from aesara.tensor.random.utils import RandomStream
-from aesara.tensor.sharedvar import TensorSharedVariable
-from aesara.tensor.var import TensorVariable
+import pytensor
+import pytensor.tensor as aet
+from pytensor import pprint
+from pytensor.tensor.random.utils import RandomStream
+from pytensor.tensor.sharedvar import TensorSharedVariable
+from pytensor.tensor.var import TensorVariable
 
 from pycmtensor.logger import debug
 
 __all__ = ["FLOATX", "Param", "Beta", "Sigma", "Bias", "Weight"]
-FLOATX = aesara.config.floatX
+FLOATX = pytensor.config.floatX
 
 
 class ExpressionParser(object):
@@ -54,7 +54,7 @@ class ExpressionParser(object):
     ]
 
     def __init__(self, expression=None):
-        """Base class for parsing and manipulating Aesara tensor expressions.
+        """Base class for parsing and manipulating pytensor tensor expressions.
 
         Args:
             expression (TensorVariable, optional): The tensor expression to parse.
@@ -305,7 +305,7 @@ class Param(TensorExpressions):
         self._status = status
         if not isinstance(value, np.ndarray):
             value = np.asarray(value)
-        self.shared_var = aesara.shared(value, name=name, borrow=True)
+        self.shared_var = pytensor.shared(value, name=name, borrow=True)
         self._init_value = value
 
         if lb is not None and ub is not None and lb > ub:
@@ -394,7 +394,7 @@ class Beta(Param):
         Param.__init__(self, name, lb=lb, ub=ub, status=status)
 
         self._init_value = np.asarray(value, dtype=FLOATX)
-        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+        self.shared_var = pytensor.shared(self.init_value, name=name, borrow=True)
 
     def __repr__(self):
         return f"Beta({self.name}, {self.get_value()})"
@@ -432,7 +432,7 @@ class RandomDraws(TensorExpressions):
             rv_n = srng.poisson(lam=1.0, size=(n_draws, 1))
         else:
             raise NotImplementedError
-        self.shared_var = aesara.shared(rv_n.eval(), name=self.name)
+        self.shared_var = pytensor.shared(rv_n.eval(), name=self.name)
 
     @property
     def name(self):
@@ -466,7 +466,7 @@ class Bias(Param):
 
         self._init_type = "bias"
         self._init_value = value
-        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+        self.shared_var = pytensor.shared(self.init_value, name=name, borrow=True)
 
     def __repr__(self):
         return f"Bias({self.name}, {self.shape})"
@@ -564,7 +564,7 @@ class Weight(Param):
 
         self._init_type = init_type
         self._init_value = value
-        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+        self.shared_var = pytensor.shared(self.init_value, name=name, borrow=True)
 
     @staticmethod
     def disp_init_types():
@@ -595,7 +595,7 @@ class Gamma(Param):
 
         self._init_value = value
         self._param_type = "Gamma"
-        self.shared_var = aesara.shared(self.init_value, name=name, borrow=True)
+        self.shared_var = pytensor.shared(self.init_value, name=name, borrow=True)
 
     @property
     def T(self):

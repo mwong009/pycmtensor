@@ -1,6 +1,6 @@
 from time import perf_counter
 
-import aesara.tensor as aet
+import pytensor.tensor as aet
 
 from pycmtensor.expressions import Beta
 from pycmtensor.functions import log_likelihood, logit
@@ -123,7 +123,7 @@ class MNL(BaseModel):
         return super().reset_values()
 
     def build_cost_fn(self):
-        """Constructs Aesara functions for calculating the cost and prediction errors of the Multinomial Logit model.
+        """Constructs pytensor functions for calculating the cost and prediction errors of the Multinomial Logit model.
 
         Example Usage:
         ```python
@@ -137,11 +137,11 @@ class MNL(BaseModel):
         BaseModel.build_cost_fn(self)
 
     def build_gh_fn(self):
-        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+        """Constructs pytensor functions for computing the Hessian matrix and the gradient vector.
 
         Returns:
-            hessian_fn (Aesara function): A function that computes the Hessian matrix.
-            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
+            hessian_fn (pytensor function): A function that computes the Hessian matrix.
+            gradient_vector_fn (pytensor function): A function that computes the gradient vector.
 
         !!! note
 

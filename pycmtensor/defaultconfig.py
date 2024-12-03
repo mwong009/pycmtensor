@@ -103,13 +103,13 @@ num_cores = multiprocessing.cpu_count()
 os.environ["MKL_NUM_THREADS"] = str(num_cores)
 os.environ["OMP_NUM_THREADS"] = str(num_cores)
 
-# write .aesararc file
+# write .pytensorrc file
 
 HOMEPATH = os.path.expanduser("~")
-conf_file = os.path.join(HOMEPATH, ".aesararc")
-aesara_rc = configparser.ConfigParser()
-aesara_rc.add_section("global")
-aesara_rc["global"] = {"device": "cpu", "floatX": "float64"}
+conf_file = os.path.join(HOMEPATH, ".pytensorrc")
+pytensor_rc = configparser.ConfigParser()
+pytensor_rc.add_section("global")
+pytensor_rc["global"] = {"device": "cpu", "floatX": "float64"}
 
 with open(conf_file, "w") as f:
-    aesara_rc.write(f)
+    pytensor_rc.write(f)

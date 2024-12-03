@@ -2,8 +2,8 @@
 The code snippet is a part of a class called `Dataset` that converts a pandas DataFrame into an xarray dataset. It initializes the dataset object with the DataFrame and the name of the choice variable. It also provides methods to access and manipulate the dataset.
 """
 
-import aesara.tensor as aet
-from aesara.tensor.var import TensorVariable
+import pytensor.tensor as aet
+from pytensor.tensor.var import TensorVariable
 
 import pycmtensor.defaultconfig as defaultconfig
 

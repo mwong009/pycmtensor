@@ -46,12 +46,12 @@ jobs:
       - name: Test pycmtensor import
         run: |
           python -c "import pycmtensor as cmt; print(cmt.__version__)"
-          cat ~/.aesararc
+          cat ~/.pytensorrc
 
-      - name: Show Aesara config
+      - name: Show pytensor config
         run: |
-          python -c "import aesara; print(aesara.config.blas__ldflags)"
-          python -c "import aesara; print(aesara.config.gcc__cxxflags)"
+          python -c "import pytensor; print(pytensor.config.blas__ldflags)"
+          python -c "import pytensor; print(pytensor.config.gcc__cxxflags)"
 
       - name: Main test
         run: pytest

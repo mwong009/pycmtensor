@@ -124,7 +124,7 @@ The `Beta(name=, value=, lb=, ub=, status=)` object takes the following argument
     ```
 
 !!! info
-    `pycmtensor.expressions.Beta` follows the same syntax as in [Biogeme]() `biogeme.expressions.Beta` for familiarity sake. However, `pycmtensor.expressions.Beta` uses `aesara.tensor` variables to define the mathematical ops. Currently they are not interchangable.
+    `pycmtensor.expressions.Beta` follows the same syntax as in [Biogeme]() `biogeme.expressions.Beta` for familiarity sake. However, `pycmtensor.expressions.Beta` uses `pytensor.tensor` variables to define the mathematical ops. Currently they are not interchangable.
 
 
 ## Specifying utility equations

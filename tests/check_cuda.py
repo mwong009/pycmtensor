@@ -3,8 +3,8 @@ import sys
 import time
 
 import numpy
-from aesara import config, function, shared
-from aesara import tensor as at
+from pytensor import config, function, shared
+from pytensor import tensor as at
 
 sys.path.insert(0, os.path.abspath(".."))
 vlen = 10 * 30 * 768  # 10 x #cores x # threads per core
