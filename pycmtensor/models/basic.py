@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-import aesara.tensor as aet
 import numpy as np
-from aesara import function, pprint
+import pytensor.tensor as aet
+from pytensor import function, pprint
 
 import pycmtensor.defaultconfig as defaultconfig
 from pycmtensor.expressions import Beta, ExpressionParser, Param
@@ -182,7 +182,7 @@ class BaseModel(object):
                 self.cost += reg
 
     def build_cost_fn(self):
-        """Constructs Aesara functions for calculating the cost and prediction errors.
+        """Constructs Tensor functions for calculating the cost and prediction errors.
 
         Example Usage:
         ```python
@@ -236,11 +236,11 @@ class BaseModel(object):
         )
 
     def build_gh_fn(self):
-        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+        """Constructs Tensor functions for computing the Hessian matrix and the gradient vector.
 
         Returns:
-            hessian_fn (Aesara function): A function that computes the Hessian matrix.
-            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
+            hessian_fn (pytensor function): A function that computes the Hessian matrix.
+            gradient_vector_fn (pytensor function): A function that computes the gradient vector.
 
         !!! note
 

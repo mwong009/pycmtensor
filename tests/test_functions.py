@@ -1,7 +1,7 @@
 # test_functions.py
-import aesara
-import aesara.tensor as aet
 import numpy as np
+import pytensor
+import pytensor.tensor as aet
 import pytest
 
 import pycmtensor.functions as functions
@@ -175,7 +175,7 @@ def test_kl_divergence():
     p = aet.vector("p")
     q = aet.vector("q")
 
-    loss = aesara.function([p, q], functions.kl_divergence(p, q))
+    loss = pytensor.function([p, q], functions.kl_divergence(p, q))
     assert round(float(loss([0.2, 0.1, 0.4, 0.3], [0.3, 0.1, 0.1, 0.5])), 4) == 0.3202
     assert float(loss([0.2, 0.1, 0.4, 0.3], [0.2, 0.1, 0.4, 0.3])) == float(0.0)
 
@@ -187,7 +187,7 @@ def test_kl_multivar_norm_univariate():
     v1 = aet.scalar("v1")
 
     kld = functions.kl_multivar_norm(m0, v0, m1, v1)
-    loss = aesara.function([m0, v0, m1, v1], kld)
+    loss = pytensor.function([m0, v0, m1, v1], kld)
     assert m0.ndim == v0.ndim == 0
     assert m1.ndim == v1.ndim == 0
 
@@ -197,11 +197,11 @@ def test_kl_multivar_norm_univariate():
         kld = functions.kl_multivar_norm(m0, v0, m1, aet.vector())
 
     g = aet.grad(kld, v0, disconnected_inputs="ignore")
-    grad = aesara.function([m0, v0, m1, v1], g)
+    grad = pytensor.function([m0, v0, m1, v1], g)
     assert round(float(grad(3, 2, 0, 1)), 2) == 0.25
 
     g = aet.grad(kld, m0, disconnected_inputs="ignore")
-    grad = aesara.function([m0, v0, m1, v1], g)
+    grad = pytensor.function([m0, v0, m1, v1], g)
     assert round(float(grad(4, 2, 0, 1))) == 4
 
 
@@ -214,19 +214,19 @@ def test_kl_multivar_norm_1():
     v1 = aet.scalar("v1")
 
     kld = functions.kl_multivar_norm(m0, v0, m1, v1)
-    loss = aesara.function([m0, v0, m1, v1], kld)
+    loss = pytensor.function([m0, v0, m1, v1], kld)
 
     output = loss([1, 2, 1], np.diag(rng.uniform(0, 1, 3)), 0, 1)
     assert round(float(output), 3) == 4.109
 
     g = aet.grad(kld, m0, disconnected_inputs="ignore")
-    grad = aesara.function([m0, v0, m1, v1], g)
+    grad = pytensor.function([m0, v0, m1, v1], g)
 
     output = grad([1, 2, 1], np.diag(rng.uniform(0, 1, 3)), 0, 1)
     assert [round(float(o), 2) for o in output] == [1, 2, 1]
 
     g = aet.grad(kld, v0, disconnected_inputs="ignore")
-    grad = aesara.function([m0, v0, m1, v1], g)
+    grad = pytensor.function([m0, v0, m1, v1], g)
 
     output = grad([1, 2, 1], np.diag(rng.uniform(0, 1, 3)), 0, 1)
     updates = [round(float(o), 2) for o in output.flatten()]
@@ -244,7 +244,7 @@ def test_kl_multivar_norm_2():
     v1 = aet.matrix("v1")
 
     kld = functions.kl_multivar_norm(m0, v0, m1, v1)
-    loss = aesara.function([m0, v0, m1, v1], kld)
+    loss = pytensor.function([m0, v0, m1, v1], kld)
 
     M0 = rng.uniform(0, 3, 3)  # ndim=1
     V0 = np.diag(rng.uniform(0, 1, 3))  # ndim=2

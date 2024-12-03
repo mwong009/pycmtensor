@@ -3,7 +3,7 @@ import copy
 import numpy as np
 import pandas as pd
 import pytest
-from aesara.tensor.var import TensorVariable
+from pytensor.tensor.var import TensorVariable
 
 from pycmtensor.dataset import Dataset
 
@@ -149,7 +149,7 @@ def test_scale_variable(lpmc_ds):
 
 
 def test_make_tensor(lpmc_ds):
-    import aesara.tensor as aet
+    import pytensor.tensor as aet
 
     ds = lpmc_ds
     tensors1 = ds[["cost_transit", "cost_driving_ccharge"]]

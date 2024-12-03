@@ -1,7 +1,7 @@
 from time import perf_counter
 
-import aesara
-import aesara.tensor as aet
+import pytensor
+import pytensor.tensor as aet
 
 import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta, Bias, Weight
@@ -122,7 +122,7 @@ class ResLogit(BaseModel):
         return super().reset_values()
 
     def build_cost_fn(self):
-        """Constructs Aesara functions for calculating the cost and prediction errors of the ResLogit model.
+        """Constructs pytensor functions for calculating the cost and prediction errors of the ResLogit model.
 
         Example Usage:
         ```python
@@ -136,24 +136,24 @@ class ResLogit(BaseModel):
         BaseModel.build_cost_fn(self)
 
     def build_gh_fn(self):
-        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+        """Constructs pytensor functions for computing the Hessian matrix and the gradient vector.
 
         Returns:
-            hessian_fn (Aesara function): A function that computes the Hessian matrix.
-            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
+            hessian_fn (pytensor function): A function that computes the Hessian matrix.
+            gradient_vector_fn (pytensor function): A function that computes the gradient vector.
 
         !!! note
 
             The hessians and gradient vector are evaluation at the maximum **log likelihood** estimates instead of the negative loglikelihood, therefore the cost is multiplied by negative one.
         """
-        self.hessian_fn = aesara.function(
+        self.hessian_fn = pytensor.function(
             name="hessian",
             inputs=self.x + [self.y, self.index],
             outputs=second_order_derivative(self.ll, self.betas),
             allow_input_downcast=True,
         )
 
-        self.gradient_vector_fn = aesara.function(
+        self.gradient_vector_fn = pytensor.function(
             name="gradient_vector",
             inputs=self.x + [self.y, self.index],
             outputs=first_order_derivative(self.ll, self.betas),

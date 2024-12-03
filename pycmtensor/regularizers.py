@@ -4,8 +4,8 @@
 This module contains regularizer terms for use in the cost function
 """
 
-import aesara.tensor as aet
 import numpy as np
+import pytensor.tensor as aet
 
 __all__ = ["Regularizers"]
 

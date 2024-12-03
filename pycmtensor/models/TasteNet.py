@@ -1,9 +1,9 @@
 from collections import OrderedDict
 from time import perf_counter
 
-import aesara
-import aesara.tensor as aet
 import numpy as np
+import pytensor
+import pytensor.tensor as aet
 
 import pycmtensor.models.layers as layers
 from pycmtensor.expressions import Beta, Bias, Weight
@@ -181,7 +181,7 @@ class TasteNet(BaseModel):
         return params
 
     def build_cost_fn(self):
-        """Constructs Aesara functions for calculating the cost and prediction errors of the TasteNet model.
+        """Constructs pytensor functions for calculating the cost and prediction errors of the TasteNet model.
 
         Example Usage:
         ```python
@@ -192,7 +192,7 @@ class TasteNet(BaseModel):
         model.build_cost_fn()
         ```
         """
-        self.tn_betas_fn = aesara.function(
+        self.tn_betas_fn = pytensor.function(
             name="tn_params",
             inputs=self.x + [self.y, self.index],
             outputs={layer.name: layer.output for layer in self.tn_betas},
@@ -202,11 +202,11 @@ class TasteNet(BaseModel):
         BaseModel.build_cost_fn(self)
 
     def build_gh_fn(self):
-        """Constructs Aesara functions for computing the Hessian matrix and the gradient vector.
+        """Constructs pytensor functions for computing the Hessian matrix and the gradient vector.
 
         Returns:
-            hessian_fn (Aesara function): A function that computes the Hessian matrix.
-            gradient_vector_fn (Aesara function): A function that computes the gradient vector.
+            hessian_fn (pytensor function): A function that computes the Hessian matrix.
+            gradient_vector_fn (pytensor function): A function that computes the gradient vector.
 
         !!! note
 

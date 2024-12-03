@@ -13,13 +13,13 @@ While these advanced Python deep learning libraries can be used to evaluate choi
 
 ### What can PyCMTensor do?
 
-PyCMTensor can be used for specifying, estimating, and conducting statistical tests on hybrid discrete choice models. It uses optimized tensor operations through [Aesara](https://aesara.readthedocs.io/en/latest/). 
+PyCMTensor can be used for specifying, estimating, and conducting statistical tests on hybrid discrete choice models. It uses optimized tensor operations through [pytensor](https://pytensor.readthedocs.io/en/latest/). 
 
 The library is built for estimating hybrid neural networks, Logit models, and Mixed Logit models. The models in PyCMTensor are built on computational graphs and are estimated using backpropagation algorithms.
 
 ## Project goals
 
-PyCMTensor aims to combine the interpretability of choice modelling syntaxes and expressions with the computational efficiency of Aesara tensor libraries. It specializes in defining 'hybrid' utility expressions and simplifies the process of integrating a deep neural network into choice models such as TasteNet or ResLogit. Unlike other deep learning libraries, PyCMTensor focuses on econometric modelling and statistical testing over purely predictive or classification models.
+PyCMTensor aims to combine the interpretability of choice modelling syntaxes and expressions with the computational efficiency of pytensor tensor libraries. It specializes in defining 'hybrid' utility expressions and simplifies the process of integrating a deep neural network into choice models such as TasteNet or ResLogit. Unlike other deep learning libraries, PyCMTensor focuses on econometric modelling and statistical testing over purely predictive or classification models.
 
 The objectives of this project include:
 

@@ -1,16 +1,16 @@
 # optimizers.py
 """PyCMTensor optimizers module"""
-import aesara
-import aesara.tensor as aet
-from aesara import shared
-from aesara.ifelse import ifelse
+import pytensor
+import pytensor.tensor as aet
+from pytensor import shared
+from pytensor.ifelse import ifelse
 
 import pycmtensor.defaultconfig as defaultconfig
 import pycmtensor.expressions as expr
 
 config = defaultconfig.config
 
-FLOATX = aesara.config.floatX
+FLOATX = pytensor.config.floatX
 
 __all__ = [
     "Adam",
@@ -53,7 +53,7 @@ class Optimizer:
         return f"{self.name}"
 
     def update(self, **kwargs):
-        """Update parameters for aesara function calls"""
+        """Update parameters for pytensor function calls"""
         raise NotImplementedError("Subclasses must implement the `update` method.")
 
 
@@ -75,9 +75,9 @@ class Adam(Optimizer):
         [^1]: Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
         """
         super().__init__(name="Adam")
-        self.b1 = aesara.shared(b1, name="b1")
-        self.b2 = aesara.shared(b2, name="b2")
-        self._t = aesara.shared(1.0, name="t")
+        self.b1 = pytensor.shared(b1, name="b1")
+        self.b2 = pytensor.shared(b2, name="b2")
+        self._t = pytensor.shared(1.0, name="t")
         self._m = [
             shared(aet.zeros_like(p()).eval(), name=f"m_{p().name}")
             for p in params
@@ -601,7 +601,7 @@ class SQNBFGS(Optimizer):
         else:
             self.warmup = 20
 
-        self._t = aesara.shared(1.0)
+        self._t = pytensor.shared(1.0)
         self._y = [
             shared(aet.zeros_like(p()).eval()) for p in params if (p.status != 1)
         ]
@@ -612,8 +612,8 @@ class SQNBFGS(Optimizer):
         self._s = [shared(p().eval()) for p in params if (p.status != 1)]
         self._yhat = [shared(p().eval()) for p in params if (p.status != 1)]
 
-        self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
-        self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
+        self._H0 = pytensor.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
+        self.I = pytensor.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
     def update(self, cost, params, lr):
         T = self.warmup
