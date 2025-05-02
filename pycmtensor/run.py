@@ -210,11 +210,11 @@ def train(model, ds, **kwargs):
 
         epoch += 1  # increment epoch
 
-    # post training process
-    model = post_training(model, epoch, i, ds)
-
     # Save hessian data
     model.save_hessian_data(n_train, train_data)
+
+    # post training process
+    model = post_training(model, epoch, i, ds)
 
 
 def initialize_results(model, train_data, t_index):
