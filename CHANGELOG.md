@@ -1,3 +1,14 @@
+## v1.13.4 (2025-05-02)
+
+### Fix
+
+- removed f1
+- removed f1
+
+### Refactor
+
+- added docstrings
+
 ## v1.13.3 (2024-08-13)
 
 ### Fix
