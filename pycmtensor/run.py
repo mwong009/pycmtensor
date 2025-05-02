@@ -345,10 +345,10 @@ def post_training(model, epoch, i, dataset):
         info(f"Max iters reached: {hf(i-1)}/{hf(model.patience)} (t={train_time})")
 
     # compute F1 score
-    prob_df = model.predict(dataset)
-    model.results.f1_score = f1_score(
-        true=prob_df[f"true_{dataset.choice}"], pred=prob_df[f"pred_{dataset.choice}"]
-    )
+    # prob_df = model.predict(dataset)
+    # model.results.f1_score = f1_score(
+    #     true=prob_df[f"true_{dataset.choice}"], pred=prob_df[f"pred_{dataset.choice}"]
+    # )
 
     # save statistics
     for key, value in model.results.statistics_graph.items():
