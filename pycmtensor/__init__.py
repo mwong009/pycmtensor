@@ -73,45 +73,12 @@ config.add(
     1.2,
     "The factor of the validation error improvement",
 )
-config.add("base_learning_rate", 0.01, "The initial learning rate of the model update")
-config.add(
-    "max_learning_rate",
-    0.1,
-    "The maximum learning rate (additional option for various schedulers)",
-)
-config.add(
-    "min_learning_rate",
-    1e-5,
-    "The minimum learning rate (additional option for various schedulers)",
-)
 config.add(
     "convergence_threshold",
     1e-4,
     "The gradient norm convergence threshold before model termination",
 )
-config.add(
-    "optimizer",
-    optimizers.Adam,
-    "Optimization algorithm to use for model estimation",
-)
-
 config.add("adam_weight_decay", 0.01, "Weight decay factor for AdamW optimizer")
-
-config.add(
-    "lr_scheduler",
-    scheduler.ConstantLR,
-    "Learning rate scheduler to use for model estimation",
-)
-config.add("lr_ExpRangeCLR_gamma", 0.5, "Gamma parameter for `ExpRangeCLR`")
-config.add("lr_stepLR_factor", 0.95, "Drop step multiplier factor for `stepLR`")
-config.add("lr_stepLR_drop_every", 20, "Drop learning rate every n steps for `stepLR`")
-config.add("lr_CLR_cycle_steps", 16, "Steps per cycle for `CyclicLR`")
-config.add("lr_PolynomialLR_power", 0.999, "Power factor for `PolynomialLR`")
-config.add(
-    "BFGS_warmup",
-    10,
-    "Discards this number of hessian matrix updates when running the `BFGS` algorithm",
-)
 config.add(
     "acceptance_method",
     1,
