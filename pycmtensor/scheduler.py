@@ -134,7 +134,7 @@ class ConstantLR(Scheduler):
 
 
 class StepLR(Scheduler):
-    def __init__(self, lr=0.01, factor=0.95, drop_every=10, **kwargs):
+    def __init__(self, lr=0.01, factor=0.95, drop_every=20, **kwargs):
         """Base class for step learning rate scheduler
 
         Args:
@@ -146,7 +146,7 @@ class StepLR(Scheduler):
         self.name = "StepLR"
         self._factor = factor
         self._drop_every = drop_every
-        self._min_lr = 1e-6 * lr
+        self._min_lr = 0.01 * lr  # minimum learning rate = 1% of initial learning rate
 
         if factor >= 1.0:
             raise ValueError(f"factor is greater than 1.")

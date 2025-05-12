@@ -188,7 +188,9 @@ def train(model, ds, **kwargs):
                 gnorm, params_prev = gnorm_func(model, train_data, t_index, params_prev)
 
                 # verbose logging
-                verbose_logging(model, gnorm, epoch, i, log_like, valid_error)
+                verbose_logging(
+                    model, gnorm, epoch, i, log_like, valid_error, learning_rate
+                )
 
                 # condition for acceptance
                 accept = accept_condition(model, i, log_like, valid_error)
@@ -293,7 +295,7 @@ def accept_condition(model, i, ll, error):
     return accept
 
 
-def verbose_logging(model, gnorm, epoch, i, ll, error):
+def verbose_logging(model, gnorm, epoch, i, ll, error, lr=None):
     info_print = False
     acceptance_method = model.config.acceptance_method
     b_ll = model.results.best_loglikelihood
@@ -316,10 +318,13 @@ def verbose_logging(model, gnorm, epoch, i, ll, error):
         info_print = True
     model.config.TIME_COUNTER = time_passed % 300
 
+    status = f"Train {hf(i)}/{hf(model.patience)} (epoch={hf(epoch)}, LL={ll:.2f}, error={error*100:.2f}%, gnorm={gnorm:.3e})"
+
+    if lr is not None:
+        status += f", lr={lr:.3e}"
+
     if info_print:
-        info(
-            f"Train {hf(i)}/{hf(model.patience)} (epoch={hf(epoch)}, LL={ll:.2f}, error={error*100:.2f}%, gnorm={gnorm:.3e})"
-        )
+        info(status)
         info_print = False
 
 
