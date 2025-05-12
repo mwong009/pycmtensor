@@ -1,3 +1,15 @@
+## v1.14.0 (2025-05-12)
+
+### Feat
+
+- rewrite import of optim and sched libraries
+
+### Fix
+
+- removed unused config options
+- show learning rate during training
+- save hessians before post training
+
 ## v1.13.4 (2025-05-02)
 
 ### Fix
