@@ -58,11 +58,10 @@ class Optimizer:
 
 
 class Adam(Optimizer):
-    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+    def __init__(self, b1=0.9, b2=0.999, **kwargs):
         """An optimizer that implements the Adam algorithm[^1]
 
         Args:
-            params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
             **kwargs (None): Additional keyword arguments.
@@ -78,16 +77,8 @@ class Adam(Optimizer):
         self.b1 = aesara.shared(b1, name="b1")
         self.b2 = aesara.shared(b2, name="b2")
         self._t = aesara.shared(1.0, name="t")
-        self._m = [
-            shared(aet.zeros_like(p()).eval(), name=f"m_{p().name}")
-            for p in params
-            if p.status != 1
-        ]
-        self._v = [
-            shared(aet.zeros_like(p()).eval(), name=f"v_{p().name}")
-            for p in params
-            if p.status != 1
-        ]
+        self._m = None
+        self._v = None
 
     @property
     def t(self):
@@ -102,6 +93,13 @@ class Adam(Optimizer):
         return self._v
 
     def update(self, cost, params, lr):
+        if self._m is None or self._v is None:
+            self._m = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._v = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -132,11 +130,10 @@ class Adam(Optimizer):
 
 
 class AdamW(Adam):
-    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+    def __init__(self, b1=0.9, b2=0.999, decay=0.01, **kwargs):
         """Initializes the AdamW class with the given parameters.
 
         Args:
-            params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
             **kwargs (None): Additional keyword arguments.
@@ -145,10 +142,17 @@ class AdamW(Adam):
             params = [...] # list of parameters
             adamw = AdamW(params, b1=0.9, b2=0.999)
         """
-        super().__init__(params, b1, b2)
-        self.w = config.adam_weight_decay
+        super().__init__(b1, b2)
+        self.w = decay
 
     def update(self, cost, params, lr):
+        if self._m is None or self._v is None:
+            self._m = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._v = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         params2 = [p for p in params if p.status != 1]
 
         bounds = [(p.lb, p.ub) for p in params2]
@@ -182,11 +186,10 @@ class AdamW(Adam):
 
 
 class Nadam(Adam):
-    def __init__(self, params, b1=0.99, b2=0.999, **kwargs):
+    def __init__(self, b1=0.99, b2=0.999, **kwargs):
         """An optimizer that implements the Nesterov Adam algorithm[^1]
 
         Args:
-            params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
             **kwargs (None): Additional keyword arguments.
@@ -198,10 +201,17 @@ class Nadam(Adam):
 
         [^1]: Dozat, T., 2016. Incorporating nesterov momentum into adam.(2016). Dostupné z: http://cs229.stanford.edu/proj2015/054_report.pdf.
         """
-        super().__init__(params, b1, b2)
+        super().__init__(b1, b2)
         self.name = "Nadam"
 
     def update(self, cost, params, lr):
+        if self._m is None or self._v is None:
+            self._m = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._v = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -237,12 +247,11 @@ class Nadam(Adam):
 
 
 class Adamax(Adam):
-    def __init__(self, params, b1=0.9, b2=0.999, **kwargs):
+    def __init__(self, b1=0.9, b2=0.999, **kwargs):
         """An optimizer that implements the Adamax algorithm[^1]. It is a variant of
         the Adam algorithm
 
         Args:
-            params (list): A list of parameters.
             b1 (float, optional): The value of the b1 parameter. Defaults to 0.9.
             b2 (float, optional): The value of the b2 parameter. Defaults to 0.999.
             **kwargs (None): Additional keyword arguments.
@@ -254,10 +263,21 @@ class Adamax(Adam):
 
         [^1]: Kingma et al., 2014. Adam: A Method for Stochastic Optimization. http://arxiv.org/abs/1412.6980
         """
-        super().__init__(params, b1, b2)
+        super().__init__(b1, b2)
         self.name = "Adamax"
 
     def update(self, cost, params, lr):
+        if self._m is None or self._v is None:
+            self._m = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._v = [
+                shared(
+                    aet.zeros_like(p()).eval(),
+                )
+                for p in params
+                if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -286,7 +306,7 @@ class Adamax(Adam):
 
 
 class Adadelta(Optimizer):
-    def __init__(self, params, rho=0.95, **kwargs):
+    def __init__(self, rho=0.95, **kwargs):
         """An optimizer that implements the Adadelta algorithm[^1]
 
         Adadelta is a stochastic gradient descent method that is based on adaptive
@@ -296,7 +316,6 @@ class Adadelta(Optimizer):
         - The need for a manually selected global learning rate
 
         Args:
-            params (list[TensorSharedVariable]): A list of shared variables representing the parameters of the model.
             rho (float, optional): A float representing the decay rate for the learning rate. Defaults to 0.95.
 
         Attributes:
@@ -307,12 +326,8 @@ class Adadelta(Optimizer):
         """
         super().__init__(name="Adadelta")
         self.rho = rho
-        self._accu = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
-        self._delta = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
+        self._accu = None
+        self._delta = None
 
     @property
     def accumulator(self):
@@ -323,6 +338,13 @@ class Adadelta(Optimizer):
         return self._delta
 
     def update(self, cost, params, lr):
+        if self._accu is None or self._delta is None:
+            self._accu = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._delta = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -347,11 +369,10 @@ class Adadelta(Optimizer):
 
 
 class RProp(Optimizer):
-    def __init__(self, params, inc=1.05, dec=0.5, bounds=[1e-6, 50.0], **kwargs):
+    def __init__(self, inc=1.05, dec=0.5, bounds=[1e-6, 50.0], **kwargs):
         """An optimizer that implements the Rprop algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): A list of TensorSharedVariable objects representing the parameters of the model.
             inc (float, optional): A float representing the increment step if the gradient direction is the same.
             dec (float, optional): A float representing the decrement step if the gradient direction is different.
             bounds (list[float]): A list of floats representing the minimum and maximum bounds for the increment step.
@@ -367,14 +388,17 @@ class RProp(Optimizer):
         self.dec = dec
         self.bounds = bounds
 
-        self._ghat = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
-        self._factor = [
-            shared(aet.ones_like(p()).eval()) for p in params if p.status != 1
-        ]
+        self._ghat = None
+        self._factor = None
 
     def update(self, cost, params, lr):
+        if self._ghat is None or self._factor is None:
+            self._ghat = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+            self._factor = [
+                shared(aet.ones_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -397,11 +421,10 @@ class RProp(Optimizer):
 
 
 class RMSProp(Optimizer):
-    def __init__(self, params, rho=0.9, **kwargs):
+    def __init__(self, rho=0.9, **kwargs):
         """An optimizer that implements the RMSprop algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): Parameters of the model.
             rho (float, optional): Discounting factor for the history/coming gradient. Defaults to 0.9.
 
         Attributes:
@@ -412,15 +435,17 @@ class RMSProp(Optimizer):
         """
         super().__init__(name="RMSProp")
         self.rho = shared(rho)
-        self._accu = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
+        self._accu = None
 
     @property
     def accumulator(self):
         return self._accu
 
     def update(self, cost, params, lr):
+        if self._accu is None:
+            self._accu = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -439,11 +464,10 @@ class RMSProp(Optimizer):
 
 
 class Momentum(Optimizer):
-    def __init__(self, params, mu=0.9, **kwargs):
+    def __init__(self, mu=0.9, **kwargs):
         """Initializes the Momentum optimizer[^1]
 
         Args:
-            params (list[TensorSharedVariable]): A list of parameters of the model.
             mu (float, optional): The acceleration factor in the relevant direction and dampens oscillations. Defaults to `0.9`.
 
         Attributes:
@@ -453,13 +477,17 @@ class Momentum(Optimizer):
         """
         super().__init__(name="Momentum")
         self.mu = shared(mu)
-        self._v = [shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1]
+        self._v = None
 
     @property
     def velocity(self):
         return self._v
 
     def update(self, cost, params, lr):
+        if self._v is None:
+            self._v = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -477,11 +505,10 @@ class Momentum(Optimizer):
 
 
 class NAG(Momentum):
-    def __init__(self, params, mu=0.99, **kwargs):
+    def __init__(self, mu=0.99, **kwargs):
         """An optimizer that implements the Nestrov Accelerated Gradient algorithm[^1]
 
         Args:
-            params (list[TensorSharedVariable]): A list of parameters of the model.
             mu (float, optional): The acceleration factor in the relevant direction. Defaults to `0.99`.
 
         Attributes:
@@ -490,7 +517,7 @@ class NAG(Momentum):
 
         [^1]: Sutskever et al., 2013. On the importance of initialization and momentum in deep learning. http://jmlr.org/proceedings/papers/v28/sutskever13.pdf
         """
-        super().__init__(params, mu)
+        super().__init__(mu)
         self.name = "NAG"
         self._t = shared(0.0)
 
@@ -499,6 +526,10 @@ class NAG(Momentum):
         return self._t
 
     def update(self, cost, params, lr):
+        if self._v is None:
+            self._v = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -520,15 +551,12 @@ class NAG(Momentum):
 
 
 class AdaGrad(Optimizer):
-    def __init__(self, params, **kwargs):
+    def __init__(self, **kwargs):
         """An optimizer that implements the Adagrad algorithm[^1]
 
         Adagrad is an optimizer with parameter-specific learning rates, which are
         adapted relative to how frequently a parameter gets updated during training.
         The more updates a parameter receives, the smaller the updates.
-
-        Args:
-            params (list[TensorSharedVariable]): parameters of the model
 
         Attributes:
             accumulator (list[TensorSharedVariable]): gradient accumulators
@@ -536,15 +564,17 @@ class AdaGrad(Optimizer):
         [^1]: Duchi et al., 2011. Adaptive Subgradient Methods for Online Learning and Stochastic Optimization. https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
         """
         super().__init__(name="AdaGrad")
-        self._accu = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
+        self._accu = None
 
     @property
     def accumulator(self):
         return self._accu
 
     def update(self, cost, params, lr):
+        if self._accu is None:
+            self._accu = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
         grads = aet.grad(cost, params, disconnected_inputs="ignore")
@@ -562,7 +592,7 @@ class AdaGrad(Optimizer):
 
 
 class SGD(Optimizer):
-    def __init__(self, params, **kwargs):
+    def __init__(self, **kwargs):
         """An optimizer that implements the stochastic gradient algorithm
 
         Args:
@@ -586,7 +616,7 @@ class SGD(Optimizer):
 
 
 class SQNBFGS(Optimizer):
-    def __init__(self, params, config=None, **kwargs):
+    def __init__(self, warmup=20, **kwargs):
         """Initializes the SQNBFGS optimizer object[^1]
 
         Args:
@@ -596,26 +626,30 @@ class SQNBFGS(Optimizer):
         [^1]: Byrd, R. H., Hansen, S. L., Nocedal, J., & Singer, Y. (2016). A stochastic quasi-Newton method for large-scale optimization. SIAM Journal on Optimization, 26(2), 1008-1031.
         """
         super().__init__(name="BFGS")
-        if config is not None:
-            self.warmup = config.BFGS_warmup
-        else:
-            self.warmup = 20
+        self.warmup = warmup
 
         self._t = aesara.shared(1.0)
-        self._y = [
-            shared(aet.zeros_like(p()).eval()) for p in params if (p.status != 1)
-        ]
-        self._accu = [
-            shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
-        ]
+        self._y = None
+        self._accu = None
 
-        self._s = [shared(p().eval()) for p in params if (p.status != 1)]
-        self._yhat = [shared(p().eval()) for p in params if (p.status != 1)]
+        self._s = None
+        self._yhat = None
 
         self._H0 = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
         self.I = aesara.shared(aet.eye(len(self._y), dtype=FLOATX).eval())
 
     def update(self, cost, params, lr):
+        if self._y is None or self._s is None:
+            self._y = [
+                shared(aet.zeros_like(p()).eval()) for p in params if (p.status != 1)
+            ]
+            self._accu = [
+                shared(aet.zeros_like(p()).eval()) for p in params if p.status != 1
+            ]
+
+            self._s = [shared(p().eval()) for p in params if (p.status != 1)]
+            self._yhat = [shared(p().eval()) for p in params if (p.status != 1)]
+
         T = self.warmup
         bounds = [(p.lb, p.ub) for p in params if p.status != 1]
         params = [p() for p in params if p.status != 1]
@@ -683,7 +717,7 @@ def clip(param, min, max):
     Returns:
         (float): The clipped value of the parameter.
     """
-    if any([min, max]) and (config.beta_clipping):
+    if any([min, max]):
         if min is None:
             min = -9999.0
         if max is None:

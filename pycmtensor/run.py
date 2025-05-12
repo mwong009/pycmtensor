@@ -13,7 +13,7 @@ from pycmtensor.utils import time_format
 IS_TRAINING = 1
 
 
-def compute(model, ds, update=False, **params):
+def compute(model, ds, lr_scheduler, update=False, **params):
     """Function for manual computation of model by specifying parameters as arguments
 
     Args:
@@ -46,16 +46,17 @@ def compute(model, ds, update=False, **params):
     v_index = np.arange(len(valid_data[-1]))
 
     if update:
-        model.lr_scheduler = model.config.lr_scheduler(
-            lr=model.config.base_learning_rate,
-            max_lr=model.config.max_learning_rate,
-            max_epochs=model.config.max_epochs,
-            factor=model.config.lr_stepLR_factor,
-            drop_every=model.config.lr_stepLR_drop_every,
-            power=model.config.lr_PolynomialLR_power,
-            cycle_steps=model.config.lr_CLR_cycle_steps,
-            gamma=model.config.lr_ExpRangeCLR_gamma,
-        )
+        model.lr_scheduler = lr_scheduler
+        # model.lr_scheduler = model.config.lr_scheduler(
+        #     lr=model.config.base_learning_rate,
+        #     max_lr=model.config.max_learning_rate,
+        #     max_epochs=model.config.max_epochs,
+        #     factor=model.config.lr_stepLR_factor,
+        #     drop_every=model.config.lr_stepLR_drop_every,
+        #     power=model.config.lr_PolynomialLR_power,
+        #     cycle_steps=model.config.lr_CLR_cycle_steps,
+        #     gamma=model.config.lr_ExpRangeCLR_gamma,
+        # )
         learning_rate = model.lr_scheduler(0)
         model.cost_updates_fn(*train_data, learning_rate, t_index, IS_TRAINING)
 
@@ -79,7 +80,7 @@ def compute(model, ds, update=False, **params):
     }
 
 
-def train(model, ds, **kwargs):
+def train(model, ds, optimizer, lr_scheduler, **kwargs):
     """Main training loop
 
     Args:
@@ -110,20 +111,23 @@ def train(model, ds, **kwargs):
     i = 0
     shift = 0
 
-    optimizer = model.config.optimizer(model.params, config=model.config)
-    updates = optimizer.update(model.cost, model.params, model.learning_rate)
+    # optimizer = model.config.optimizer(model.params, config=model.config)
+    model.optimizer = optimizer
+    updates = model.optimizer.update(model.cost, model.params, model.learning_rate)
     model.build_cost_updates_fn(updates)
 
-    model.lr_scheduler = model.config.lr_scheduler(
-        lr=model.config.base_learning_rate,
-        max_lr=model.config.max_learning_rate,
-        max_epochs=model.config.max_epochs,
-        factor=model.config.lr_stepLR_factor,
-        drop_every=model.config.lr_stepLR_drop_every,
-        power=model.config.lr_PolynomialLR_power,
-        cycle_steps=model.config.lr_CLR_cycle_steps,
-        gamma=model.config.lr_ExpRangeCLR_gamma,
-    )
+    model.lr_scheduler = lr_scheduler
+
+    # model.lr_scheduler = model.config.lr_scheduler(
+    #     lr=model.config.base_learning_rate,
+    #     max_lr=model.config.max_learning_rate,
+    #     max_epochs=model.config.max_epochs,
+    #     factor=model.config.lr_stepLR_factor,
+    #     drop_every=model.config.lr_stepLR_drop_every,
+    #     power=model.config.lr_PolynomialLR_power,
+    #     cycle_steps=model.config.lr_CLR_cycle_steps,
+    #     gamma=model.config.lr_ExpRangeCLR_gamma,
+    # )
 
     model.results.statistics_graph = {
         "train_ll": [],
@@ -206,17 +210,47 @@ def train(model, ds, **kwargs):
             i += 1
 
             # secondary condition for convergence
-            if done_looping(model, epoch, i, log_like, valid_error, gnorm):
+            if done_looping(
+                model, epoch, i, log_like, valid_error, gnorm, learning_rate
+            ):
                 done = True
                 break
 
         epoch += 1  # increment epoch
 
+    model = post_training(model, epoch)
+
     # Save hessian data
     model.save_hessian_data(n_train, train_data)
 
-    # post training process
-    model = post_training(model, epoch, i, ds)
+
+def post_training(model, epoch):
+    now = perf_counter()
+    train_time = round(now - model.results.start_time, 3)
+    model.results.train_time = time_format(train_time)
+    model.results.epochs_per_sec = round(epoch / train_time, 2)
+
+    threshold = model.config.convergence_threshold
+    if model.results.converged[1] == "gnorm < threshold":
+        info(f"Model converged (t={train_time}), gnorm < {threshold}")
+    else:
+        info(f"Max iters reached: {hf(i-1)}/{hf(model.patience)} (t={train_time})")
+
+    # save statistics
+    for key, value in model.results.statistics_graph.items():
+        model.results.statistics_graph[key] = np.array(value).tolist()
+    model.results.statistics_graph["learning_rate"] = model.lr_scheduler.history
+
+    best_epoch = model.results.best_epoch
+    best_ll = model.results.best_loglikelihood
+    best_error = model.results.best_valid_error
+    gnorm = model.results.gnorm
+
+    info(
+        f"Best results obtained at epoch {best_epoch}: LL={best_ll:.2f}, error={best_error*100:.2f}%, gnorm={gnorm:.5e}"
+    )
+
+    return model
 
 
 def initialize_results(model, train_data, t_index):
@@ -247,10 +281,10 @@ def append_statistics(model, log_like, train_error, valid_error):
     model.results.statistics_graph["train_error"].append(train_error)
 
 
-def done_looping(model, epoch, i, log_like, error, gnorm):
+def done_looping(model, epoch, i, log_like, error, gnorm, learning_rate):
     if (i > model.patience) or (model.results.converged[0] != False):
         info(
-            f"Train {hf(i-1)}/{hf(model.patience)} (epoch={hf(epoch)}, LL={log_like:.2f}, error={error*100:.2f}%, gnorm={gnorm:.3e})"
+            f"Train {hf(i-1)}/{hf(model.patience)} (epoch={hf(epoch)}, LL={log_like:.2f}, error={error*100:.2f}%, gnorm={gnorm:.3e}), lr={learning_rate:.2e}"
         )
         return True
     return False
@@ -321,7 +355,7 @@ def verbose_logging(model, gnorm, epoch, i, ll, error, lr=None):
     status = f"Train {hf(i)}/{hf(model.patience)} (epoch={hf(epoch)}, LL={ll:.2f}, error={error*100:.2f}%, gnorm={gnorm:.3e})"
 
     if lr is not None:
-        status += f", lr={lr:.3e}"
+        status += f", lr={lr:.2e}"
 
     if info_print:
         info(status)
@@ -335,38 +369,3 @@ def early_stopping(model, gnorm, i):
     if i > model.patience:
         return [True, "iteration > patience"]
     return [False, "0"]
-
-
-def post_training(model, epoch, i, dataset):
-    now = perf_counter()
-    train_time = round(now - model.results.start_time, 3)
-    model.results.train_time = time_format(train_time)
-    model.results.epochs_per_sec = round(epoch / train_time, 2)
-
-    threshold = model.config.convergence_threshold
-    if model.results.converged[1] == "gnorm < threshold":
-        info(f"Model converged (t={train_time}), gnorm < {threshold}")
-    else:
-        info(f"Max iters reached: {hf(i-1)}/{hf(model.patience)} (t={train_time})")
-
-    # compute F1 score
-    # prob_df = model.predict(dataset)
-    # model.results.f1_score = f1_score(
-    #     true=prob_df[f"true_{dataset.choice}"], pred=prob_df[f"pred_{dataset.choice}"]
-    # )
-
-    # save statistics
-    for key, value in model.results.statistics_graph.items():
-        model.results.statistics_graph[key] = np.array(value).tolist()
-    model.results.statistics_graph["learning_rate"] = model.lr_scheduler.history
-
-    best_epoch = model.results.best_epoch
-    best_ll = model.results.best_loglikelihood
-    best_error = model.results.best_valid_error
-    gnorm = model.results.gnorm
-
-    info(
-        f"Best results obtained at epoch {best_epoch}: LL={best_ll:.2f}, error={best_error*100:.2f}%, gnorm={gnorm:.5e}"
-    )
-
-    return model

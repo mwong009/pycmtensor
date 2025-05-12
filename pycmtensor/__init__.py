@@ -39,6 +39,10 @@ from pycmtensor.run import compute, train
 
 config = defaultconfig.config
 
+# defaults
+defaultScheduler = scheduler.ConstantLR()
+defaultOptimizer = optimizers.SGD()
+
 # aesara configs
 aesara.config.on_unused_input = "ignore"
 aesara.config.mode = "Mode"
@@ -108,7 +112,6 @@ config.add(
     10,
     "Discards this number of hessian matrix updates when running the `BFGS` algorithm",
 )
-config.add("beta_clipping", True, "Enables or disables Beta value clipping")
 config.add(
     "acceptance_method",
     1,
