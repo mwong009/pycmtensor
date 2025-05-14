@@ -47,16 +47,6 @@ def compute(model, ds, lr_scheduler, update=False, **params):
 
     if update:
         model.lr_scheduler = lr_scheduler
-        # model.lr_scheduler = model.config.lr_scheduler(
-        #     lr=model.config.base_learning_rate,
-        #     max_lr=model.config.max_learning_rate,
-        #     max_epochs=model.config.max_epochs,
-        #     factor=model.config.lr_stepLR_factor,
-        #     drop_every=model.config.lr_stepLR_drop_every,
-        #     power=model.config.lr_PolynomialLR_power,
-        #     cycle_steps=model.config.lr_CLR_cycle_steps,
-        #     gamma=model.config.lr_ExpRangeCLR_gamma,
-        # )
         learning_rate = model.lr_scheduler(0)
         model.cost_updates_fn(*train_data, learning_rate, t_index, IS_TRAINING)
 
@@ -99,7 +89,7 @@ def train(model, ds, optimizer, lr_scheduler, **kwargs):
     n_train = ds.n_train
     n_valid = ds.n_valid
     n_train_batches = n_train // batch_size
-    model.config.BFGS_warmup = model.config.BFGS_warmup * n_train_batches
+    # model.config.BFGS_warmup = model.config.BFGS_warmup * n_train_batches
 
     model.patience = model.config.patience
     validation_freq = n_train_batches
@@ -117,17 +107,6 @@ def train(model, ds, optimizer, lr_scheduler, **kwargs):
     model.build_cost_updates_fn(updates)
 
     model.lr_scheduler = lr_scheduler
-
-    # model.lr_scheduler = model.config.lr_scheduler(
-    #     lr=model.config.base_learning_rate,
-    #     max_lr=model.config.max_learning_rate,
-    #     max_epochs=model.config.max_epochs,
-    #     factor=model.config.lr_stepLR_factor,
-    #     drop_every=model.config.lr_stepLR_drop_every,
-    #     power=model.config.lr_PolynomialLR_power,
-    #     cycle_steps=model.config.lr_CLR_cycle_steps,
-    #     gamma=model.config.lr_ExpRangeCLR_gamma,
-    # )
 
     model.results.statistics_graph = {
         "train_ll": [],
@@ -239,7 +218,7 @@ def post_training(model, epoch):
     # save statistics
     for key, value in model.results.statistics_graph.items():
         model.results.statistics_graph[key] = np.array(value).tolist()
-    model.results.statistics_graph["learning_rate"] = model.lr_scheduler.history
+    # model.results.statistics_graph["learning_rate"] = model.lr_scheduler.history
 
     best_epoch = model.results.best_epoch
     best_ll = model.results.best_loglikelihood
