@@ -43,6 +43,9 @@ aesara.config.allow_gc = False
 
 # model default configs
 
+USE_MIN_ERROR = 0
+USE_MAX_LOG_LIKELIHOOD = 1
+
 config.add(
     "batch_size",
     32,
