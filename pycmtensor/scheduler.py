@@ -36,7 +36,7 @@ __all__ = [
 
 
 class Scheduler:
-    def __init__(self, lr):
+    def __init__(self, lr=0.01, epochs=2000):
         """Initializes the Scheduler object with a base learning rate.
 
         Args:
@@ -49,7 +49,9 @@ class Scheduler:
         """
         self.name = "Scheduler"
         self._base_lr = lr
+        self._learning_rate = lr
         self._history = []
+        self.max_epochs = epochs
 
     def __str__(self):
         """Returns a string representation of the Scheduler object.
@@ -75,17 +77,22 @@ class Scheduler:
 
         return msg[:-2] + ")"
 
-    def __call__(self, epoch):
-        """Records the learning rate and returns the current learning rate for a specific epoch.
-
-        Args:
-            epoch (int): The epoch number.
+    def __call__(self, **kwargs):
+        """Returns the current learning rate.
 
         Returns:
             (float): The current learning rate.
         """
-        self.record(self.lr)
-        return self.lr
+        return self.learning_rate
+
+    @property
+    def learning_rate(self):
+        """Property that returns the current learning rate.
+
+        Returns:
+            (float): The current learning rate.
+        """
+        return self._learning_rate
 
     @property
     def lr(self):
@@ -94,10 +101,6 @@ class Scheduler:
         Returns:
             (float): The base learning rate.
         """
-        return self._base_lr
-
-    @property  # alias for lr
-    def learning_rate(self):
         return self._base_lr
 
     @property
@@ -123,29 +126,29 @@ class Scheduler:
 
 
 class ConstantLR(Scheduler):
-    def __init__(self, lr=0.01, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01):
         """Subclass of Scheduler for constant learning rate scheduler.
 
         Args:
             lr (float): initial learning rate
         """
-        super().__init__(lr)
+        super().__init__(lr, epochs=max_epochs)
         self.name = "ConstantLR"
 
 
 class StepLR(Scheduler):
-    def __init__(self, lr=0.01, factor=0.95, drop_every=20, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01, factor=0.95, drop=20):
         """Base class for step learning rate scheduler
 
         Args:
             lr (float): initial learning rate
             factor (float): percentage reduction to the learning rate
-            drop_every (int): step down the learning rate after every n epochs
+            drop (int): step down the learning rate after every n epochs
         """
-        super().__init__(lr)
+        super().__init__(lr, epochs=max_epochs)
         self.name = "StepLR"
         self._factor = factor
-        self._drop_every = drop_every
+        self._drop = drop
         self._min_lr = 0.01 * lr  # minimum learning rate = 1% of initial learning rate
 
         if factor >= 1.0:
@@ -156,27 +159,27 @@ class StepLR(Scheduler):
         return self._factor
 
     @property
-    def drop_every(self):
-        return self._drop_every
+    def drop(self):
+        return self._drop
 
     def __call__(self, epoch):
-        decay = self.factor ** np.floor(epoch / self._drop_every)
-        lr = max(float(self.lr * decay), self._min_lr)
-        return self.record(lr)
+        decay = self.factor ** np.floor(epoch / self._drop)
+        self._learning_rate = max(float(self.lr * decay), self._min_lr)
+
+        return self.learning_rate
 
 
 class PolynomialLR(Scheduler):
-    def __init__(self, max_epochs, lr=0.01, power=1.0, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01, power=1.0):
         """Subclass of Scheduler for polynomial decay learning rate scheduler.
 
         Args:
-            lr (float): initial learning rate value
             max_epochs (int): the max number of training epochs
+            lr (float): initial learning rate value
             power (float): the exponential factor to decay
         """
-        super().__init__(lr)
+        super().__init__(lr, epochs=max_epochs)
         self.name = "PolynomialLR"
-        self._max_epochs = max_epochs
         self._min_lr = 0.01 * lr
         self._power = power
 
@@ -187,37 +190,28 @@ class PolynomialLR(Scheduler):
     def power(self):
         return self._power
 
-    @property
-    def max_epochs(self):
-        return self._max_epochs
-
     def __call__(self, epoch):
         decay = (1 - (epoch / float(self.max_epochs))) ** self.power
-        lr = max(float(self.lr * decay), self._min_lr)
-        return self.record(lr)
+        self._learning_rate = max(float(self.lr * decay), self._min_lr)
+
+        return self.learning_rate
 
 
 class CyclicLR(Scheduler):
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, scale_fn=None, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01, cycle_steps=16):
         """Subclass of Scheduler for cyclic learning rate scheduler.
 
         Args:
             lr (float, optional): initial learning rate value.
-            max_lr (float): Peak learning rate value.
             cycle_steps (int): The number of steps to complete a cycle.
-            scale_fn (function): Scaling function for the learning rate.
 
         Raises:
             ValueError: _description_
         """
-        super().__init__(lr)
+        super().__init__(lr, epochs=max_epochs)
         self.name = "CyclicLR"
-        self._max_lr = max_lr
+        self._max_lr = lr * 10
         self._cycle_steps = cycle_steps
-        self._scale_fn = scale_fn
-
-        if self.max_lr < self.lr:
-            raise ValueError(f"max_lr is less than lr")
 
     @property
     def max_lr(self):
@@ -239,7 +233,7 @@ class CyclicLR(Scheduler):
 
 
 class Triangular2CLR(CyclicLR):
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01, cycle_steps=16):
         """Subclass of CyclicLR for Triangular Cyclic LR scheduler.
 
         The scaling of the Triangular Cyclic function is:
@@ -253,7 +247,7 @@ class Triangular2CLR(CyclicLR):
             max_lr (float): Peak learning rate value.
             cycle_steps (int): The number of steps to complete a cycle.
         """
-        super().__init__(lr, max_lr, cycle_steps, scale_fn=self.scale_fn)
+        super().__init__(max_epochs, lr, cycle_steps)
         self.name = "Triangular2CLR"
 
     def scale_fn(self, k):
@@ -261,7 +255,7 @@ class Triangular2CLR(CyclicLR):
 
 
 class ExpRangeCLR(CyclicLR):
-    def __init__(self, lr=0.01, max_lr=0.1, cycle_steps=16, gamma=0.5, **kwargs):
+    def __init__(self, max_epochs=2000, lr=0.01, cycle_steps=16, gamma=0.5):
         """Subclass of CyclicLR for exponential range Cyclic LR scheduler.
 
         The scaling is:
@@ -276,7 +270,7 @@ class ExpRangeCLR(CyclicLR):
             cycle_steps (int): The number of steps to complete a cycle.
             gamma (float): Exponential parameter.
         """
-        super().__init__(lr, max_lr, cycle_steps, scale_fn=self.scale_fn)
+        super().__init__(max_epochs, lr, cycle_steps)
         self.name = "ExpRangeCLR"
         self._gamma = gamma
 
