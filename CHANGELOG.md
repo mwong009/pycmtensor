@@ -1,3 +1,13 @@
+## v1.14.2 (2025-05-14)
+
+### Fix
+
+- refector max_epochs into scheduler
+
+### Refactor
+
+- refactoring internal code
+
 ## v1.14.1 (2025-05-14)
 
 ### Fix
