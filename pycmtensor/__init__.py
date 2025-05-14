@@ -7,13 +7,6 @@ import pycmtensor.defaultconfig as defaultconfig
 
 config = defaultconfig.config
 
-print(config.batch_size)  # Output: 32
-print(config.seed)  # Output: 100
-print(config.max_epochs)  # Output: 500
-print(config.base_learning_rate)  # Output: 0.01
-print(config.optimizer)  # Output: <class 'pycmtensor.optimizers.Adam'>
-print(config.lr_scheduler)  # Output: <class 'pycmtensor.scheduler.ConstantLR'>
-
 Inputs:
 No specific inputs are required for this code snippet.
 

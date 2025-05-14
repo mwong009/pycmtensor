@@ -180,6 +180,9 @@ class Results(object):
         stats.loc["Best result at epoch"] = f"{self.best_epoch:d}"
         return stats
 
+    def beta_estimates(self):
+        return self.beta_statistics()
+
     def beta_statistics(self):
         """Beta statistics
 

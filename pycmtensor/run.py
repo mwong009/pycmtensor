@@ -81,45 +81,44 @@ def train(model, ds, optimizer, lr_scheduler, **kwargs):
     for key, value in kwargs.items():
         model.config.add(key, value)
 
-    batch_size = model.config.batch_size
-    if (batch_size == 0) or (batch_size == None):
-        model.config.batch_size = ds.n_train
-        batch_size = model.config.batch_size
+    model.batch_size = kwargs.get("batch_size", None)
+    model.patience = kwargs.get("patience", 2000)
+    model.patience_increase = kwargs.get("patience_increase", 2)
+    model.convergence_threshold = kwargs.get("convergence_threshold", 1e-4)
 
-    n_train = ds.n_train
-    n_valid = ds.n_valid
-    n_train_batches = n_train // batch_size
-    # model.config.BFGS_warmup = model.config.BFGS_warmup * n_train_batches
+    model.n_train = ds.n_train
+    model.n_valid = ds.n_valid
 
-    model.patience = model.config.patience
-    validation_freq = n_train_batches
-    max_epochs = model.config.max_epochs
-    model.config.max_iterations = max_epochs * n_train_batches
+    if (model.batch_size == 0) or (model.batch_size == None):
+        model.batch_size = model.n_train
 
-    done = False
-    epoch = 0
-    i = 0
-    shift = 0
+    model.n_train_batches = model.n_train // model.batch_size
+    model.validation_freq = model.n_train_batches
 
-    # optimizer = model.config.optimizer(model.params, config=model.config)
     model.optimizer = optimizer
     updates = model.optimizer.update(model.cost, model.params, model.learning_rate)
     model.build_cost_updates_fn(updates)
 
     model.lr_scheduler = lr_scheduler
+    model.max_epochs = model.lr_scheduler.max_epochs
+    model.max_iterations = model.max_epochs * model.n_train_batches
 
-    model.results.statistics_graph = {
-        "train_ll": [],
-        "train_error": [],
-        "valid_error": [],
-    }
+    model.stats = pd.DataFrame(
+        columns=[
+            "train_log_likelihood",
+            "train_error",
+            "valid_log_likelihood",
+            "valid_error",
+            "gnorm",
+            "learning_rate",
+        ]
+    )
 
     x_y = model.x + [model.y]
     train_data = ds.train_dataset(x_y)
     valid_data = ds.valid_dataset(x_y)
 
     t_index = np.arange(len(train_data[-1]))
-
     log_like = model.log_likelihood_fn(*train_data, t_index)
     null_loglikelihood = model.null_log_likelihood_fn(*train_data, t_index)
     train_error = model.prediction_error_fn(*train_data)
@@ -137,38 +136,52 @@ def train(model, ds, optimizer, lr_scheduler, **kwargs):
     model.results.gnorm_min = np.inf
     model.results.init_loglikelihood = log_like
     model.results.null_loglikelihood = null_loglikelihood
-    model.results.n_train = n_train
-    model.results.n_valid = n_valid
+
+    done = False
+    epoch = 0
+    i = 0
+
+    model.results.statistics_graph = {
+        "train_ll": [],
+        "train_error": [],
+        "valid_error": [],
+    }
+
+    model.results.n_train = model.n_train
+    model.results.n_valid = model.n_valid
     model.results.n_params = model.n_params
     model.results.config = model.config
     model.results.converged = [False, "0"]
 
     params_prev = initialize_results(model, train_data, t_index)
     batch_data = []
-    for batch in range(n_train_batches):
-        batch_data.append(ds.train_dataset(x_y, batch, batch_size, shift))
+    for b in range(model.n_train_batches):
+        batch_data.append(ds.train_dataset(x_y, b, model.batch_size, shift=0))
 
     info(
-        f"Start (n={n_train}, epoch={epoch}, NLL={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
+        f"Start (n={model.n_train}, nll={model.results.null_loglikelihood:.2f}, error={model.results.best_valid_error*100:.2f}%)"
     )
 
-    model.results.start_time = perf_counter()
-    while (epoch < model.config.max_epochs) and (not done):
+    model.start_time = perf_counter()
+    while (epoch < model.max_epochs) and (not done):
         learning_rate = model.lr_scheduler(epoch)  # get learning rate
 
-        for batch in range(n_train_batches):
-            index = np.arange(len(batch_data[batch][-1]))
-            model.cost_updates_fn(*batch_data[batch], learning_rate, index, IS_TRAINING)
+        for b in range(model.n_train_batches):
+            index = np.arange(len(batch_data[b][-1]))
+            model.cost_updates_fn(*batch_data[b], learning_rate, index, IS_TRAINING)
 
-            if i % validation_freq == 0:
+            if i % model.validation_freq == 0:
                 # train step
                 log_like, train_error, valid_error = train_step(
                     model, ds, train_data, t_index, valid_data
                 )
-                append_statistics(model, log_like, train_error, valid_error)
 
-                # convergence
+                # convergence check
                 gnorm, params_prev = gnorm_func(model, train_data, t_index, params_prev)
+
+                append_stats(
+                    model, log_like, train_error, valid_error, learning_rate, gnorm, i
+                )
 
                 # verbose logging
                 verbose_logging(
@@ -200,16 +213,16 @@ def train(model, ds, optimizer, lr_scheduler, **kwargs):
     model = post_training(model, epoch)
 
     # Save hessian data
-    model.save_hessian_data(n_train, train_data)
+    model.save_hessian_data(model.n_train, train_data)
 
 
 def post_training(model, epoch):
     now = perf_counter()
-    train_time = round(now - model.results.start_time, 3)
+    train_time = round(now - model.start_time, 3)
     model.results.train_time = time_format(train_time)
     model.results.epochs_per_sec = round(epoch / train_time, 2)
 
-    threshold = model.config.convergence_threshold
+    threshold = model.convergence_threshold
     if model.results.converged[1] == "gnorm < threshold":
         info(f"Model converged (t={train_time}), gnorm < {threshold}")
     else:
@@ -254,10 +267,19 @@ def train_step(model, ds, train_data, t_index, valid_data):
     return log_like, train_error, valid_error
 
 
-def append_statistics(model, log_like, train_error, valid_error):
+def append_stats(
+    model, log_like, train_error, valid_error, learning_rate, gnorm, iteration
+):
     model.results.statistics_graph["train_ll"].append(log_like)
     model.results.statistics_graph["valid_error"].append(valid_error)
     model.results.statistics_graph["train_error"].append(train_error)
+
+    model.stats.loc[iteration, "train_log_likelihood"] = log_like
+    model.stats.loc[iteration, "train_error"] = train_error
+    model.stats.loc[iteration, "valid_log_likelihood"] = log_like
+    model.stats.loc[iteration, "valid_error"] = valid_error
+    model.stats.loc[iteration, "gnorm"] = gnorm
+    model.stats.loc[iteration, "learning_rate"] = learning_rate
 
 
 def done_looping(model, epoch, i, log_like, error, gnorm, learning_rate):
@@ -298,11 +320,11 @@ def accept_condition(model, i, ll, error):
         accept = error < model.results.best_valid_error
 
     if accept:
-        max_patience = max(model.patience, i * model.config.patience_increase)
-        model.patience = int(min(max_patience, model.config.max_iterations))
+        max_patience = max(model.patience, i * model.patience_increase)
+        model.patience = int(min(max_patience, model.max_iterations))
 
         now = perf_counter()
-        accept_time = round(now - model.results.start_time, 3)
+        accept_time = round(now - model.start_time, 3)
         model.results.accept_time = time_format(accept_time)
 
     return accept
@@ -320,13 +342,13 @@ def verbose_logging(model, gnorm, epoch, i, ll, error, lr=None):
         if error < (model.results.best_valid_error - 0.001):
             info_print = True
 
-    if epoch == (model.config.max_epochs // 10):
+    if epoch == (model.max_epochs // 10):
         info_print = True
     if gnorm < (model.results.gnorm_min / 5.0):
         info_print = True
         model.results.gnorm_min = gnorm
 
-    time_passed = perf_counter() - model.results.start_time
+    time_passed = perf_counter() - model.start_time
     if (time_passed % 300) < model.config.TIME_COUNTER:
         info_print = True
     model.config.TIME_COUNTER = time_passed % 300
@@ -342,7 +364,7 @@ def verbose_logging(model, gnorm, epoch, i, ll, error, lr=None):
 
 
 def early_stopping(model, gnorm, i):
-    threshold = model.config.convergence_threshold
+    threshold = model.convergence_threshold
     if gnorm < threshold:
         return [True, "gnorm < threshold"]
     if i > model.patience:
