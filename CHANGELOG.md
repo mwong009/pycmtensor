@@ -1,3 +1,9 @@
+## v1.14.1 (2025-05-14)
+
+### Fix
+
+- comment unused config option
+
 ## v1.14.0 (2025-05-12)
 
 ### Feat
